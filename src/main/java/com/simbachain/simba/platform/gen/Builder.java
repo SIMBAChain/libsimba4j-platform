@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.simbachain.SimbaException;
+import com.simbachain.simba.Parameter;
 import com.simbachain.simba.platform.ContractInfo;
 import com.simbachain.simba.platform.ContractMetadata;
 import com.simbachain.simba.platform.ContractMethod;
@@ -54,6 +55,7 @@ public class Builder {
         try {
             Templates.registerTemplate("contract", "contract.tpl");
             Templates.registerTemplate("contract-instance", "contract-instance.tpl");
+            Templates.registerTemplate("method-doc", "method-doc.tpl");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -85,7 +87,7 @@ public class Builder {
             if (!"public".equals(viz)) {
                 continue;
             }
-            String methodName = getJavaMethodName(s);
+            String methodName = getJavaMethodName(s, meth.getParameterMap());
             boolean access = meth.getAccessor();
             
             List<ContractParameter> returns = meth.getReturns();
@@ -240,6 +242,14 @@ public class Builder {
         }
         return returnType;
     }
+
+    private String getJavaMethodName(String name, Map<String, Parameter> parameters) {
+        if(parameters.get("__" + name) != null) {
+            name = toCamelCase(name, true);
+            return "new" + name;
+        }
+        return toCamelCase(name, false);
+    }
     
     private String getJavaParamName(String name) {
         return toCamelCase(name, false);
@@ -266,6 +276,13 @@ public class Builder {
         if (!value.contains("_")) {
             if(capFirst) {
                 value = value.substring(0, 1).toUpperCase() + value.substring(1);
+            } else {
+                if(value.equals(value.toUpperCase())) {
+                    value = value.toLowerCase();
+                } else {
+                    value = value.substring(0, 1)
+                                 .toLowerCase() + value.substring(1);
+                }
             }
             return value;
         } else {
@@ -274,10 +291,6 @@ public class Builder {
             }
             return CaseUtils.toCamelCase(value, capFirst, '_'); 
         }
-    }
-
-    private String getJavaMethodName(String name) {
-        return toCamelCase(name, false);
     }
 
     public static class JavaObject {
@@ -413,6 +426,14 @@ public class Builder {
                 return "CallReturn<" + this.returns.get(0).type + ">";
             } else {
                 return "CallReturn<java.util.List>";
+            }
+        }
+
+        public String getReturnDoc() {
+            if (this.returns.size() == 0) {
+                return "CallResponse";
+            } else  {
+                return "CallReturn";
             }
         }
 

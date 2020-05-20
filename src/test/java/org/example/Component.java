@@ -26,24 +26,41 @@ public class Component extends ContractClient {
 
     /**
      * Execute the getUid Transaction.
+     *
+     * @return CallReturn containing the response.
+     * @throws SimbaException if an error occurs. 
      */
     public CallReturn<String> getUid() throws SimbaException {
         return this.simba.callGetter("getUid", this.instanceId, String.class);
     }
+
     /**
      * Execute the getDesign Transaction.
+     *
+     * @return CallReturn containing the response.
+     * @throws SimbaException if an error occurs. 
      */
     public CallReturn<String> getDesign() throws SimbaException {
         return this.simba.callGetter("getDesign", this.instanceId, String.class);
     }
+
     /**
      * Execute the getSerialNum Transaction.
+     *
+     * @return CallReturn containing the response.
+     * @throws SimbaException if an error occurs. 
      */
     public CallReturn<Integer> getSerialNum() throws SimbaException {
         return this.simba.callGetter("getSerialNum", this.instanceId, Integer.class);
     }
+
     /**
      * Execute the delivered Transaction.
+     *
+     * @param datetime Integer.
+     * @param location String.
+     * @return CallResponse containing the response.
+     * @throws SimbaException if an error occurs. 
      */
     public CallResponse delivered(Integer datetime, String location) throws SimbaException {
         JsonData data = JsonData.jsonData();
@@ -51,8 +68,14 @@ public class Component extends ContractClient {
         data = data.and("location", location); 
         return this.simba.callInstanceMethod("delivered", this.instanceId, data);
     }
+
     /**
      * Execute the manufactured Transaction.
+     *
+     * @param datetime Integer.
+     * @param location String.
+     * @return CallResponse containing the response.
+     * @throws SimbaException if an error occurs. 
      */
     public CallResponse manufactured(Integer datetime, String location) throws SimbaException {
         JsonData data = JsonData.jsonData();
@@ -60,11 +83,18 @@ public class Component extends ContractClient {
         data = data.and("location", location); 
         return this.simba.callInstanceMethod("manufactured", this.instanceId, data);
     }
+
     /**
      * Create a new instance of this contract. If a key in the json data
-     * is named 'assetId', this will be used as the asset Id of the contract.  
+     * is named 'assetId', this will be used as the asset Id of the contract.
+     * 
+     * @param assetId String.
+     * @param design String.
+     * @param serialNum Integer.
+     * @return DeployedContract containing address and assetId if specified. 
+     * @throws SimbaException if an error occurs. 
      */
-    public DeployedContract newInstance(String assetId, String design, Integer serialNum) throws SimbaException {
+    public DeployedContract newComponent(String assetId, String design, Integer serialNum) throws SimbaException {
         JsonData data = JsonData.jsonData();
         data = data.and("assetId", assetId); 
         data = data.and("design", design); 

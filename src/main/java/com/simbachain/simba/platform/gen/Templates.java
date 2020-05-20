@@ -36,6 +36,8 @@ import java.util.Properties;
 import com.simbachain.SimbaException;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.app.event.implement.IncludeRelativePath;
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResource;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
@@ -61,6 +63,7 @@ public class Templates {
         p.setProperty("resource.loader", "string");
         p.setProperty("string.resource.loader.class",
             "org.apache.velocity.runtime.resource.loader.StringResourceLoader");
+        p.setProperty(RuntimeConstants.EVENTHANDLER_INCLUDE, IncludeRelativePath.class.getName());
         engine = new VelocityEngine();
         engine.init(p);
         repository = StringResourceLoader.getRepository();

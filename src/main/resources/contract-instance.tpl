@@ -25,11 +25,9 @@ public class ${jc.className} extends ContractClient {
         super(simba);
         this.instanceId = instanceId;
     }
-
 #foreach( $method in ${jc.methods} )
-    /**
-     * Execute the ${method.name} Transaction.
-     */
+
+#parse("method-doc")
     public ${method.returnValue} ${method.javaName}(${method.parameterList}) throws SimbaException {
 #if( ${method.parameters.size()} == 1)
 #if( $method.parameters.get(0).structType )
@@ -67,21 +65,28 @@ public class ${jc.className} extends ContractClient {
 #end
 #end
 #if ( ${method.files} )
-        return this.simba.callInstanceMethod("${method.javaName}", this.instanceId, data, files);
+        return this.simba.callInstanceMethod("${method.name}", this.instanceId, data, files);
 #else
 #if( $method.accessor )
-        return this.simba.callGetter("${method.javaName}", this.instanceId, ${method.returnType});
+        return this.simba.callGetter("${method.name}", this.instanceId, ${method.returnType});
 #else
-        return this.simba.callInstanceMethod("${method.javaName}", this.instanceId, data);
+        return this.simba.callInstanceMethod("${method.name}", this.instanceId, data);
 #end
 #end
     }
 #end
+
     /**
      * Create a new instance of this contract. If a key in the json data
-     * is named 'assetId', this will be used as the asset Id of the contract.  
+     * is named 'assetId', this will be used as the asset Id of the contract.
+     * 
+#foreach( $param in ${jc.constructor.parameters} )
+     * @param ${param.javaName} ${param.type}.
+#end
+     * @return DeployedContract containing address and assetId if specified. 
+     * @throws SimbaException if an error occurs. 
      */
-    public DeployedContract newInstance(${jc.constructor.parameterList}) throws SimbaException {
+    public DeployedContract new${jc.className}(${jc.constructor.parameterList}) throws SimbaException {
 #if( ${jc.constructor.parameters.size()} == 1)
 #if( $jc.constructor.parameters.get(0).structType )
 #if( $jc.constructor.parameters.get(0).dimensions > 0 )
@@ -127,21 +132,33 @@ public class ${jc.className} extends ContractClient {
     }
 
 #foreach( $struct in ${jc.structs} )
+    /**
+     * The ${struct.javaName} class used as inputs to functions.
+     */
     public static class ${struct.javaName} implements Jsonable {
 #foreach( $comp in ${struct.components} )        
         private ${comp.type} ${comp.javaName};
 #end
-
-#foreach( $comp in ${struct.components} )        
+#foreach( $comp in ${struct.components} )
+  
+        /**
+         * Getter for ${comp.javaName}.
+         * @return ${comp.javaName}
+         */      
         public ${comp.type} get${comp.getterName}() {
             return ${comp.javaName};
         }
-        
+
+        /**
+         * Setter for ${comp.javaName}.
+         * @param ${comp.javaName} of type ${comp.type}.
+         */        
         public void set${comp.getterName}(${comp.type} ${comp.javaName}) {
             this.${comp.javaName} = ${comp.javaName};
         }
 #end
 
+        @Override
         public JsonData toJsonData() {
             JsonData data = JsonData.jsonData();
 #foreach( $comp in ${struct.components} )

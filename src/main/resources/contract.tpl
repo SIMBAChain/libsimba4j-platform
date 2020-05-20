@@ -17,11 +17,9 @@ public class ${jc.className} extends ContractClient {
     public ${jc.className}(SimbaPlatform simba) {
         super(simba);
     }
-
 #foreach( $method in ${jc.methods} )
-    /**
-     * Execute the ${method.name} Transaction.
-     */
+
+#parse("method-doc")
     public ${method.returnValue} ${method.javaName}(${method.parameterList}) throws SimbaException {
 #if( ${method.parameters.size()} == 1)
 #if( $method.parameters.get(0).structType )
@@ -56,29 +54,41 @@ public class ${jc.className} extends ContractClient {
 #end
 #end
 #if ( ${method.files} )
-        return this.simba.callMethod("${method.javaName}", data, files);
+        return this.simba.callMethod("${method.name}", data, files);
 #else
-        return this.simba.callMethod("${method.javaName}", data);
+        return this.simba.callMethod("${method.name}", data);
 #end
     }
 #end
 
 #foreach( $struct in ${jc.structs} )
+    /**
+     * The ${struct.javaName} class used as inputs to functions.
+     */
     public static class ${struct.javaName} implements Jsonable {
 #foreach( $comp in ${struct.components} )        
         private ${comp.type} ${comp.javaName};
 #end
+#foreach( $comp in ${struct.components} )
 
-#foreach( $comp in ${struct.components} )        
+        /**
+         * Getter for ${comp.javaName}.
+         * @return ${comp.javaName}
+         */         
         public ${comp.type} get${comp.getterName}() {
             return ${comp.javaName};
         }
-        
+
+        /**
+         * Setter for ${comp.javaName}
+         * @param ${comp.javaName} of type ${comp.type}.
+         */        
         public void set${comp.getterName}(${comp.type} ${comp.javaName}) {
             this.${comp.javaName} = ${comp.javaName};
         }
 #end
 
+        @Override
         public JsonData toJsonData() {
             JsonData data = JsonData.jsonData();
 #foreach( $comp in ${struct.components} )
