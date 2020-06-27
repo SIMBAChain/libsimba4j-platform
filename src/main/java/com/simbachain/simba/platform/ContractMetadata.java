@@ -22,7 +22,9 @@
 
 package com.simbachain.simba.platform;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -68,6 +70,9 @@ public class ContractMetadata {
 
     @JsonProperty
     private Map<String, Object> assets = new HashMap<>();
+
+    @JsonProperty
+    private List<String> inheritance = new ArrayList<>();
 
     public String getVersion() {
         return version;
@@ -167,6 +172,18 @@ public class ContractMetadata {
 
     public void setMeta(Map<String, Object> meta) {
         this.meta = meta;
+    }
+
+    public void setAbstract(boolean anAbstract) {
+        isAbstract = anAbstract;
+    }
+
+    public List<String> getInheritance() {
+        return inheritance;
+    }
+
+    public void setInheritance(List<String> inheritance) {
+        this.inheritance = inheritance;
     }
 
     @Override

@@ -123,7 +123,7 @@ public class ${jc.className} extends ContractClient {
 #end
 #end
         NewInstanceResponse response = this.simba.callNewInstance(data);
-        Future<DeployedContract> future = simba.waitForContractInstanceDeployment(response.getId());
+        Future<DeployedContract> future = simba.waitForContractInstanceDeployment(response.getInstanceId());
         try {
             return future.get();
         } catch (Exception e) {

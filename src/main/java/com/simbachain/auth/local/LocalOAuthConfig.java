@@ -31,28 +31,21 @@ import com.simbachain.auth.OAuthConfig;
 public class LocalOAuthConfig extends OAuthConfig {
 
     private final String user;
-    private final String password;
     private final String tokenUrl;
 
     public LocalOAuthConfig(String clientId,
         String clientSecret,
         String user,
-        String password,
         String tokenUrl) {
         super(clientId, clientSecret);
         this.user = user;
-        this.password = password;
         this.tokenUrl = tokenUrl;
     }
 
     public String getUser() {
         return user;
     }
-
-    public String getPassword() {
-        return password;
-    }
-
+    
     public String getTokenUrl() {
         return tokenUrl;
     }

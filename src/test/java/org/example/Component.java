@@ -100,7 +100,7 @@ public class Component extends ContractClient {
         data = data.and("design", design); 
         data = data.and("serialNum", serialNum); 
         NewInstanceResponse response = this.simba.callNewInstance(data);
-        Future<DeployedContract> future = simba.waitForContractInstanceDeployment(response.getId());
+        Future<DeployedContract> future = simba.waitForContractInstanceDeployment(response.getInstanceId());
         try {
             return future.get();
         } catch (Exception e) {

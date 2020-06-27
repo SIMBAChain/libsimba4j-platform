@@ -80,7 +80,7 @@ public class MyAsset extends ContractClient {
         data = data.and("balance", balance); 
         data = data.and("assetId", assetId); 
         NewInstanceResponse response = this.simba.callNewInstance(data);
-        Future<DeployedContract> future = simba.waitForContractInstanceDeployment(response.getId());
+        Future<DeployedContract> future = simba.waitForContractInstanceDeployment(response.getInstanceId());
         try {
             return future.get();
         } catch (Exception e) {

@@ -31,7 +31,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NewInstanceResponse {
     
-    private String id;
+    @JsonProperty("instance_id")
+    private String instanceId;
     
     @JsonProperty("transaction_hash")
     private String transactionHash;
@@ -39,16 +40,16 @@ public class NewInstanceResponse {
     @JsonProperty("transaction_id")
     private String transactionId;
 
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
     public String getTransactionHash() {
         return transactionHash;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public void setTransactionHash(String transactionHash) {
@@ -61,5 +62,21 @@ public class NewInstanceResponse {
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("NewInstanceResponse{");
+        sb.append("instanceId='")
+          .append(instanceId)
+          .append('\'');
+        sb.append(", transactionHash='")
+          .append(transactionHash)
+          .append('\'');
+        sb.append(", transactionId='")
+          .append(transactionId)
+          .append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -99,13 +99,8 @@ public class LocalTokenProvider implements AccessTokenProvider {
             }
             if (this.token == null) {
                 Map<String, Object> data = new HashMap<>();
-                data.put("grant_type", "password");
-                data.put("username", credentials.getUser());
-                data.put("password", credentials.getPassword());
-                data.put("client_id", credentials.getClientId());
-                data.put("client_secret", credentials.getClientSecret());
-                data.put("scope", "read_write");
-
+                data.put("grant_type", "client_credentials");
+                
                 Map<String, String> headers = new HashMap<>();
                 String userCredentials = credentials.getClientId()
                     + ":"

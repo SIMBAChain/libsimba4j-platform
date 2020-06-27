@@ -67,9 +67,9 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
 
     @Override
     protected Metadata loadMetadata() throws SimbaException {
-        JsonApi<ContractInfo> result = this.get(getApiPath(), jsonResponseHandler(new TypeReference<JsonApi<ContractInfo>>() {
+        ContractInfo result = this.get(getApiPath(), jsonResponseHandler(new TypeReference<ContractInfo>() {
         }));
-        return result.getData().getAttributes();
+        return result;
     }
     
     public ContractInfo getContractInfo() {
@@ -85,17 +85,15 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: SimbaPlatform.getTransaction: " + "txnId = [" + txnId + "]");
         }
-        JsonApi<PlatformTransaction> jsonTxn = this.get(
+        PlatformTransaction txn = this.get(
             String.format("%s%sorganisations/%s/transactions/%s", getEndpoint(), getvPath(), getConfig().getOrganisationId(), txnId),
-            jsonResponseHandler(new TypeReference<JsonApi<PlatformTransaction>>() {
+            jsonResponseHandler(new TypeReference<PlatformTransaction>() {
             }));
-        PlatformTransaction txn = jsonTxn.getData().getAttributes();
         String method = txn.getMethod();
         Method m = getMetadata().getMethod(method);
         if (m != null) {
             txn.setMethodParameters(m.getParameterMap());
         }
-        txn.setId(jsonTxn.getData().getId());
         return txn;
     }
 
@@ -111,9 +109,8 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
 
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/%s/%s/", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract(), idType, id.getValue(), method);
-        JsonApi<ReturnObject<R>> response = this.get(endpoint, jsonResponseHandler(new TypeReference<JsonApi<ReturnObject<R>>>() {
+        ReturnObject<R> data = this.get(endpoint, jsonResponseHandler(new TypeReference<ReturnObject<R>>() {
             }));
-        ReturnObject<R> data = response.getData().getAttributes();
         CallReturn<R> methodResponse = new CallReturn<>(data.getRequestId(), handleCast(data.getValue(), cls));
         methodResponse.setStatus(data.getState());
         methodResponse.setError(data.getError());
@@ -162,11 +159,8 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
 
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/%s/%s/", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract(), idType, id.getValue(), method);
-        parameters = JsonApiWrapper.methodCall(parameters);
-        JsonApi<PlatformTransaction> response = this.post(endpoint, parameters, jsonResponseHandler(new TypeReference<JsonApi<PlatformTransaction>>() {
+        PlatformTransaction txn = this.post(endpoint, parameters, jsonResponseHandler(new TypeReference<PlatformTransaction>() {
             }), files);
-        PlatformTransaction txn = response.getData()
-                                          .getAttributes();
         CallResponse methodResponse = new CallResponse(txn.getRequestId());
         methodResponse.setStatus(txn.getState()
                                     .toString());
@@ -189,12 +183,8 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
         validateConstructorParameters(parameters);
         String endpoint = String.format("%s%sapps/%s/new/%s/", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract());
-        parameters = JsonApiWrapper.newInstance(parameters);
-        JsonApi<NewInstanceResponse> response = this.post(endpoint, parameters, jsonResponseHandler(new TypeReference<JsonApi<NewInstanceResponse>>() {
+        NewInstanceResponse instanceResponse = this.post(endpoint, parameters, jsonResponseHandler(new TypeReference<NewInstanceResponse>() {
         }));
-        NewInstanceResponse instanceResponse = response.getData()
-                                          .getAttributes();
-        instanceResponse.setId(response.getData().getId());
         if (log.isDebugEnabled()) {
             log.debug("EXIT: SimbaPlatform.callNewInstance: returning " + instanceResponse);
         }
@@ -260,11 +250,9 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
         
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract(), method);
-        parameters = JsonApiWrapper.methodCall(parameters);
-        JsonApi<PlatformTransaction> response = this.post(endpoint, parameters, jsonResponseHandler(
-            new TypeReference<JsonApi<PlatformTransaction>>() {
+        PlatformTransaction txn = this.post(endpoint, parameters, jsonResponseHandler(
+            new TypeReference<PlatformTransaction>() {
             }), files);
-        PlatformTransaction txn = response.getData().getAttributes();
         CallResponse methodResponse = new CallResponse(txn.getRequestId());
         methodResponse.setStatus(txn.getState().toString());
         methodResponse.setError(txn.getError());
@@ -283,14 +271,12 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
                 + transactionIdOrHash
                 + "]");
         }
-        JsonApi<Manifest> apiManifest = this.get(
+        Manifest m = this.get(
             String.format("%s%sapps/%s/contract/%s/bundle/%s/manifest", getEndpoint(), getvPath(),
                 getConfig().getAppName(), getContract(), transactionIdOrHash), jsonResponseHandler(
-                new TypeReference<JsonApi<Manifest>>() {
+                new TypeReference<Manifest>() {
                 }));
-        Manifest m = apiManifest.getData()
-                       .getAttributes(); 
-        m.setHash(apiManifest.getData().getId());
+        m.setHash(transactionIdOrHash);
         if (log.isDebugEnabled()) {
             log.debug("EXIT: SimbaPlatform.getBundleMetadataForTransaction: returning " + m);
         }
@@ -353,24 +339,24 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public PagedResult<Transaction> getTransactions() throws SimbaException {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: SimbaChain.getTransactions: " + "");
         }
-        JsonApiPage<? extends Transaction> jsonPage = this.get(
+        PagedResult<? extends Transaction> result = this.get(
             String.format("%s%sorganisations/%s/transactions/", getEndpoint(), getvPath(),
                 getConfig().getOrganisationId()),
-            jsonResponseHandler(new TypeReference<JsonApiPage<PlatformTransaction>>() {
+            jsonResponseHandler(new TypeReference<PagedResult<PlatformTransaction>>() {
             }));
-        @SuppressWarnings ("unchecked")
-        PagedResult<Transaction> result = (PagedResult<Transaction>) jsonPage.toPagedResult();
         if (log.isDebugEnabled()) {
             log.debug("EXIT: SimbaPlatform.getTransactions: returning " + result);
         }
-        return result;
+        return (PagedResult<Transaction>) result;
     }
 
     @Override
+    @SuppressWarnings ("unchecked")
     public PagedResult<Transaction> getTransactions(String method, Query.Params params)
         throws SimbaException {
             if (log.isDebugEnabled()) {
@@ -384,42 +370,39 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
             validateQueryParameters(method, params);
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/%s", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract(), method, params.toJsonApiString());
-        JsonApiPage<? extends Transaction> jsonPage = this.get(endpoint,
-            jsonResponseHandler(new TypeReference<JsonApiPage<PlatformTransaction>>() {
+        PagedResult<? extends Transaction> result = this.get(endpoint,
+            jsonResponseHandler(new TypeReference<PagedResult<PlatformTransaction>>() {
             }));
-        @SuppressWarnings ("unchecked")
-        PagedResult<Transaction> result = (PagedResult<Transaction>) jsonPage.toPagedResult();
         if (log.isDebugEnabled()) {
             log.debug("EXIT: SimbaPlatform.getTransactions: returning " + result);
         }
-        return result;
+        return (PagedResult<Transaction>) result;
     }
 
     @Override
+    @SuppressWarnings ("unchecked")
     public PagedResult<Transaction> next(PagedResult<Transaction> results) throws SimbaException {
         if (results.getNext() == null) {
             return null;
         }
-        JsonApiPage<? extends Transaction> jsonPage = this.get(results.getNext(),
-            jsonResponseHandler(new TypeReference<JsonApiPage<PlatformTransaction>>() {
+        PagedResult<? extends Transaction> result = this.get(results.getNext(),
+            jsonResponseHandler(new TypeReference<PagedResult<PlatformTransaction>>() {
             }));
-        @SuppressWarnings ("unchecked")
-        PagedResult<Transaction> result = (PagedResult<Transaction>) jsonPage.toPagedResult();
-        return result;
+        return (PagedResult<Transaction>) result;
     }
 
     @Override
+    @SuppressWarnings ("unchecked")
     public PagedResult<Transaction> previous(PagedResult<Transaction> results)
         throws SimbaException {
         if (results.getPrevious() == null) {
             return null;
         }
-        JsonApiPage<? extends Transaction> jsonPage = this.get(results.getPrevious(),
-            jsonResponseHandler(new TypeReference<JsonApiPage<PlatformTransaction>>() {
+        PagedResult<? extends Transaction> result = this.get(results.getPrevious(),
+            jsonResponseHandler(new TypeReference<PagedResult<PlatformTransaction>>() {
             }));
-        @SuppressWarnings ("unchecked")
-        PagedResult<Transaction> result = (PagedResult<Transaction>) jsonPage.toPagedResult();
-        return result;
+        
+        return (PagedResult<Transaction>) result;
     }
 
     @Override
@@ -436,13 +419,11 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
         if(log.isDebugEnabled()) {
             log.debug("ENTER: SimbaPlatform.getDeployedContractInstance: " + "id = [" + id + "]");
         }
-        JsonApi<DeployedContract> jsonTxn = this.get(
+        DeployedContract txn = this.get(
             String.format("%s%sorganisations/%s/instances/%s", getEndpoint(), getvPath(),
                 getConfig().getOrganisationId(), id),
-            jsonResponseHandler(new TypeReference<JsonApi<DeployedContract>>() {
+            jsonResponseHandler(new TypeReference<DeployedContract>() {
             }));
-        DeployedContract txn = jsonTxn.getData().getAttributes();
-        txn.setId(jsonTxn.getData().getId());
         return txn;
     }
 
