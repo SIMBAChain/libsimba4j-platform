@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 SIMBA Chain Inc.
+ * Copyright (c) 2021 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,37 +23,64 @@
 package com.simbachain.auth.azure;
 
 import com.simbachain.auth.AccessTokenProvider;
-import com.simbachain.auth.OAuthConfig;
+import com.simbachain.auth.AuthConfig;
 
 /**
  * Azure config that uses OAuth.
  */
-public class AzConfig extends OAuthConfig {
-    
-    private String tennantId;
-    private String server = "https://login.microsoftonline.com/";
+public class AzConfig extends AuthConfig {
 
-    public AzConfig(String clientId, String clientSecret, String tennantId, String server) {
+    public enum Flow {
+        USER_PASSWORD, CLIENT_CREDENTIAL
+    }
+
+    private final String tenantId;
+    private final String appId;
+    private final Flow flow;
+    private String server = "https://login.microsoftonline.com";
+
+    public AzConfig(String clientId,
+        String clientSecret,
+        String tenantId,
+        String appId,
+        Flow flow,
+        String server) {
         super(clientId, clientSecret);
-        this.tennantId = tennantId;
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.flow = flow;
         this.server = server;
     }
 
-    public AzConfig(String clientId, String clientSecret, String tennantId) {
+    public AzConfig(String clientId,
+        String clientSecret,
+        String tenantId,
+        String appId,
+        Flow flow) {
         super(clientId, clientSecret);
-        this.tennantId = tennantId;
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.flow = flow;
     }
 
-    public String getTennantId() {
-        return tennantId;
+    public String getTenantId() {
+        return tenantId;
     }
 
     public String getServer() {
         return server;
     }
 
+    public String getAppId() {
+        return appId;
+    }
+
     @Override
     public AccessTokenProvider getTokenProvider() {
-        return new AzAccessTokenProvider(this);
+        if (flow == Flow.CLIENT_CREDENTIAL) {
+            return new AzCredentialAccessTokenProvider(this);
+        } else {
+            return new AzUserAccessTokenProvider(this);
+        }
     }
 }

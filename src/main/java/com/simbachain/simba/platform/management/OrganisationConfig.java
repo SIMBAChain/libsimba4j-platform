@@ -20,48 +20,30 @@
  * SOFTWARE.
  */
 
-package com.simbachain.auth;
+package com.simbachain.simba.platform.management;
 
+import com.simbachain.auth.AuthConfig;
+import com.simbachain.simba.SimbaConfig;
 
 /**
- * Represents an OAuth 2 access token.
+ *
  */
-public class AccessToken {
+public class OrganisationConfig implements SimbaConfig {
+    
+    private final String organisationId;
+    
+    private final AuthConfig authConfig;
 
-    private String token;
-    private String type;
-    private long expiry;
-
-    public AccessToken(String token, String type, long expiry) {
-        this.token = token;
-        this.type = type;
-        this.expiry = expiry;
+    public OrganisationConfig(String organisationId, AuthConfig authConfig) {
+        this.organisationId = organisationId;
+        this.authConfig = authConfig;
     }
 
-    public String getToken() {
-        return token;
+    public String getOrganisationId() {
+        return organisationId;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public long getExpiry() {
-        return expiry;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("AccessToken{");
-        sb.append("token='")
-          .append(token)
-          .append('\'');
-        sb.append(", type='")
-          .append(type)
-          .append('\'');
-        sb.append(", expiry=")
-          .append(expiry);
-        sb.append('}');
-        return sb.toString();
+    public AuthConfig getAuthConfig() {
+        return authConfig;
     }
 }

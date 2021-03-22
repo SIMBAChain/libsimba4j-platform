@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 SIMBA Chain Inc.
+ * Copyright (c) 2021 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,20 +34,20 @@ import com.simbachain.auth.AccessToken;
 import com.simbachain.auth.AccessTokenProvider;
 
 /**
- *  Implementation of AccessTokenProvider that talks to Azure.
+ * Implementation of AccessTokenProvider that talks to Azure.
  */
-public class AzAccessTokenProvider implements AccessTokenProvider {
+public class AzCredentialAccessTokenProvider implements AccessTokenProvider {
 
-    private AzConfig credentials;
+    private final AzConfig credentials;
     private AccessToken token = null;
     private long expires = 0L;
 
-    public AzAccessTokenProvider(AzConfig credentials) {
+    public AzCredentialAccessTokenProvider(AzConfig credentials) {
         this.credentials = credentials;
     }
 
     public AccessToken getToken() throws SimbaException {
-        
+
         String server = credentials.getServer();
         if (!server.endsWith("/")) {
             server += "/";
@@ -55,20 +55,24 @@ public class AzAccessTokenProvider implements AccessTokenProvider {
 
         try {
             long now = System.currentTimeMillis();
-            if(now >= this.expires) {
+            if (now >= this.expires) {
                 this.token = null;
             }
             if (this.token == null) {
                 ConfidentialClientApplication app = ConfidentialClientApplication.builder(
-                    credentials.getClientId(), ClientCredentialFactory.create(credentials.getClientSecret()))
-                                                                                 .authority(String.format(
-                                                                                     "%s%s", server,
-                                                                                     credentials.getTennantId()))
+                    credentials.getClientId(),
+                    ClientCredentialFactory.create(credentials.getClientSecret()))
+                                                                                 .authority(
+                                                                                     String.format(
+                                                                                         "%s%s",
+                                                                                         server,
+                                                                                         credentials.getTenantId()))
                                                                                  .build();
 
-                String scope = String.format("api://%s/.default", credentials.getClientId());
-                ClientCredentialParameters clientCredentialParam = ClientCredentialParameters.builder(Collections.singleton(scope))
-                                                                                             .build();
+                String scope = String.format("%s/.default", credentials.getAppId());
+                ClientCredentialParameters clientCredentialParam
+                    = ClientCredentialParameters.builder(Collections.singleton(scope))
+                                                .build();
                 CompletableFuture<IAuthenticationResult> future = app.acquireToken(
                     clientCredentialParam);
                 IAuthenticationResult result = future.get();
@@ -78,10 +82,11 @@ public class AzAccessTokenProvider implements AccessTokenProvider {
                 this.token = new AccessToken(result.accessToken(), "Bearer", expiry);
             }
             return this.token;
-            
+
         } catch (Exception e) {
-            throw new SimbaException(e.getMessage(), SimbaException.SimbaError.AUTHENTICATION_ERROR, e);
-        } 
+            throw new SimbaException(e.getMessage(), SimbaException.SimbaError.AUTHENTICATION_ERROR,
+                e);
+        }
     }
 
 }

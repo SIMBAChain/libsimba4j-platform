@@ -20,33 +20,29 @@
  * SOFTWARE.
  */
 
-package com.simbachain.simba.platform;
+package com.simbachain.simba.platform.management;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- *
+ *  Response to a deployment.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class NewInstanceResponse {
+public class DeploymentResponse {
     
-    @JsonProperty("instance_id")
-    private String instanceId;
-    
-    @JsonProperty("transaction_hash")
+    @JsonProperty ("transaction_hash")
     private String transactionHash;
-    
-    @JsonProperty("transaction_id")
+
+    @JsonProperty ("transaction_id")
     private String transactionId;
 
-    public String getInstanceId() {
-        return instanceId;
-    }
+    @JsonProperty ("deployment_id")
+    private String deploymentId;
+    
+    @JsonProperty ("instance_id")
+    private String instanceId;
 
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
-    }
+    @JsonProperty
+    private String state;
 
     public String getTransactionHash() {
         return transactionHash;
@@ -64,17 +60,47 @@ public class NewInstanceResponse {
         this.transactionId = transactionId;
     }
 
+    public String getDeploymentId() {
+        return deploymentId;
+    }
+
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("NewInstanceResponse{");
-        sb.append("instanceId='")
-          .append(instanceId)
-          .append('\'');
-        sb.append(", transactionHash='")
+        final StringBuilder sb = new StringBuilder("DeploymentResponse{");
+        sb.append("transactionHash='")
           .append(transactionHash)
           .append('\'');
         sb.append(", transactionId='")
           .append(transactionId)
+          .append('\'');
+        sb.append(", deploymentId='")
+          .append(deploymentId)
+          .append('\'');
+        sb.append(", instanceId='")
+          .append(instanceId)
+          .append('\'');
+        sb.append(", state='")
+          .append(state)
           .append('\'');
         sb.append('}');
         return sb.toString();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 SIMBA Chain Inc.
+ * Copyright (c) 2021 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,6 +55,9 @@ public class ContractMetadata {
 
     @JsonProperty
     private Map<String, ContractType> types = new HashMap<>();
+
+    @JsonProperty
+    private Map<String, ContractType> enums = new HashMap<>();
 
     @JsonProperty
     private Map<String, Object> source = new HashMap<>();
@@ -132,6 +135,14 @@ public class ContractMetadata {
 
     public void setTypes(Map<String, ContractType> types) {
         this.types = types;
+    }
+
+    public Map<String, ContractType> getEnums() {
+        return enums;
+    }
+
+    public void setEnums(Map<String, ContractType> enums) {
+        this.enums = enums;
     }
 
     public Map<String, Object> getSource() {

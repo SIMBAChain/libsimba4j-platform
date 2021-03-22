@@ -22,46 +22,28 @@
 
 package com.simbachain.auth;
 
+import com.simbachain.simba.SimbaConfig;
 
 /**
- * Represents an OAuth 2 access token.
+ *  OAuth focussed simba config.
  */
-public class AccessToken {
+public abstract class AuthConfig implements SimbaConfig {
 
-    private String token;
-    private String type;
-    private long expiry;
+    private final String clientId;
+    private final String clientSecret;
 
-    public AccessToken(String token, String type, long expiry) {
-        this.token = token;
-        this.type = type;
-        this.expiry = expiry;
+    public AuthConfig(String clientId, String clientSecret) {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
     }
 
-    public String getToken() {
-        return token;
+    public String getClientId() {
+        return clientId;
     }
 
-    public String getType() {
-        return type;
+    public String getClientSecret() {
+        return clientSecret;
     }
-
-    public long getExpiry() {
-        return expiry;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("AccessToken{");
-        sb.append("token='")
-          .append(token)
-          .append('\'');
-        sb.append(", type='")
-          .append(type)
-          .append('\'');
-        sb.append(", expiry=")
-          .append(expiry);
-        sb.append('}');
-        return sb.toString();
-    }
+    
+    public abstract AccessTokenProvider getTokenProvider();
 }

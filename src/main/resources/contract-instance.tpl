@@ -5,8 +5,8 @@ import java.util.concurrent.Future;
 import com.simbachain.simba.JsonData;
 import com.simbachain.simba.CallResponse;
 import com.simbachain.SimbaException;
-import com.simbachain.simba.platform.DeployedContract;
-import com.simbachain.simba.platform.SimbaPlatform;
+import com.simbachain.simba.platform.DeployedContractInstance;
+import com.simbachain.simba.platform.ContractService;
 import com.simbachain.simba.platform.ContractClient;
 import com.simbachain.simba.platform.InstanceId;
 import com.simbachain.simba.platform.NewInstanceResponse;
@@ -64,15 +64,25 @@ public class ${jc.className} extends ContractClient {
 #end
 #end
 #end
-#if ( ${method.files} )
-        return this.simba.callInstanceMethod("${method.name}", this.instanceId, data, files);
-#else
 #if( $method.accessor )
         return this.simba.callGetter("${method.name}", this.instanceId, ${method.returnType});
+#else   
+#if ( ${method.files} )
+        return this.simba.callInstanceMethod("${method.name}", this.instanceId, data, files);
 #else
         return this.simba.callInstanceMethod("${method.name}", this.instanceId, data);
 #end
 #end
+    }
+    
+    /**
+     * Get transactions for the ${method.name} transaction.
+     *
+     * @param params Query.Params.
+     * @return PagedResult of Transaction objects.
+     */
+    public PagedResult<Transaction> get${method.getterName}Transactions(Query.Params params) throws SimbaException {
+        return this.getTransactions("${method.name}", params);
     }
 #end
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 SIMBA Chain Inc.
+ * Copyright (c) 2021 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,8 @@
 
 package com.simbachain.simba.platform;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -47,11 +49,12 @@ import com.simbachain.simba.PagedResult;
 import com.simbachain.simba.Query;
 import com.simbachain.simba.Simba;
 import com.simbachain.simba.Transaction;
+import com.simbachain.simba.platform.gen.Builder;
 
 /**
- * Platform Implementation of SIMBA API
+ * Platform Implementation of SIMBA API as a Contract service
  */
-public class SimbaPlatform extends Simba<PlatformConfig> {
+public class ContractService extends Simba<AppConfig> {
 
     /**                     
      * Constructor overrriden by subclasses.
@@ -60,7 +63,7 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
      * @param contract the name of the contract or the appname, e.g. mycontract
      * @param config   used by subclasses.
      */
-    public SimbaPlatform(String endpoint, String contract, PlatformConfig config) {
+    public ContractService(String endpoint, String contract, AppConfig config) {
         super(endpoint, contract, config);
         this.setvPath("v2/");
     }
@@ -95,6 +98,25 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
             txn.setMethodParameters(m.getParameterMap());
         }
         return txn;
+    }
+
+    public <R> CallReturn<R> callGetter(String method, Class<R> cls)
+        throws SimbaException {
+        if (log.isDebugEnabled()) {
+            log.debug("ENTER: SimbaPlatform.callMethod: " + "method = [" + method + "]");
+        }
+
+        String endpoint = String.format("%s%sapps/%s/contract/%s/%s/", getEndpoint(), getvPath(),
+            getConfig().getAppName(), getContract(), method);
+        ReturnObject<R> data = this.get(endpoint, jsonResponseHandler(new TypeReference<ReturnObject<R>>() {
+        }));
+        CallReturn<R> methodResponse = new CallReturn<>(data.getRequestId(), handleCast(data.getValue(), cls));
+        methodResponse.setStatus(data.getState());
+        methodResponse.setError(data.getError());
+        if (log.isDebugEnabled()) {
+            log.debug("EXIT: SimbaPlatform.callMethod: returning " + methodResponse);
+        }
+        return methodResponse;
     }
 
     public <R> CallReturn<R> callGetter(String method, InstanceId id, Class<R> cls)
@@ -154,7 +176,7 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
                     + "]");
             }
         }
-        validateParameters(method, parameters, false);
+        validateParameters(getMetadata(), method, parameters, false);
         String idType = id.getType() == InstanceId.Type.ADDRESS ? "address" : "asset";
 
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/%s/%s/", getEndpoint(), getvPath(),
@@ -246,7 +268,7 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
                 + f
                 + "]");
         }
-        validateParameters(method, parameters, files.length > 0);
+        validateParameters(getMetadata(), method, parameters, files.length > 0);
         
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract(), method);
@@ -367,7 +389,7 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
                     + params
                     + "]");
             }
-            validateQueryParameters(method, params);
+            validateQueryParameters(getMetadata(), method, params);
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/%s", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract(), method, params.toJsonApiString());
         PagedResult<? extends Transaction> result = this.get(endpoint,
@@ -415,14 +437,14 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
         return null;
     }
     
-    public DeployedContract getDeployedContractInstance(String id) throws SimbaException {
+    public DeployedContractInstance getDeployedContractInstance(String id) throws SimbaException {
         if(log.isDebugEnabled()) {
             log.debug("ENTER: SimbaPlatform.getDeployedContractInstance: " + "id = [" + id + "]");
         }
-        DeployedContract txn = this.get(
+        DeployedContractInstance txn = this.get(
             String.format("%s%sorganisations/%s/instances/%s", getEndpoint(), getvPath(),
                 getConfig().getOrganisationId(), id),
-            jsonResponseHandler(new TypeReference<DeployedContract>() {
+            jsonResponseHandler(new TypeReference<DeployedContractInstance>() {
             }));
         return txn;
     }
@@ -430,13 +452,13 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
     @Override
     protected Map<String, String> getApiHeaders() throws SimbaException {
         Map<String, String> apiHeaders = new HashMap<>();
-        AccessToken token = getConfig().getoAuthConfig().getTokenProvider()
+        AccessToken token = getConfig().getAuthConfig().getTokenProvider()
                                        .getToken();
         apiHeaders.put("Authorization", token.getType() + " " + token.getToken());
         return apiHeaders;
     }
 
-    private class DeployedContractCallable implements Callable<DeployedContract> {
+    private class DeployedContractCallable implements Callable<DeployedContractInstance> {
 
         private String id;
         private long poll;
@@ -451,8 +473,8 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
         }
 
         @Override
-        public DeployedContract call() throws Exception {
-            DeployedContract txn = null;
+        public DeployedContractInstance call() throws Exception {
+            DeployedContractInstance txn = null;
             long now = System.currentTimeMillis();
             long end = now + (totalSeconds * 1000);
             while (now < end) {
@@ -467,19 +489,35 @@ public class SimbaPlatform extends Simba<PlatformConfig> {
         }
     }
 
-    public Future<DeployedContract> waitForContractInstanceDeployment(String id,
+    public Future<DeployedContractInstance> waitForContractInstanceDeployment(String id,
         long interval,
         int totalSeconds) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<DeployedContract> txn = executor.submit(
+        Future<DeployedContractInstance> txn = executor.submit(
             new DeployedContractCallable(id, interval, totalSeconds));
         executor.shutdown();
         return txn;
 
     }
 
-    public Future<DeployedContract> waitForContractInstanceDeployment(String id) {
+    public Future<DeployedContractInstance> waitForContractInstanceDeployment(String id) {
         return waitForContractInstanceDeployment(id, 1000, 30);
 
+    }
+
+    public String generateContractPackage(String packageName, String outputDirectory)
+        throws IOException {
+        File f = new File(outputDirectory);
+        if(!f.exists()) {
+            boolean created = f.mkdirs();
+            if (!created) {
+                throw new IOException("Could not create output directory: " + outputDirectory);
+            }
+            if(!f.canWrite()) {
+                throw new IOException("Cannot write to output directory: " + outputDirectory);
+            }
+        }
+        Builder builder = new Builder(packageName, outputDirectory, this.getContractInfo());
+        return builder.build();
     }
 }

@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2021 SIMBA Chain Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.example;
 
 import java.math.BigInteger;
@@ -8,10 +30,10 @@ import com.simbachain.simba.CallResponse;
 import com.simbachain.simba.JsonData;
 import com.simbachain.simba.platform.CallReturn;
 import com.simbachain.simba.platform.ContractClient;
-import com.simbachain.simba.platform.DeployedContract;
+import com.simbachain.simba.platform.ContractService;
+import com.simbachain.simba.platform.DeployedContractInstance;
 import com.simbachain.simba.platform.InstanceId;
 import com.simbachain.simba.platform.NewInstanceResponse;
-import com.simbachain.simba.platform.SimbaPlatform;
 
 /**
  * Class that represents an instance of the stateful MyAsset contract.
@@ -20,7 +42,7 @@ public class MyAsset extends ContractClient {
 
     private final InstanceId instanceId;
 
-    public MyAsset(SimbaPlatform simba, InstanceId instanceId) {
+    public MyAsset(ContractService simba, InstanceId instanceId) {
         super(simba);
         this.instanceId = instanceId;
     }
@@ -75,12 +97,12 @@ public class MyAsset extends ContractClient {
      * @return DeployedContract containing address and assetId if specified. 
      * @throws SimbaException if an error occurs. 
      */
-    public DeployedContract newMyAsset(BigInteger balance, String assetId) throws SimbaException {
+    public DeployedContractInstance newMyAsset(BigInteger balance, String assetId) throws SimbaException {
         JsonData data = JsonData.jsonData();
         data = data.and("balance", balance); 
         data = data.and("assetId", assetId); 
         NewInstanceResponse response = this.simba.callNewInstance(data);
-        Future<DeployedContract> future = simba.waitForContractInstanceDeployment(response.getInstanceId());
+        Future<DeployedContractInstance> future = simba.waitForContractInstanceDeployment(response.getInstanceId());
         try {
             return future.get();
         } catch (Exception e) {

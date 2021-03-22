@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 SIMBA Chain Inc.
+ * Copyright (c) 2021 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,36 +20,50 @@
  * SOFTWARE.
  */
 
-package com.simbachain.simba.platform;
+package com.simbachain.simba.platform.management;
 
-import com.simbachain.auth.OAuthConfig;
-import com.simbachain.simba.SimbaConfig;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 /**
- *
+ * 
  */
-public class PlatformConfig implements SimbaConfig {
+@JsonIgnoreProperties (ignoreUnknown = true)
+public class ContractArtifact extends ContractDesign {
     
-    private String appName;
-    private String organisationId;
-    
-    private OAuthConfig oAuthConfig;
+    @JsonProperty ("linked_contracts")
+    private List<String> linkedContracts;
 
-    public PlatformConfig(String appName, String organisationId, OAuthConfig oAuthConfig) {
-        this.appName = appName;
-        this.organisationId = organisationId;
-        this.oAuthConfig = oAuthConfig;
+    @JsonProperty
+    private List<String> methods;
+
+    @JsonProperty
+    private String design;
+
+    public List<String> getLinkedContracts() {
+        return linkedContracts;
     }
 
-    public String getAppName() {
-        return appName;
+    public void setLinkedContracts(List<String> linkedContracts) {
+        this.linkedContracts = linkedContracts;
     }
 
-    public String getOrganisationId() {
-        return organisationId;
+    public List<String> getMethods() {
+        return methods;
     }
 
-    public OAuthConfig getoAuthConfig() {
-        return oAuthConfig;
+    public void setMethods(List<String> methods) {
+        this.methods = methods;
+    }
+
+    public String getDesign() {
+        return design;
+    }
+
+    public void setDesign(String design) {
+        this.design = design;
     }
 }

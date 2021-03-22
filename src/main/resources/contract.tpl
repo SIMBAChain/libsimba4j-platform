@@ -3,8 +3,11 @@ package ${jc.packageName};
 import com.simbachain.simba.JsonData;
 import com.simbachain.simba.CallResponse;
 import com.simbachain.SimbaException;
-import com.simbachain.simba.platform.SimbaPlatform;
+import com.simbachain.simba.platform.ContractService;
 import com.simbachain.simba.platform.ContractClient;
+import com.simbachain.simba.PagedResult;
+import com.simbachain.simba.Query;
+import com.simbachain.simba.Transaction;
 #foreach( $import in ${jc.imports} )
 import ${import};
 #end
@@ -53,11 +56,25 @@ public class ${jc.className} extends ContractClient {
 #end
 #end
 #end
+#if( $method.accessor )
+        return this.simba.callGetter("${method.name}", ${method.returnType});
+#else
 #if ( ${method.files} )
         return this.simba.callMethod("${method.name}", data, files);
 #else
         return this.simba.callMethod("${method.name}", data);
 #end
+#end
+    }
+    
+    /**
+     * Get transactions for the ${method.name} transaction.
+     *
+     * @param params Query.Params.
+     * @return PagedResult of Transaction objects.
+     */
+    public PagedResult<Transaction> get${method.getterName}Transactions(Query.Params params) throws SimbaException {
+        return this.getTransactions("${method.name}", params);
     }
 #end
 

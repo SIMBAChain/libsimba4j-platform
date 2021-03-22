@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 SIMBA Chain Inc.
+ * Copyright (c) 2021 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,9 +36,9 @@ import com.simbachain.simba.Transaction;
  */
 public class ContractClient {
     
-    protected final SimbaPlatform simba;
+    protected final ContractService simba;
 
-    public ContractClient(SimbaPlatform simba) {
+    public ContractClient(ContractService simba) {
         this.simba = simba;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 SIMBA Chain Inc.
+ * Copyright (c) 2021 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,8 +47,8 @@ public class Builder {
     
     public static final String BUNDLE_HASH = "_bundleHash";
     
-    private JavaClass javaClass;
-    private String destination;
+    private final JavaClass javaClass;
+    private final String destination;
     private ContractMetadata metadata = null;
 
     public Builder(String packageName, String destination, ContractInfo info) {
@@ -108,7 +108,7 @@ public class Builder {
                 isInstance = true;
             }
             if(javaMethod.isFiles()) {
-                javaClass.addImport("com.simbachain.simba.Simba.UploadFile");
+                javaClass.addImport("com.simbachain.simba.SimbaClient.UploadFile");
             }
             javaClass.addMethod(javaMethod);
         }

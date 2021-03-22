@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 SIMBA Chain Inc.
+ * Copyright (c) 2021 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,30 +20,25 @@
  * SOFTWARE.
  */
 
-package com.simbachain.auth;
+package com.simbachain.simba.platform;
 
-import com.simbachain.simba.SimbaConfig;
+import com.simbachain.auth.AuthConfig;
+import com.simbachain.simba.platform.management.OrganisationConfig;
 
 /**
- *  OAuth focussed simba config.
+ *
  */
-public abstract class OAuthConfig implements SimbaConfig {
-
-    private String clientId;
-    private String clientSecret;
-
-    public OAuthConfig(String clientId, String clientSecret) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public String getClientSecret() {
-        return clientSecret;
-    }
+public class AppConfig extends OrganisationConfig {
     
-    public abstract AccessTokenProvider getTokenProvider();
+    private final String appName;
+
+    public AppConfig(String appName, String organisationId, AuthConfig authConfig) {
+        super(organisationId, authConfig);
+        this.appName = appName;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
 }

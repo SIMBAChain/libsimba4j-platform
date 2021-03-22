@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 SIMBA Chain Inc.
+ * Copyright (c) 2021 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class LocalTokenProvider implements AccessTokenProvider {
     
-    private LocalOAuthConfig credentials;
+    private final LocalOAuthConfig credentials;
     private AccessToken token = null;
     private long expires = 0L;
     protected static ObjectMapper mapper = new ObjectMapper();
@@ -113,7 +113,7 @@ public class LocalTokenProvider implements AccessTokenProvider {
                 Map<String, String> result = this.post(client, credentials.getTokenUrl(), data,
                     headers);
                 
-                long expires = now + (Integer.parseInt(result.get("expires_in")) * 1000);
+                long expires = now + (Long.parseLong(result.get("expires_in")) * 1000);
                 this.expires = expires - 5000;
                 this.token = new AccessToken(result.get("access_token"), result.get("token_type"),
                     expires);
