@@ -33,7 +33,7 @@
     <licenses>
         <license>
             <name>MIT</name>
-            <url>https://simbachain.github.io/libsimba4j/LICENSE.md</url>
+            <url>https://simbachain.github.io/libsimba4j-platform/LICENSE.md</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
