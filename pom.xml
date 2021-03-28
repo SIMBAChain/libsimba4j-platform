@@ -26,8 +26,8 @@
 	<groupId>com.simbachain</groupId>
 	<artifactId>libsimba4j-platform</artifactId>
 	<version>0.1.11-SNAPSHOT</version>
-    <name>LibSimba4J Platform</name>
-    <description>Java Client for SIMBA Chain</description>
+    <name>LibSimba4J Enterprise Platform</name>
+    <description>Java Client for SIMBA Chain Enterprise Platform</description>
     <url>https://simbachain.github.io/libsimba4j/</url>
 
     <licenses>

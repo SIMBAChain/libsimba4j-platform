@@ -52,7 +52,7 @@ import com.simbachain.simba.Transaction;
 import com.simbachain.simba.platform.gen.Builder;
 
 /**
- * Platform Implementation of SIMBA API as a Contract service
+ * Enterprise Platform Implementation of SIMBA API as a Contract service
  */
 public class ContractService extends Simba<AppConfig> implements FieldFiltered {
 

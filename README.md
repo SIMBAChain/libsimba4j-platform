@@ -9,8 +9,6 @@
 </p>
 
 > libsimba4j-platform is a library simplifying the use of SIMBAChain Enterprise Platform APIs.
-> We aim to abstract away the various blockchain concepts, reducing the necessary time needed to
-> get to working code.
 
 ### [🏠 Homepage](https://github.com/simbachain/libsimba4j-platform#readme)
 
