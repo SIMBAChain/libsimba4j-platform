@@ -1,16 +1,14 @@
-#  LibSimba4J Platform Documentation
+# LibSimba4J Platform Documentation
 
 This page provides usage exeamples of the Java SIMBA Chain Enterprise Platform client.
 
 JavaDocs are available <a href="./api-doc/index.html" target="_blank">here</a>
 
-
 ## Getting Started
-
 
 To use LibSimba4J Platform include it as a dependency. For Maven builds add the following dependency
 to your pom file:
- 
+
 ```
 <dependency>
     <groupId>com.simbachain</groupId>
@@ -31,8 +29,8 @@ dependencies {
 }
 ```
 
-To build from source, LibSimba4J builds with maven. You will need to have maven 3.* installed. Once you have maven,
-cd into the top level directory and type:
+To build from source, LibSimba4J builds with maven. You will need to have maven 3.* installed. Once
+you have maven, cd into the top level directory and type:
 
 ```shell
 mvn install
@@ -45,7 +43,8 @@ The first thing to do is configure authentication. SIMBA Enterprise Platform (SE
 The Interfaces in the `com.simbachain.auth` package provide a means to hook in your own auth.
 
 The `AuthConfig` abstract class is the way into providing an `AccessTokenProvider` which in turn
-creates `AccessToken` objects. `AccessToken` objects have a token and an expiry. `AccessTokenProvider`
+creates `AccessToken` objects. `AccessToken` objects have a token and an
+expiry. `AccessTokenProvider`
 objects should be able to renew tokens transparently.
 
 ```java
@@ -95,12 +94,12 @@ The project contains Azure OAuth implementations of these classes. In this case,
 pieces of information:
 
 * Tenant ID - This can retrieved from the `/authinfo` endpoint of the platform.
-* Client ID - this can be a registered application id for client credential flow, or a password
-    for user password flow.
+* Client ID - this can be a registered application id for client credential flow, or a password for
+  user password flow.
 * Client Secret - this is either a registered application secret or password.
 * Application ID - this is used for the scope of request. It can retrieved from the `/authinfo`
-    endpoint of the platform.
-  
+  endpoint of the platform.
+
 Given these fields, you can create an `AzConfig` instance. When you create the config, you define
 the flow to use - eithe client credential or user/password flow.
 
@@ -115,8 +114,14 @@ AzConfig config=new AzConfig(clientId, clientSecret, tenantId, appId,
 ```
 
 Once you have an auth config established, you can create services. Let's start with the
-`OrganisationService`. This provides management tasks to list resources, and deploy code and contracts.
-The following example shows how this is done
+`OrganisationService`. This provides management tasks to list resources, and deploy code and
+contracts. The following example shows how this is done.
+
+First create an `OrganisationConfig` instance. This takes your auth config and the name of an
+organisation you are a member of.
+
+Then create an `OrganisationService` passing in the org config and the root endpoint of the SEP
+service.
 
 ```java
 AzConfig config=new AzConfig(clientId,clientSecret,tenantId,appId,
@@ -135,21 +140,21 @@ for (Application result : results) {
 }
 
 PagedResult<ContractDesign> cds=orgService.getContractDesigns();
-List<?extends ContractDesign> cdsResults=cds.getResults();
+List<? extends ContractDesign> cdsResults = cds.getResults();
 for(ContractDesign result:cdsResults){
-System.out.println(result.getName());
+    System.out.println(result.getName());
 }
 
-PagedResult<ContractArtifact> cas=orgService.getContractArtifacts();
-List<?extends ContractArtifact> casResults=cas.getResults();
+PagedResult<ContractArtifact> cas = orgService.getContractArtifacts();
+List<? extends ContractArtifact> casResults = cas.getResults();
 for(ContractArtifact result:casResults){
-System.out.println(result.getName());
+    System.out.println(result.getName());
 }
 
-PagedResult<DeployedContract> dcs=orgService.getDeployedContracts();
-List<?extends DeployedContract> dcsResults=dcs.getResults();
+PagedResult<DeployedContract> dcs = orgService.getDeployedContracts();
+List<? extends DeployedContract> dcsResults = dcs.getResults();
 for(DeployedContract result:dcsResults){
-System.out.println(result.getApiName());
+    System.out.println(result.getApiName());
 }
 
 ```
@@ -164,7 +169,31 @@ ContractDesign design = orgService.compileContract(in, apiName, "sasa");
 System.out.println(design);
 ```
 
-Create a snapshot of the code as an artifact and deploy it:
+Create a snapshot of the code as an artifact and deploy it.
+
+A `DeploymentSpec` is used to spell out the configuration of the deployment including:
+
+* Contract API name. This is the path the contract will bedloyed to in the REST API.
+* The name of the blockchain to deploy to.
+* The name of the storage backend for off-chain storage.
+* The name of the application to deploy the contract into.
+
+Available blockchains and storage backends can be queried:
+
+```java
+PagedResult<Blockchain> bcs = orgService.getBlockchains();
+List<? extends Blockchain> bcsResults = bcs.getResults();
+for (Blockchain result : bcsResults) {
+    System.out.println(result.getName());
+}
+
+PagedResult<Storage> sts = orgService.getStorages();
+List<? extends Storage> stsResults = sts.getResults();
+for (Storage result : stsResults) {
+    System.out.println(result.getName());
+}
+```
+
 
 ```java
 ContractArtifact artifact = orgService.createArtifact(design.getId());
@@ -176,12 +205,15 @@ spec.setStorage("azure");
 spec.setAppName("neo-supplychain");
 
 
-Future<DeployedContract> future=orgService.deployContract(artifact.getId(),spec);
-DeployedContract contract=future.get();
+Future<DeployedContract> future = orgService.deployContract(artifact.getId(),spec);
+DeployedContract contract = future.get();
 System.out.println(contract);
 ```
 
 Once you have a deployed contract, you can create a `ContractService` to interact directly with it.
+
+The `ContractService` creation method of `OrganisationService` takes an `Application` name, and the
+API name you gave to the `DeploedContract`.
 
 ```java
 ContractService contractService = orgService.newContractService("neo-supplychain", apiName);
@@ -239,8 +271,8 @@ while (results.getNext() != null) {
 }
 ```
 
-Using the `ContractService` you can also ask it to generate source code for you to simplify
-contract interactions:
+Using the `ContractService` you can also ask it to generate source code for you to simplify contract
+interactions:
 
 ```java
 String path = contractService.generateContractPackage("com.supplychain", "./");
@@ -580,9 +612,3 @@ public class SupplyChain extends ContractClient {
 }
 
 ```
-
-
-
- 
- 
-

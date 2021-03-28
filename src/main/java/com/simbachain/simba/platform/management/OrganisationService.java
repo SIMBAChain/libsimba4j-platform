@@ -97,6 +97,22 @@ public class OrganisationService extends SimbaClient {
             }));
     }
 
+    public PagedResult<Blockchain> getBlockchains() throws SimbaException {
+        return this.get(
+            String.format("%s%sorganisations/%s/blockchains/", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId()),
+            jsonResponseHandler(new TypeReference<PagedResult<Blockchain>>() {
+            }));
+    }
+
+    public PagedResult<Storage> getStorages() throws SimbaException {
+        return this.get(
+            String.format("%s%sorganisations/%s/storage/", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId()),
+            jsonResponseHandler(new TypeReference<PagedResult<Storage>>() {
+            }));
+    }
+
     public Application getApplication(String applicationId) throws SimbaException {
         return this.get(
             String.format("%s%sorganisations/%s/applications/%s/", getEndpoint(), getvPath(),
