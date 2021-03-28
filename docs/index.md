@@ -1,6 +1,6 @@
-# LibSimba4J Platform Documentation
+# LibSimba4J Enterprise Platform Documentation
 
-This page provides usage exeamples of the Java SIMBA Chain Enterprise Platform client.
+This page provides usage examples of the Java SIMBA Chain Enterprise Platform client.
 
 JavaDocs are available <a href="./api-doc/index.html" target="_blank">here</a>
 
