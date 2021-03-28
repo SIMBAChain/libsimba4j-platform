@@ -54,7 +54,7 @@ import com.simbachain.simba.platform.gen.Builder;
 /**
  * Platform Implementation of SIMBA API as a Contract service
  */
-public class ContractService extends Simba<AppConfig> {
+public class ContractService extends Simba<AppConfig> implements FieldFiltered {
 
     /**                     
      * Constructor overrriden by subclasses.
@@ -389,6 +389,8 @@ public class ContractService extends Simba<AppConfig> {
                     + params
                     + "]");
             }
+            Method m = getMetadata().getMethod(method);
+            System.out.println("ContractService.getTransactions params: " + m.getParameterMap());
             validateQueryParameters(getMetadata(), method, params);
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/%s", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract(), method, params.toJsonApiString());
@@ -428,6 +430,32 @@ public class ContractService extends Simba<AppConfig> {
     }
 
     @Override
+    @SuppressWarnings ("unchecked")
+    public PagedResult<Transaction> getTransactions(String method,
+        Query.Params params,
+        List<String> fields) throws SimbaException {
+        if (log.isDebugEnabled()) {
+            log.debug("ENTER: SimbaPlatform.getTransactions: "
+                + "method = ["
+                + method
+                + "], params = ["
+                + params
+                + "], fields = [" 
+                + fields + "]");
+        }
+        validateQueryParameters(getMetadata(), method, params);
+        String endpoint = String.format("%s%sapps/%s/contract/%s/%s/%s", getEndpoint(), getvPath(),
+            getConfig().getAppName(), getContract(), method, createQueryString(params, fields));
+        PagedResult<? extends Transaction> result = this.get(endpoint,
+            jsonResponseHandler(new TypeReference<PagedResult<PlatformTransaction>>() {
+            }));
+        if (log.isDebugEnabled()) {
+            log.debug("EXIT: SimbaPlatform.getTransactions: returning " + result);
+        }
+        return (PagedResult<Transaction>) result;
+    }
+
+    @Override
     public Funds addFunds() throws SimbaException {
         return null;
     }
@@ -456,6 +484,28 @@ public class ContractService extends Simba<AppConfig> {
                                        .getToken();
         apiHeaders.put("Authorization", token.getType() + " " + token.getToken());
         return apiHeaders;
+    }
+    
+    protected String createQueryString(Query.Params params, List<String> fields) {
+        String paramString = params.toJsonApiString();
+        if (fields == null || fields.size() == 0) {
+            return paramString;
+        } else {
+            StringBuilder sb = new StringBuilder("fields=");
+            for (int i = 0; i < fields.size(); i++) {
+                sb.append(fields.get(i));
+                if(i < fields.size() - 1){
+                    sb.append(",");
+                }
+            }
+            if (paramString.length() > 0) {
+                sb.insert(0, "&");
+                sb.insert(0, paramString);
+            } else{
+                sb.insert(0, "?");
+            }
+            return sb.toString();
+        }
     }
 
     private class DeployedContractCallable implements Callable<DeployedContractInstance> {

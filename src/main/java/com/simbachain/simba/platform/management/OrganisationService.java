@@ -73,6 +73,57 @@ public class OrganisationService extends SimbaClient {
             }));
     }
 
+    public PagedResult<ContractDesign> getContractDesigns() throws SimbaException {
+        return this.get(
+            String.format("%s%sorganisations/%s/contract_designs/", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId()),
+            jsonResponseHandler(new TypeReference<PagedResult<ContractDesign>>() {
+            }));
+    }
+
+    public PagedResult<ContractArtifact> getContractArtifacts() throws SimbaException {
+        return this.get(
+            String.format("%s%sorganisations/%s/contract_artifacts/", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId()),
+            jsonResponseHandler(new TypeReference<PagedResult<ContractArtifact>>() {
+            }));
+    }
+
+    public PagedResult<DeployedContract> getDeployedContracts() throws SimbaException {
+        return this.get(
+            String.format("%s%sorganisations/%s/deployed_contracts/", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId()),
+            jsonResponseHandler(new TypeReference<PagedResult<DeployedContract>>() {
+            }));
+    }
+
+    public Application getApplication(String applicationId) throws SimbaException {
+        return this.get(
+            String.format("%s%sorganisations/%s/applications/%s/", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId(), applicationId), jsonResponseHandler(Application.class));
+    }
+
+    public ContractDesign getContractDesign(String designId) throws SimbaException {
+        return this.get(
+            String.format("%s%sorganisations/%s/contract_designs/%s/", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId(), designId), jsonResponseHandler(ContractDesign.class));
+    }
+
+    public ContractArtifact getContractArtifact(String artifactId) throws SimbaException {
+        return this.get(
+            String.format("%s%sorganisations/%s/contract_artifacts/%s/", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId(), artifactId), jsonResponseHandler(ContractArtifact.class));
+    }
+
+    public DeployedContract getDeployedContract(String id) throws SimbaException {
+        if (log.isDebugEnabled()) {
+            log.debug("ENTER: SimbaPlatform.getDeployedContract: " + "id = [" + id + "]");
+        }
+        return this.get(
+            String.format("%s%sorganisations/%s/deployed_contracts/%s", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId(), id), jsonResponseHandler(DeployedContract.class));
+    }
+
     public ContractDesign compileContract(InputStream contract, String name, String model) throws SimbaException {
         String contractCode = new BufferedReader(new InputStreamReader(contract)).lines()
                                                                                  .parallel()
@@ -82,8 +133,8 @@ public class OrganisationService extends SimbaClient {
         return compileContract(contractCode, name, model, true);
     }
 
-    public ContractDesign compileContract(String contractCode, String name, String model) throws SimbaException {
-        return compileContract(contractCode, name, model, false);
+    public ContractDesign compileContract(String contractBase64Code, String name, String model) throws SimbaException {
+        return compileContract(contractBase64Code, name, model, false);
     }
 
     public ContractDesign compileContract(String contractCode, String name, String model, boolean encodeCode)
@@ -120,16 +171,6 @@ public class OrganisationService extends SimbaClient {
         return waitForContractDeployment(response.getInstanceId());
     }
 
-    public DeployedContract getDeployedContract(String id) throws SimbaException {
-        if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.getDeployedContract: " + "id = [" + id + "]");
-        }
-        DeployedContract contract = this.get(
-            String.format("%s%sorganisations/%s/deployed_contracts/%s", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId(), id), jsonResponseHandler(DeployedContract.class));
-        return contract;
-    }
-
     public ContractService newContractService(String appName, String contractName)
         throws SimbaException {
         ContractService service = new ContractService(getEndpoint(), contractName,
@@ -150,9 +191,9 @@ public class OrganisationService extends SimbaClient {
 
     private class DeployedContractCallable implements Callable<DeployedContract> {
 
-        private String id;
-        private long poll;
-        private int totalSeconds;
+        private final String id;
+        private final long poll;
+        private final int totalSeconds;
 
         private DeployedContractCallable(String id, long poll, int totalSeconds) {
             this.id = id;
