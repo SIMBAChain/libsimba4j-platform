@@ -25,7 +25,7 @@ package com.simbachain.auth;
 import com.simbachain.SimbaException;
 
 /**
- *  Provides an AccessToken. OAuthCredential implementations provide
+ *  Provides an AccessToken. AuthConfig implementations provide
  *  access to an instance of this interface in order for clients to be able
  *  to grab a token.
  */

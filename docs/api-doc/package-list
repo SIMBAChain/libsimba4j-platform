@@ -1,0 +1,6 @@
+com.simbachain.auth
+com.simbachain.auth.azure
+com.simbachain.auth.local
+com.simbachain.simba.platform
+com.simbachain.simba.platform.gen
+com.simbachain.simba.platform.management
