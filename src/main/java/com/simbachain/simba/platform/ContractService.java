@@ -50,6 +50,7 @@ import com.simbachain.simba.Query;
 import com.simbachain.simba.Simba;
 import com.simbachain.simba.Transaction;
 import com.simbachain.simba.platform.gen.Builder;
+import com.simbachain.simba.platform.management.User;
 
 /**
  * Enterprise Platform Implementation of SIMBA API as a Contract service
@@ -81,6 +82,11 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
 
     public String getApiPath() {
         return String.format("%s%sapps/%s/contract/%s/info", getEndpoint(), getvPath(), getConfig().getAppName(), getContract());
+    }
+
+    public User whoami() throws SimbaException {
+        return this.get(String.format("%suser/whoami/", getEndpoint()),
+            jsonResponseHandler(User.class));
     }
 
     @Override

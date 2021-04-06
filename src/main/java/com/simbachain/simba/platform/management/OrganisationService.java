@@ -65,6 +65,12 @@ public class OrganisationService extends SimbaClient {
         return "v2/";
     }
 
+    public User whoami() throws SimbaException {
+        return this.get(
+            String.format("%suser/whoami/", getEndpoint()),
+            jsonResponseHandler(User.class));
+    }
+    
     public PagedResult<Application> getApplications() throws SimbaException {
         return this.get(
             String.format("%s%sorganisations/%s/applications/", getEndpoint(), getvPath(),
