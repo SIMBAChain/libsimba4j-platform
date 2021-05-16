@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simbachain.simba.Method;
 import com.simbachain.simba.Parameter;
@@ -37,6 +38,7 @@ import com.simbachain.simba.Parameter;
 /**
  *
  */
+@JsonIgnoreProperties (ignoreUnknown = true)
 public class ContractMethod implements Method {
     
     @JsonProperty

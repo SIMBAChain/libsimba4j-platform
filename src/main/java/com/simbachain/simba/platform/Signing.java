@@ -20,40 +20,45 @@
  * SOFTWARE.
  */
 
-package com.simbachain.auth;
+package com.simbachain.simba.platform;
 
-import com.simbachain.simba.SimbaConfig;
+import java.math.BigInteger;
+import java.util.Map;
+
+import org.web3j.crypto.RawTransaction;
+import org.web3j.utils.Numeric;
 
 /**
- *  OAuth focussed simba config.
+ *
  */
-public abstract class AuthConfig implements SimbaConfig {
+public class Signing {
 
-    private final String clientId;
-    private final String clientSecret;
-    private final boolean writeToFile;
-
-    public AuthConfig(String clientId, String clientSecret, boolean writeToFile) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.writeToFile = writeToFile;
+    private Signing() {
     }
 
-    public AuthConfig(String clientId, String clientSecret) {
-        this(clientId, clientSecret, false);
+    public static BigInteger getBitInt(String value) {
+        if (value == null
+            || value.trim()
+                    .length() == 0) {
+            return BigInteger.ZERO;
+        }
+        value = value.trim();
+        if (value.startsWith("0x")) {
+            return Numeric.toBigInt(value);
+        }
+        return new BigInteger(value);
     }
 
-    public String getClientId() {
-        return clientId;
-    }
+    public static RawTransaction createSigningTransaction(Map<String, String> raw) {
 
-    public String getClientSecret() {
-        return clientSecret;
-    }
+        String nonce = raw.get("nonce");
+        String gasPrice = raw.get("gasPrice");
+        String gasLimit = raw.getOrDefault("gas", raw.get("gasLimit"));
+        BigInteger value = getBitInt(raw.getOrDefault("value", ""));
+        String to = raw.get("to");
+        String data = raw.getOrDefault("data", null);
 
-    public boolean isWriteToFile() {
-        return writeToFile;
+        return RawTransaction.createTransaction(getBitInt(nonce), getBitInt(gasPrice),
+            getBitInt(gasLimit), to, value, data);
     }
-
-    public abstract AccessTokenProvider getTokenProvider();
 }

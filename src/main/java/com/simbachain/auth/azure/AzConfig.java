@@ -33,19 +33,22 @@ public class AzConfig extends AuthConfig {
     public enum Flow {
         USER_PASSWORD, CLIENT_CREDENTIAL
     }
+    
+    private static String DEFAULT_SERVER = "https://login.microsoftonline.com"; 
 
     private final String tenantId;
     private final String appId;
     private final Flow flow;
-    private String server = "https://login.microsoftonline.com";
+    private final String server;
 
     public AzConfig(String clientId,
         String clientSecret,
         String tenantId,
         String appId,
         Flow flow,
-        String server) {
-        super(clientId, clientSecret);
+        String server,
+        boolean writeToFile) {
+        super(clientId, clientSecret, writeToFile);
         this.tenantId = tenantId;
         this.appId = appId;
         this.flow = flow;
@@ -56,11 +59,16 @@ public class AzConfig extends AuthConfig {
         String clientSecret,
         String tenantId,
         String appId,
+        Flow flow, boolean writeToFile) {
+        this(clientId, clientSecret, tenantId, appId, flow, DEFAULT_SERVER, writeToFile);
+    }
+
+    public AzConfig(String clientId,
+        String clientSecret,
+        String tenantId,
+        String appId,
         Flow flow) {
-        super(clientId, clientSecret);
-        this.tenantId = tenantId;
-        this.appId = appId;
-        this.flow = flow;
+        this(clientId, clientSecret, tenantId, appId, flow, DEFAULT_SERVER, false);
     }
 
     public String getTenantId() {

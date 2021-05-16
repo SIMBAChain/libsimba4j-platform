@@ -1,5 +1,6 @@
 package ${jc.packageName};
 
+import java.util.Map;
 import com.simbachain.simba.JsonData;
 import com.simbachain.simba.CallResponse;
 import com.simbachain.SimbaException;
@@ -17,55 +18,15 @@ import ${import};
  */
 public class ${jc.className} extends ContractClient {
 
-    public ${jc.className}(SimbaPlatform simba) {
+    public ${jc.className}(ContractService simba) {
         super(simba);
     }
 #foreach( $method in ${jc.methods} )
-
-#parse("method-doc")
-    public ${method.returnValue} ${method.javaName}(${method.parameterList}) throws SimbaException {
-#if( ${method.parameters.size()} == 1)
-#if( $method.parameters.get(0).structType )
-#if( $method.parameters.get(0).dimensions > 0 )
-        java.util.List<JsonData> list = new java.util.ArrayList<>();
-        for (${method.parameters.get(0).componentType} element : ${method.parameters.get(0).javaName}) {
-            list.add(element.toJsonData());
-        }
-        JsonData data = JsonData.with("${method.parameters.get(0).name}", list);
-#else
-        JsonData data = JsonData.with("${method.parameters.get(0).name}", ${method.parameters.get(0).javaName}.toJsonData());
-#end 
-#else
-        JsonData data = JsonData.with("${method.parameters.get(0).name}", ${method.parameters.get(0).javaName}); 
-#end
-#else
-        JsonData data = JsonData.jsonData();
-#foreach( $param in ${method.parameters} )
-#if( $param.structType )
-#if( $param.dimensions > 0 )
-        java.util.List<JsonData> list = new java.util.ArrayList<>();
-        for (${param.componentType} element : ${param.javaName}) {
-            list.add(element.toJsonData());
-        }
-        data = data.and("${param.name}", list);
-#else
-        data = data.and("${param.name}", ${param.javaName}.toJsonData());
-#end 
-#else
-        data = data.and("${param.name}", ${param.javaName}); 
-#end
-#end
-#end
 #if( $method.accessor )
-        return this.simba.callGetter("${method.name}", ${method.returnType});
+#parse("method-get")
 #else
-#if ( ${method.files} )
-        return this.simba.callMethod("${method.name}", data, files);
-#else
-        return this.simba.callMethod("${method.name}", data);
+#parse("method-post")
 #end
-#end
-    }
     
     /**
      * Get transactions for the ${method.name} transaction.
@@ -107,7 +68,7 @@ public class ${jc.className} extends ContractClient {
 
         @Override
         public JsonData toJsonData() {
-            JsonData data = JsonData.jsonData();
+            JsonData ${struct.jsonDataName} = JsonData.jsonData();
 #foreach( $comp in ${struct.components} )
 #if( $comp.structType )
 #if( $comp.dimensions > 0 )
@@ -115,15 +76,15 @@ public class ${jc.className} extends ContractClient {
             for (${comp.componentType} element : ${comp.javaName}) {
                 list.add(element.toJsonData());
             }
-            data = data.and("${comp.name}", list);
+            ${struct.jsonDataName} = ${struct.jsonDataName}.and("${comp.name}", list);
 #else
-            data = data.and("${comp.name}", ${comp.javaName}.toJsonData());
+            ${struct.jsonDataName} = ${struct.jsonDataName}.and("${comp.name}", ${comp.javaName}.toJsonData());
 #end 
 #else
-            data = data.and("${comp.name}", ${comp.javaName}); 
+            ${struct.jsonDataName} = ${struct.jsonDataName}.and("${comp.name}", ${comp.javaName}); 
 #end
 #end        
-            return data;
+            return ${struct.jsonDataName};
         }
     }
 

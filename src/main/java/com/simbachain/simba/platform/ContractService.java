@@ -51,11 +51,32 @@ import com.simbachain.simba.Simba;
 import com.simbachain.simba.Transaction;
 import com.simbachain.simba.platform.gen.Builder;
 import com.simbachain.simba.platform.management.User;
+import com.simbachain.wallet.Wallet;
+import org.web3j.crypto.RawTransaction;
 
 /**
  * Enterprise Platform Implementation of SIMBA API as a Contract service
  */
 public class ContractService extends Simba<AppConfig> implements FieldFiltered {
+    
+    public static enum Headers {
+        HTTP_HEADER_SENDER("txn-sender"),
+        HTTP_HEADER_SENDER_TOKEN("txn-sender-token"),
+        HTTP_HEADER_NONCE("txn-nonce"),
+        HTTP_HEADER_DELEGATE("txn-delegate"),
+        HTTP_HEADER_RUNLOCAL("txn-runlocal");
+        
+        private final String value;
+
+        Headers(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+    private Wallet wallet;
 
     /**                     
      * Constructor overrriden by subclasses.
@@ -69,6 +90,18 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         this.setvPath("v2/");
     }
 
+    /**
+     * Constructor with Wallet.
+     *
+     * @param endpoint the URL of a particular contract API, e.g. https://api.simbachain.com/
+     * @param contract the name of the contract or the appname, e.g. mycontract
+     * @param config   used by subclasses.
+     */
+    public ContractService(String endpoint, String contract, AppConfig config, Wallet wallet) {
+        this(endpoint, contract, config);
+        this.wallet = wallet;
+    }
+
     @Override
     protected Metadata loadMetadata() throws SimbaException {
         ContractInfo result = this.get(getApiPath(), jsonResponseHandler(new TypeReference<ContractInfo>() {
@@ -78,6 +111,14 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     
     public ContractInfo getContractInfo() {
         return (ContractInfo)getMetadata();
+    }
+
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
     }
 
     public String getApiPath() {
@@ -106,10 +147,9 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         return txn;
     }
 
-    public <R> CallReturn<R> callGetter(String method, Class<R> cls)
-        throws SimbaException {
+    public <R> CallReturn<R> callGetter(String method, Class<R> cls) throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.callMethod: " + "method = [" + method + "]");
+            log.debug("ENTER: SimbaPlatform.callGetter: " + "method = [" + method + "]");
         }
 
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/", getEndpoint(), getvPath(),
@@ -120,7 +160,26 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         methodResponse.setStatus(data.getState());
         methodResponse.setError(data.getError());
         if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.callMethod: returning " + methodResponse);
+            log.debug("EXIT: SimbaPlatform.callGetter: returning " + methodResponse);
+        }
+        return methodResponse;
+    }
+
+    public <R> CallReturn<R> callGetter(String method, Class<R> cls, JsonData params)
+        throws SimbaException {
+        if (log.isDebugEnabled()) {
+            log.debug("ENTER: SimbaPlatform.callGetter: " + "method = [" + method + "]");
+        }
+
+        String endpoint = String.format("%s%sapps/%s/contract/%s/%s/?%s", getEndpoint(), getvPath(),
+            getConfig().getAppName(), getContract(), method, asQueryParameters(params));
+        ReturnObject<R> data = this.get(endpoint, jsonResponseHandler(new TypeReference<ReturnObject<R>>() {
+        }));
+        CallReturn<R> methodResponse = new CallReturn<>(data.getRequestId(), handleCast(data.getValue(), cls));
+        methodResponse.setStatus(data.getState());
+        methodResponse.setError(data.getError());
+        if (log.isDebugEnabled()) {
+            log.debug("EXIT: SimbaPlatform.callGetter: returning " + methodResponse);
         }
         return methodResponse;
     }
@@ -128,7 +187,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     public <R> CallReturn<R> callGetter(String method, InstanceId id, Class<R> cls)
         throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.callMethod: "
+            log.debug("ENTER: SimbaPlatform.callGetter: "
                 + "method = ["
                 + method
                 + "]");
@@ -143,7 +202,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         methodResponse.setStatus(data.getState());
         methodResponse.setError(data.getError());
         if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.callMethod: returning " + methodResponse);
+            log.debug("EXIT: SimbaPlatform.callGetter: returning " + methodResponse);
         }
         return methodResponse;
     }
@@ -263,6 +322,39 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     @Override
     public CallResponse callMethod(String method, JsonData parameters, UploadFile... files)
         throws SimbaException {
+        return this.callMethod(method, parameters, new HashMap<>(), files);
+    }
+    
+    public CallResponse signAndSubmit(String transactionId, Map<String, String> raw) throws SimbaException {
+        if(log.isDebugEnabled()) {
+            log.debug("ENTER: ContractService.signAndSubmit: "
+                + "transactionId = ["
+                + transactionId + "], raw = ["
+                + raw + "]");
+        }
+
+        RawTransaction rawTransaction = Signing.createSigningTransaction(raw);
+        String signedTransaction = this.wallet.sign(rawTransaction);
+        String endpoint = String.format("%s%sapps/%s/transactions/%s/", getEndpoint(), getvPath(),
+            getConfig().getAppName(), transactionId);
+        PlatformTransaction txn = this.post(endpoint, JsonData.with("transaction", signedTransaction),
+            jsonResponseHandler(new TypeReference<PlatformTransaction>() {
+        }));
+        CallResponse methodResponse = new CallResponse(txn.getId());
+        methodResponse.setStatus(txn.getState()
+                                    .toString());
+        methodResponse.setError(txn.getError());
+        if (log.isDebugEnabled()) {
+            log.debug("EXIT: SimbaPlatform.callMethod: returning " + methodResponse);
+        }
+        return methodResponse;
+    }
+
+    @Override
+    public CallResponse callMethod(String method,
+        JsonData parameters,
+        Map<String, String> headers,
+        UploadFile... files) throws SimbaException {
         if (log.isDebugEnabled()) {
             Object f = files.length == 0 ? "" : Arrays.asList(files);
             log.debug("ENTER: SimbaPlatform.callMethod: "
@@ -270,24 +362,31 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
                 + method
                 + "], parameters = ["
                 + parameters
+                + "], headers = ["
+                + headers
                 + "], files = ["
                 + f
                 + "]");
         }
         validateParameters(getMetadata(), method, parameters, files.length > 0);
-        
+
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract(), method);
-        PlatformTransaction txn = this.post(endpoint, parameters, jsonResponseHandler(
-            new TypeReference<PlatformTransaction>() {
-            }), files);
-        CallResponse methodResponse = new CallResponse(txn.getRequestId());
-        methodResponse.setStatus(txn.getState().toString());
-        methodResponse.setError(txn.getError());
-        if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.callMethod: returning " + methodResponse);
+        PlatformTransaction txn = this.post(endpoint, parameters, jsonResponseHandler(new TypeReference<PlatformTransaction>() {
+            }), headers, files);
+        if (txn.getState() == Transaction.State.PENDING && this.wallet != null) {
+            Map<String, String> raw = txn.getRawTransaction();
+            return signAndSubmit(txn.getId(), raw);
+        } else {
+            CallResponse methodResponse = new CallResponse(txn.getId());
+            methodResponse.setStatus(txn.getState()
+                                        .toString());
+            methodResponse.setError(txn.getError());
+            if (log.isDebugEnabled()) {
+                log.debug("EXIT: SimbaPlatform.callMethod: returning " + methodResponse);
+            }
+            return methodResponse;
         }
-        return methodResponse;
     }
 
     @Override
@@ -396,7 +495,6 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
                     + "]");
             }
             Method m = getMetadata().getMethod(method);
-            System.out.println("ContractService.getTransactions params: " + m.getParameterMap());
             validateQueryParameters(getMetadata(), method, params);
         String endpoint = String.format("%s%sapps/%s/contract/%s/%s/%s", getEndpoint(), getvPath(),
             getConfig().getAppName(), getContract(), method, params.toJsonApiString());
@@ -576,4 +674,23 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         Builder builder = new Builder(packageName, outputDirectory, this.getContractInfo());
         return builder.build();
     }
+
+    private String asQueryParameters(JsonData parameters) throws SimbaException {
+        StringBuilder sb = new StringBuilder();
+        Map<String, Object> map = parameters.asMap();
+        for (String s : map.keySet()) {
+            Object o = map.get(s);
+            if (o instanceof String || o instanceof Number || o instanceof Boolean) {
+                if(sb.length() > 0){
+                    sb.append("&");
+                }
+                sb.append(s).append("=").append(o);
+            } else {
+                throw new SimbaException("Only primitive types are supported as query parameters",
+                    SimbaException.SimbaError.EXECUTION_ERROR);
+            }
+        }
+        return sb.toString();
+    }
+
 }

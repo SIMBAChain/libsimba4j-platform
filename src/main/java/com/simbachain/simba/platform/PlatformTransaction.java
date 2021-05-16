@@ -76,6 +76,9 @@ public class PlatformTransaction implements Transaction {
     @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private Date created;
 
+    @JsonProperty("raw_transaction")
+    private Map<String, String> rawTransaction;
+
     @JsonIgnore
     private String app;
     @JsonIgnore
@@ -252,6 +255,14 @@ public class PlatformTransaction implements Transaction {
         this.contractAddress = contractAddress;
     }
 
+    public Map<String, String> getRawTransaction() {
+        return rawTransaction;
+    }
+
+    public void setRawTransaction(Map<String, String> rawTransaction) {
+        this.rawTransaction = rawTransaction;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("PlatformTransaction{");
@@ -298,6 +309,8 @@ public class PlatformTransaction implements Transaction {
           .append(state);
         sb.append(", created=")
           .append(created);
+        sb.append(", rawTransaction=")
+          .append(rawTransaction);
         sb.append(", app='")
           .append(app)
           .append('\'');

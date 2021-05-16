@@ -31,6 +31,7 @@ import com.microsoft.aad.msal4j.UserNamePasswordParameters;
 import com.simbachain.SimbaException;
 import com.simbachain.auth.AccessToken;
 import com.simbachain.auth.AccessTokenProvider;
+import com.simbachain.auth.FileAccessToken;
 
 /**
  * Implementation of AccessTokenProvider that talks to Azure.
@@ -38,11 +39,15 @@ import com.simbachain.auth.AccessTokenProvider;
 public class AzUserAccessTokenProvider implements AccessTokenProvider {
 
     private final AzConfig credentials;
-    private AccessToken token = null;
-    private long expires = 0L;
+    private final AccessToken token;
 
     public AzUserAccessTokenProvider(AzConfig credentials) {
         this.credentials = credentials;
+        if (this.credentials.isWriteToFile()) {
+            this.token = new FileAccessToken(String.format(".%s", this.credentials.getClientId()));
+        } else {
+            this.token = new AccessToken();
+        }
     }
 
     public AccessToken getToken() throws SimbaException {
@@ -54,10 +59,10 @@ public class AzUserAccessTokenProvider implements AccessTokenProvider {
 
         try {
             long now = System.currentTimeMillis();
-            if (now >= this.expires) {
-                this.token = null;
+            if (now >= this.token.getExpiry()) {
+                this.token.invalidate();
             }
-            if (this.token == null) {
+            if (!this.token.isValid()) {
                 PublicClientApplication pca = PublicClientApplication.builder(
                     credentials.getAppId())
                                                                      .authority(
@@ -76,8 +81,7 @@ public class AzUserAccessTokenProvider implements AccessTokenProvider {
                 IAuthenticationResult result = future.get();
                 long expiry = result.expiresOnDate()
                                     .getTime();
-                this.expires = expiry - 5000;
-                this.token = new AccessToken(result.accessToken(), "Bearer", expiry);
+                this.token.refresh(result.accessToken(), "Bearer", expiry - 5000);
             }
             return this.token;
 

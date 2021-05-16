@@ -22,6 +22,7 @@
 
 package com.simbachain.simba.platform;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simbachain.simba.Metadata;
 import com.simbachain.simba.Method;
@@ -29,6 +30,7 @@ import com.simbachain.simba.Method;
 /**
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ContractInfo implements Metadata {
 
     @JsonProperty ("api_name")

@@ -31,11 +31,16 @@ public class AccessToken {
     private String token;
     private String type;
     private long expiry;
+    private boolean valid;
 
     public AccessToken(String token, String type, long expiry) {
         this.token = token;
         this.type = type;
         this.expiry = expiry;
+    }
+
+    public AccessToken() {
+        this("", "", 0L);
     }
 
     public String getToken() {
@@ -50,6 +55,21 @@ public class AccessToken {
         return expiry;
     }
 
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void refresh(String token, String type, long expiry) {
+        this.token = token;
+        this.type = type;
+        this.expiry = expiry;
+        this.valid = true;
+    }
+    
+    public void invalidate() {
+        this.valid = false;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("AccessToken{");
@@ -61,6 +81,8 @@ public class AccessToken {
           .append('\'');
         sb.append(", expiry=")
           .append(expiry);
+        sb.append(", valid=")
+          .append(valid);
         sb.append('}');
         return sb.toString();
     }

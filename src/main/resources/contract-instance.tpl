@@ -10,6 +10,9 @@ import com.simbachain.simba.platform.ContractService;
 import com.simbachain.simba.platform.ContractClient;
 import com.simbachain.simba.platform.InstanceId;
 import com.simbachain.simba.platform.NewInstanceResponse;
+import com.simbachain.simba.PagedResult;
+import com.simbachain.simba.Query;
+import com.simbachain.simba.Transaction;
 #foreach( $import in ${jc.imports} )
 import ${import};
 #end
@@ -21,7 +24,7 @@ public class ${jc.className} extends ContractClient {
 
     private final InstanceId instanceId;
 
-    public ${jc.className}(SimbaPlatform simba, InstanceId instanceId) {
+    public ${jc.className}(ContractService simba, InstanceId instanceId) {
         super(simba);
         this.instanceId = instanceId;
     }
@@ -36,17 +39,17 @@ public class ${jc.className} extends ContractClient {
         for (${method.parameters.get(0).componentType} element : ${method.parameters.get(0).javaName}) {
             list.add(element.toJsonData());
         }
-        JsonData data = JsonData.with("${method.parameters.get(0).name}", list);
+        JsonData ${method.jsonDataName} = JsonData.with("${method.parameters.get(0).name}", list);
 #else
-        JsonData data = JsonData.with("${method.parameters.get(0).name}", ${method.parameters.get(0).javaName}.toJsonData());
+        JsonData ${method.jsonDataName} = JsonData.with("${method.parameters.get(0).name}", ${method.parameters.get(0).javaName}.toJsonData());
 #end 
 #else
-        JsonData data = JsonData.with("${method.parameters.get(0).name}", ${method.parameters.get(0).javaName}); 
+        JsonData ${method.jsonDataName} = JsonData.with("${method.parameters.get(0).name}", ${method.parameters.get(0).javaName}); 
 #end
 #else
 #if( ${method.accessor} && ${method.parameters.size()} == 0)
 #else
-        JsonData data = JsonData.jsonData();
+        JsonData ${method.jsonDataName} = JsonData.jsonData();
 #end
 #foreach( $param in ${method.parameters} )
 #if( $param.structType )
@@ -55,12 +58,12 @@ public class ${jc.className} extends ContractClient {
         for (${param.componentType} element : ${param.javaName}) {
             list.add(element.toJsonData());
         }
-        data = data.and("${param.name}", list);
+        ${method.jsonDataName} = ${method.jsonDataName}.and("${param.name}", list);
 #else
-        data = data.and("${param.name}", ${param.javaName}.toJsonData());
+        ${method.jsonDataName} = ${method.jsonDataName}.and("${param.name}", ${param.javaName}.toJsonData());
 #end 
 #else
-        data = data.and("${param.name}", ${param.javaName}); 
+        ${method.jsonDataName} = ${method.jsonDataName}.and("${param.name}", ${param.javaName}); 
 #end
 #end
 #end
@@ -68,9 +71,9 @@ public class ${jc.className} extends ContractClient {
         return this.simba.callGetter("${method.name}", this.instanceId, ${method.returnType});
 #else   
 #if ( ${method.files} )
-        return this.simba.callInstanceMethod("${method.name}", this.instanceId, data, files);
+        return this.simba.callInstanceMethod("${method.name}", this.instanceId, ${method.jsonDataName}, files);
 #else
-        return this.simba.callInstanceMethod("${method.name}", this.instanceId, data);
+        return this.simba.callInstanceMethod("${method.name}", this.instanceId, ${method.jsonDataName});
 #end
 #end
     }
@@ -93,10 +96,10 @@ public class ${jc.className} extends ContractClient {
 #foreach( $param in ${jc.constructor.parameters} )
      * @param ${param.javaName} ${param.type}.
 #end
-     * @return DeployedContract containing address and assetId if specified. 
+     * @return DeployedContractInstance containing address and assetId if specified. 
      * @throws SimbaException if an error occurs. 
      */
-    public DeployedContract new${jc.className}(${jc.constructor.parameterList}) throws SimbaException {
+    public DeployedContractInstance new${jc.className}(${jc.constructor.parameterList}) throws SimbaException {
 #if( ${jc.constructor.parameters.size()} == 1)
 #if( $jc.constructor.parameters.get(0).structType )
 #if( $jc.constructor.parameters.get(0).dimensions > 0 )
@@ -104,17 +107,18 @@ public class ${jc.className} extends ContractClient {
         for (${jc.constructor.parameters.get(0).componentType} element : ${jc.constructor.parameters.get(0).javaName}) {
             list.add(element.toJsonData());
         }
-        JsonData data = JsonData.with("${jc.constructor.parameters.get(0).name}", list);
+        JsonData ${jc.constructor.jsonDataName} = JsonData.with("${jc.constructor.parameters.get(0).name}", list);
 #else
-        JsonData data = JsonData.with("${jc.constructor.parameters.get(0).name}", ${jc.constructor.parameters.get(0).javaName}.toJsonData());
+        JsonData ${jc.constructor.jsonDataName} = JsonData.with("${jc.constructor.parameters.get(0).name}", ${jc.constructor.parameters.get(0).javaName}.toJsonData());
 #end 
 #else
-        JsonData data = JsonData.with("${jc.constructor.parameters.get(0).name}", ${jc.constructor.parameters.get(0).javaName}); 
+        JsonData ${jc.constructor.jsonDataName} = JsonData.with("${jc.constructor.parameters.get(0).name}", ${jc.constructor.parameters.get(0).javaName}); 
 #end
 #else
 #if( ${jc.constructor.parameters.size()} == 0)
+        JsonData ${jc.constructor.jsonDataName} = JsonData.jsonData();
 #else
-        JsonData data = JsonData.jsonData();
+        JsonData ${jc.constructor.jsonDataName} = JsonData.jsonData();
 #end
 #foreach( $param in ${jc.constructor.parameters} )
 #if( $param.structType )
@@ -123,17 +127,17 @@ public class ${jc.className} extends ContractClient {
         for (${param.componentType} element : ${param.javaName}) {
             list.add(element.toJsonData());
         }
-        data = data.and("${param.name}", list);
+        ${jc.constructor.jsonDataName} = ${jc.constructor.jsonDataName}.and("${param.name}", list);
 #else
-        data = data.and("${param.name}", ${param.javaName}.toJsonData());
+        ${jc.constructor.jsonDataName} = ${jc.constructor.jsonDataName}.and("${param.name}", ${param.javaName}.toJsonData());
 #end 
 #else
-        data = data.and("${param.name}", ${param.javaName}); 
+        ${jc.constructor.jsonDataName} = ${jc.constructor.jsonDataName}.and("${param.name}", ${param.javaName}); 
 #end
 #end
 #end
-        NewInstanceResponse response = this.simba.callNewInstance(data);
-        Future<DeployedContract> future = simba.waitForContractInstanceDeployment(response.getInstanceId());
+        NewInstanceResponse response = this.simba.callNewInstance(${jc.constructor.jsonDataName});
+        Future<DeployedContractInstance> future = simba.waitForContractInstanceDeployment(response.getInstanceId());
         try {
             return future.get();
         } catch (Exception e) {
@@ -170,7 +174,7 @@ public class ${jc.className} extends ContractClient {
 
         @Override
         public JsonData toJsonData() {
-            JsonData data = JsonData.jsonData();
+            JsonData ${struct.jsonDataName} = JsonData.jsonData();
 #foreach( $comp in ${struct.components} )
 #if( $comp.structType )
 #if( $comp.dimensions > 0 )
@@ -178,15 +182,15 @@ public class ${jc.className} extends ContractClient {
             for (${comp.componentType} element : ${comp.javaName}) {
                 list.add(element.toJsonData());
             }
-            data = data.and("${comp.name}", list);
+            ${struct.jsonDataName} = ${struct.jsonDataName}.and("${comp.name}", list);
 #else
-            data = data.and("${comp.name}", ${comp.javaName}.toJsonData());
+            ${struct.jsonDataName} = ${struct.jsonDataName}.and("${comp.name}", ${comp.javaName}.toJsonData());
 #end 
 #else
-            data = data.and("${comp.name}", ${comp.javaName}); 
+            ${struct.jsonDataName} = ${struct.jsonDataName}.and("${comp.name}", ${comp.javaName}); 
 #end
 #end        
-            return data;
+            return ${struct.jsonDataName};
         }
     }
 

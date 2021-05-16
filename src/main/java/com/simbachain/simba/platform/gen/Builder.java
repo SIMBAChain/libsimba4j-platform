@@ -56,6 +56,9 @@ public class Builder {
             Templates.registerTemplate("contract", "contract.tpl");
             Templates.registerTemplate("contract-instance", "contract-instance.tpl");
             Templates.registerTemplate("method-doc", "method-doc.tpl");
+            Templates.registerTemplate("method-header-doc", "method-header-doc.tpl");
+            Templates.registerTemplate("method-get", "method-get.tpl");
+            Templates.registerTemplate("method-post", "method-post.tpl");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -75,10 +78,13 @@ public class Builder {
         ContractMethod construct = metadata.getConstructor();
         JavaMethod constructor = new JavaMethod(this.javaClass.getClassName(), this.javaClass.getClassName(), false);
         List<ContractParameter> cParams = construct.getParams();
+        List<String> args = new ArrayList<>();
         for (ContractParameter param : cParams) {
+            args.add(param.getName());
             JavaObject p = createComponent(param);
             constructor.addParameter(p);
         }
+        constructor.setJsonDataName(getDataName(args));
         javaClass.setConstructor(constructor);
         boolean isInstance = false;
         for (String s : methods.keySet()) {
@@ -93,19 +99,25 @@ public class Builder {
             List<ContractParameter> returns = meth.getReturns();
             JavaMethod javaMethod = new JavaMethod(s, methodName, access);
             List<ContractParameter> params = meth.getParams();
+            List<String> paramNames = new ArrayList<>();
             for (ContractParameter param : params) {
+                paramNames.add(param.getName());
                 JavaObject p = createComponent(param);
                 if(p.isStructType()) {
                     javaClass.addImport("com.simbachain.simba.Jsonable");
                 }
                 javaMethod.addParameter(p);
             }
+            String dataName = getDataName(paramNames);
+            javaMethod.setJsonDataName(dataName);
+            String headersName = getHeadersName(paramNames);
+            javaMethod.setHeadersName(headersName);
             for (ContractParameter aReturn : returns) {
                 javaMethod.addReturn(createComponent(aReturn));
             }
             if(javaMethod.isAccessor()) {
                 javaClass.addImport("com.simbachain.simba.platform.CallReturn");
-                isInstance = true;
+                //isInstance = true;
             }
             if(javaMethod.isFiles()) {
                 javaClass.addImport("com.simbachain.simba.SimbaClient.UploadFile");
@@ -129,6 +141,22 @@ public class Builder {
             curr = next;
         }
         return writeToFile(output, javaClass.getClassName(), curr);
+    }
+    
+    private String getDataName(List<String> names) {
+        String start = "data";
+        while (names.contains(start)) {
+            start = "_" + start;
+        }
+        return start;
+    }
+
+    private String getHeadersName(List<String> names) {
+        String start = "headers";
+        while (names.contains(start)) {
+            start = "_" + start;
+        }
+        return start;
     }
 
     private String writeToFile(String template, String name, File parent) throws SimbaException {
@@ -200,9 +228,12 @@ public class Builder {
         if(save) {
             structure = new Struct(struct, structName, dimensions);
             List<ContractParameter> components = type.getComponents();
+            List<String> comps = new ArrayList<>();
             for (ContractParameter component : components) {
+                comps.add(component.getName());
                 structure.addComponent(createComponent(component));
             }
+            structure.setJsonDataName(getDataName(comps));
             this.javaClass.addStruct(structure);
         }
         return structName;
@@ -252,6 +283,11 @@ public class Builder {
     }
     
     private String getJavaParamName(String name) {
+        try {
+            Integer.parseInt(name);
+            return "_" + name;
+        } catch (NumberFormatException e) {
+        }
         return toCamelCase(name, false);
     }
 
@@ -299,6 +335,7 @@ public class Builder {
         private final String type;
         private final boolean structType;
         private final int dimensions;
+        private String jsonDataName = "data";
 
         public JavaObject(String name,
             String javaName,
@@ -331,7 +368,15 @@ public class Builder {
         public int getDimensions() {
             return dimensions;
         }
-        
+
+        public String getJsonDataName() {
+            return jsonDataName;
+        }
+
+        public void setJsonDataName(String jsonDataName) {
+            this.jsonDataName = jsonDataName;
+        }
+
         public String getComponentType() {
             if(dimensions > 0) {
                 return type.substring(0, type.indexOf("["));
@@ -363,9 +408,10 @@ public class Builder {
     public static class JavaMethod extends JavaObject {
 
         private final List<JavaObject> parameters = new ArrayList<>();
-        private List<JavaObject> returns = new ArrayList<>();
-        private boolean accessor;
+        private final List<JavaObject> returns = new ArrayList<>();
+        private final boolean accessor;
         private JavaObject bundleHash = null;
+        private String headersName = "headers";
 
         public JavaMethod(String name, String javaName, boolean accessor) {
             super(name, javaName, "method", false, 0);
@@ -411,6 +457,31 @@ public class Builder {
             return sb.toString();
         }
 
+        public String getHeaderParameterList() {
+            StringBuilder sb = new StringBuilder();
+            int count = 0;
+            for (JavaObject param : parameters) {
+                sb.append(param.type)
+                  .append(" ")
+                  .append(param.javaName);
+                if (count < parameters.size() - 1) {
+                    sb.append(", ");
+                }
+                count++;
+            }
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("Map<String, String> ").append(getHeadersName());
+            if (bundleHash != null) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append("UploadFile... files");
+            }
+            return sb.toString();
+        }
+
         public List<JavaObject> getReturns() {
             return returns;
         }
@@ -445,6 +516,14 @@ public class Builder {
             } else {
                 return "java.util.List.class";
             }
+        }
+        
+        public String getHeadersName() {
+            return headersName;
+        }
+
+        public void setHeadersName(String headersName) {
+            this.headersName = headersName;
         }
 
         public boolean isAccessor() {

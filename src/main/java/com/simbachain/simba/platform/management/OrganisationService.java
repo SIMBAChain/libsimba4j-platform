@@ -41,8 +41,13 @@ import com.simbachain.auth.AccessToken;
 import com.simbachain.simba.JsonData;
 import com.simbachain.simba.PagedResult;
 import com.simbachain.simba.SimbaClient;
+import com.simbachain.simba.Transaction;
 import com.simbachain.simba.platform.AppConfig;
 import com.simbachain.simba.platform.ContractService;
+import com.simbachain.simba.platform.PlatformTransaction;
+import com.simbachain.simba.platform.Signing;
+import com.simbachain.wallet.Wallet;
+import org.web3j.crypto.RawTransaction;
 
 /**
  *
@@ -50,6 +55,7 @@ import com.simbachain.simba.platform.ContractService;
 public class OrganisationService extends SimbaClient {
 
     private final OrganisationConfig config;
+    private Wallet wallet;
 
     public OrganisationService(String endpoint, OrganisationConfig config) {
         super(endpoint);
@@ -65,12 +71,19 @@ public class OrganisationService extends SimbaClient {
         return "v2/";
     }
 
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
+
     public User whoami() throws SimbaException {
-        return this.get(
-            String.format("%suser/whoami/", getEndpoint()),
+        return this.get(String.format("%suser/whoami/", getEndpoint()),
             jsonResponseHandler(User.class));
     }
-    
+
     public PagedResult<Application> getApplications() throws SimbaException {
         return this.get(
             String.format("%s%sorganisations/%s/applications/", getEndpoint(), getvPath(),
@@ -112,9 +125,8 @@ public class OrganisationService extends SimbaClient {
     }
 
     public PagedResult<Storage> getStorages() throws SimbaException {
-        return this.get(
-            String.format("%s%sorganisations/%s/storage/", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId()),
+        return this.get(String.format("%s%sorganisations/%s/storage/", getEndpoint(), getvPath(),
+            getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<Storage>>() {
             }));
     }
@@ -122,19 +134,22 @@ public class OrganisationService extends SimbaClient {
     public Application getApplication(String applicationId) throws SimbaException {
         return this.get(
             String.format("%s%sorganisations/%s/applications/%s/", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId(), applicationId), jsonResponseHandler(Application.class));
+                getConfig().getOrganisationId(), applicationId),
+            jsonResponseHandler(Application.class));
     }
 
     public ContractDesign getContractDesign(String designId) throws SimbaException {
         return this.get(
             String.format("%s%sorganisations/%s/contract_designs/%s/", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId(), designId), jsonResponseHandler(ContractDesign.class));
+                getConfig().getOrganisationId(), designId),
+            jsonResponseHandler(ContractDesign.class));
     }
 
     public ContractArtifact getContractArtifact(String artifactId) throws SimbaException {
         return this.get(
             String.format("%s%sorganisations/%s/contract_artifacts/%s/", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId(), artifactId), jsonResponseHandler(ContractArtifact.class));
+                getConfig().getOrganisationId(), artifactId),
+            jsonResponseHandler(ContractArtifact.class));
     }
 
     public DeployedContract getDeployedContract(String id) throws SimbaException {
@@ -146,7 +161,8 @@ public class OrganisationService extends SimbaClient {
                 getConfig().getOrganisationId(), id), jsonResponseHandler(DeployedContract.class));
     }
 
-    public ContractDesign compileContract(InputStream contract, String name, String model) throws SimbaException {
+    public ContractDesign compileContract(InputStream contract, String name, String model)
+        throws SimbaException {
         String contractCode = new BufferedReader(new InputStreamReader(contract)).lines()
                                                                                  .parallel()
                                                                                  .collect(
@@ -155,12 +171,15 @@ public class OrganisationService extends SimbaClient {
         return compileContract(contractCode, name, model, true);
     }
 
-    public ContractDesign compileContract(String contractBase64Code, String name, String model) throws SimbaException {
+    public ContractDesign compileContract(String contractBase64Code, String name, String model)
+        throws SimbaException {
         return compileContract(contractBase64Code, name, model, false);
     }
 
-    public ContractDesign compileContract(String contractCode, String name, String model, boolean encodeCode)
-        throws SimbaException {
+    public ContractDesign compileContract(String contractCode,
+        String name,
+        String model,
+        boolean encodeCode) throws SimbaException {
         if (encodeCode) {
             contractCode = Base64.getEncoder()
                                  .encodeToString(contractCode.getBytes(StandardCharsets.UTF_8));
@@ -183,14 +202,47 @@ public class OrganisationService extends SimbaClient {
             jsonResponseHandler(ContractArtifact.class));
     }
 
-    public Future<DeployedContract> deployContract(String artifactId, DeploymentSpec spec)
-        throws SimbaException {
+    public Future<DeployedContract> deployContract(String artifactId,
+        DeploymentSpec spec,
+        Map<String, String> headers) throws SimbaException {
         JsonData data = spec.toJsonData();
         DeploymentResponse response = this.post(
             String.format("%s%sorganisations/%s/contract_artifacts/%s/deploy/", getEndpoint(),
                 getvPath(), getConfig().getOrganisationId(), artifactId), data,
-            jsonResponseHandler(DeploymentResponse.class));
+            jsonResponseHandler(DeploymentResponse.class), headers);
+        if (this.wallet != null
+            && response.getTransactionHash() == null
+            && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()) != null) {
+            String txnId = response.getTransactionId();
+            PlatformTransaction txn = this.get(
+                String.format("%s%sorganisations/%s/transactions/%s", getEndpoint(), getvPath(),
+                    getConfig().getOrganisationId(), txnId),
+                jsonResponseHandler(new TypeReference<PlatformTransaction>() {
+                }));
+            Map<String, String> raw = txn.getRawTransaction();
+            RawTransaction rawTransaction = Signing.createSigningTransaction(raw);
+            String signedTransaction = this.wallet.sign(rawTransaction);
+            String endpoint = String.format("%s%sapps/%s/transactions/%s/", getEndpoint(),
+                getvPath(), spec.getAppName(), txnId);
+            txn = this.post(endpoint, JsonData.with("transaction", signedTransaction),
+                jsonResponseHandler(new TypeReference<PlatformTransaction>() {
+                }));
+            if (txn.getState()
+                   .equals(Transaction.State.SUBMITTED)) {
+                response.setTransactionHash(txn.getTxnHash());
+            }
+        }
         return waitForContractDeployment(response.getInstanceId());
+    }
+
+    public Future<DeployedContract> deployContract(String artifactId, DeploymentSpec spec)
+        throws SimbaException {
+        Map<String, String> headers = new HashMap<>();
+        if (this.wallet != null) {
+            headers.put(ContractService.Headers.HTTP_HEADER_SENDER.getValue(),
+                this.wallet.getAddress());
+        }
+        return deployContract(artifactId, spec, headers);
     }
 
     public ContractService newContractService(String appName, String contractName)
@@ -198,6 +250,9 @@ public class OrganisationService extends SimbaClient {
         ContractService service = new ContractService(getEndpoint(), contractName,
             new AppConfig(appName, contractName, config.getAuthConfig()));
         service.init();
+        if (this.wallet != null) {
+            service.setWallet(this.wallet);
+        }
         return service;
     }
 
