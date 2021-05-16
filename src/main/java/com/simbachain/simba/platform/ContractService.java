@@ -64,7 +64,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         HTTP_HEADER_SENDER_TOKEN("txn-sender-token"),
         HTTP_HEADER_NONCE("txn-nonce"),
         HTTP_HEADER_DELEGATE("txn-delegate"),
-        HTTP_HEADER_RUNLOCAL("txn-runlocal");
+        HTTP_HEADER_RUNLOCAL("txn-runlocal"),
+        HTTP_HEADER_REQUEST_ID("x-request-id");
         
         private final String value;
 
