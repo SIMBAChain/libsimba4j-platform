@@ -59,7 +59,7 @@ import org.web3j.crypto.RawTransaction;
  */
 public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     
-    public static enum Headers {
+    public enum Headers {
         HTTP_HEADER_SENDER("txn-sender"),
         HTTP_HEADER_SENDER_TOKEN("txn-sender-token"),
         HTTP_HEADER_NONCE("txn-nonce"),
@@ -97,6 +97,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
      * @param endpoint the URL of a particular contract API, e.g. https://api.simbachain.com/
      * @param contract the name of the contract or the appname, e.g. mycontract
      * @param config   used by subclasses.
+     * @param wallet A wallet to use for client side signing.                 
      */
     public ContractService(String endpoint, String contract, AppConfig config, Wallet wallet) {
         this(endpoint, contract, config);
