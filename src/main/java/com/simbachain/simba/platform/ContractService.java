@@ -50,6 +50,8 @@ import com.simbachain.simba.Query;
 import com.simbachain.simba.Simba;
 import com.simbachain.simba.Transaction;
 import com.simbachain.simba.platform.gen.Builder;
+import com.simbachain.simba.platform.management.BlockchainIdentities;
+import com.simbachain.simba.platform.management.TransactionCount;
 import com.simbachain.simba.platform.management.User;
 import com.simbachain.wallet.Wallet;
 import org.web3j.crypto.RawTransaction;
@@ -130,6 +132,24 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     public User whoami() throws SimbaException {
         return this.get(String.format("%suser/whoami/", getEndpoint()),
             jsonResponseHandler(User.class));
+    }
+
+    public BlockchainIdentities getIdentities() throws SimbaException {
+        return this.get(String.format("%suser/wallet/", getEndpoint()),
+            jsonResponseHandler(BlockchainIdentities.class));
+    }
+
+    public long getTransactionCount(String blockchain) throws SimbaException {
+        TransactionCount count = this.get(String.format("%suser/transactions/%s/count/", getEndpoint(), blockchain),
+            jsonResponseHandler(TransactionCount.class));
+        return count.getCount();
+    }
+
+    public long getTransactionCount(String blockchain, String address) throws SimbaException {
+        TransactionCount count = this.get(
+            String.format("%suser/transactions/%s/count/%s/", getEndpoint(), blockchain, address),
+            jsonResponseHandler(TransactionCount.class));
+        return count.getCount();
     }
 
     @Override

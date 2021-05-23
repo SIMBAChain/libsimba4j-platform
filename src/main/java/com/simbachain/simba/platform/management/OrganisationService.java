@@ -84,6 +84,25 @@ public class OrganisationService extends SimbaClient {
             jsonResponseHandler(User.class));
     }
 
+    public BlockchainIdentities getIdentities() throws SimbaException {
+        return this.get(String.format("%suser/wallet/", getEndpoint()),
+            jsonResponseHandler(BlockchainIdentities.class));
+    }
+
+    public long getTransactionCount(String blockchain) throws SimbaException {
+        TransactionCount count = this.get(String.format("%suser/transactions/%s/count/", getEndpoint(), blockchain),
+            jsonResponseHandler(TransactionCount.class));
+        return count.getCount();
+    }
+
+    public long getTransactionCount(String blockchain, String address)
+        throws SimbaException {
+        TransactionCount count = this.get(
+            String.format("%suser/transactions/%s/count/%s/", getEndpoint(), blockchain, address),
+            jsonResponseHandler(TransactionCount.class));
+        return count.getCount();
+    }
+
     public PagedResult<Application> getApplications() throws SimbaException {
         return this.get(
             String.format("%s%sorganisations/%s/applications/", getEndpoint(), getvPath(),

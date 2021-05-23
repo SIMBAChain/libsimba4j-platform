@@ -25,7 +25,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.simbachain</groupId>
 	<artifactId>libsimba4j-platform</artifactId>
-	<version>0.1.11-SNAPSHOT</version>
+	<version>0.1.11</version>
     <name>LibSimba4J Enterprise Platform</name>
     <description>Java Client for SIMBA Chain Enterprise Platform</description>
     <url>https://simbachain.github.io/libsimba4j/</url>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>com.simbachain</groupId>
             <artifactId>libsimba4j</artifactId>
-            <version>0.1.10</version>
+            <version>0.1.12</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
