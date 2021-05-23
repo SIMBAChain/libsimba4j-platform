@@ -60,6 +60,15 @@ public class Blockchain implements Ided {
     @JsonProperty("supported_contract_types")
     private List<String> supportedContractTypes;
 
+    @JsonProperty ("consensus_alg")
+    private String consensusAlg;
+
+    @JsonProperty ("gas_price_multiplier")
+    private String gasPriceMultiplier;
+
+    @JsonProperty ("gas_estimate_multiplier")
+    private String gasEstimateMultiplier;
+
     @Override
     public String getId() {
         return id;
@@ -134,6 +143,30 @@ public class Blockchain implements Ided {
         this.supportedContractTypes = supportedContractTypes;
     }
 
+    public String getConsensusAlg() {
+        return consensusAlg;
+    }
+
+    public void setConsensusAlg(String consensusAlg) {
+        this.consensusAlg = consensusAlg;
+    }
+
+    public String getGasPriceMultiplier() {
+        return gasPriceMultiplier;
+    }
+
+    public void setGasPriceMultiplier(String gasPriceMultiplier) {
+        this.gasPriceMultiplier = gasPriceMultiplier;
+    }
+
+    public String getGasEstimateMultiplier() {
+        return gasEstimateMultiplier;
+    }
+
+    public void setGasEstimateMultiplier(String gasEstimateMultiplier) {
+        this.gasEstimateMultiplier = gasEstimateMultiplier;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Blockchain{");
@@ -162,6 +195,15 @@ public class Blockchain implements Ided {
           .append('\'');
         sb.append(", supportedContractTypes=")
           .append(supportedContractTypes);
+        sb.append(", consensusAlg='")
+          .append(consensusAlg)
+          .append('\'');
+        sb.append(", gasPriceMultiplier='")
+          .append(gasPriceMultiplier)
+          .append('\'');
+        sb.append(", gasEstimateMultiplier='")
+          .append(gasEstimateMultiplier)
+          .append('\'');
         sb.append('}');
         return sb.toString();
     }

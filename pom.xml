@@ -25,7 +25,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.simbachain</groupId>
 	<artifactId>libsimba4j-platform</artifactId>
-	<version>0.1.11</version>
+	<version>0.1.12</version>
     <name>LibSimba4J Enterprise Platform</name>
     <description>Java Client for SIMBA Chain Enterprise Platform</description>
     <url>https://simbachain.github.io/libsimba4j/</url>
@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>org.web3j</groupId>
 			<artifactId>core</artifactId>
-			<version>4.5.6</version>
+			<version>4.8.4</version>
 		</dependency>
         <dependency>
             <groupId>com.simbachain</groupId>
@@ -89,6 +89,21 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
             <version>1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.68</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.12.3</version>
         </dependency>
     </dependencies>
 	<build>
