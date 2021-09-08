@@ -26,7 +26,6 @@ import com.simbachain.SimbaException;
 import com.simbachain.auth.azure.AzConfig;
 import com.simbachain.simba.platform.AppConfig;
 import com.simbachain.simba.platform.ContractService;
-import com.simbachain.simba.platform.management.BlockchainIdentities;
 import com.simbachain.simba.platform.management.OrganisationConfig;
 import com.simbachain.simba.platform.management.OrganisationService;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -54,9 +53,7 @@ public class AzCredentialExample {
         simba.init();
         System.out.println(simba.getMetadata());
         System.out.println(simba.whoami());
-        BlockchainIdentities ids = simba.getIdentities();
-        System.out.println(ids.getWallet().getIdentities("ethereum", "Quorum"));
-        System.out.println(simba.getTransactionCount("Quorum"));
+
 
         System.out.println("========= USER/PASSWORD LOGIN ===========");
         AzConfig userConfig = new AzConfig(dotenv.get("USER_EMAIL"), dotenv.get("USER_PASSWORD"),
