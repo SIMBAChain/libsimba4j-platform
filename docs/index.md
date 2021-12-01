@@ -101,7 +101,7 @@ pieces of information:
   endpoint of the platform.
 
 Given these fields, you can create an `AzConfig` instance. When you create the config, you define
-the flow to use - eithe client credential or user/password flow.
+the flow to use - either client credential or user/password flow.
 
 ```java
 String tenantId = "tenant-id";

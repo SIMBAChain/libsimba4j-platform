@@ -37,6 +37,9 @@ public class BlockchainIdentities {
     private Wallet wallet;
 
     public Wallet getWallet() {
+        if (wallet == null){
+            return Wallet.emptyWallet();
+        }
         return wallet;
     }
 
@@ -167,6 +170,15 @@ public class BlockchainIdentities {
                 }
             }
             return new HashMap<>();
+        }
+
+        @JsonIgnore
+        public static Wallet emptyWallet() {
+            Wallet w = new Wallet();
+            w.setAlias("");
+            w.setPrincipal("");
+            w.setIdentities(new HashMap<>());
+            return w;
         }
 
         @Override

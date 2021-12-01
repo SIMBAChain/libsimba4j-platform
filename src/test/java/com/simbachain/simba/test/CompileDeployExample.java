@@ -74,7 +74,8 @@ public class CompileDeployExample {
         System.out.println(design);
         ContractArtifact artifact = orgService.createArtifact(design.getId());
 
-        PagedResult<Application> apps = orgService.getApplications();
+        PagedResult<Application> apps = orgService.getApplications(20, 0);
+        System.out.println("Available Applications:");
         List<? extends Application> results = apps.getResults();
         for (Application result : results) {
             System.out.println(result.getName());
@@ -92,30 +93,56 @@ public class CompileDeployExample {
 
         PagedResult<ContractDesign> cds = orgService.getContractDesigns();
         List<? extends ContractDesign> cdsResults = cds.getResults();
+        System.out.println("Contract Designs:");
         for (ContractDesign result : cdsResults) {
             System.out.println(result.getName());
+        }
+        while (cds.getNext() != null) {
+            cds = orgService.nextContractDesigns(cds);
+            cdsResults = cds.getResults();
+            for (ContractDesign cd : cdsResults) {
+                System.out.println(cd.getName());
+            }
         }
 
         PagedResult<ContractArtifact> cas = orgService.getContractArtifacts();
         List<? extends ContractArtifact> casResults = cas.getResults();
+        System.out.println("Contract Artifacts:");
         for (ContractArtifact result : casResults) {
             System.out.println(result.getName());
+        }
+        while (cas.getNext() != null) {
+            cas = orgService.nextContractArtifacts(cas);
+            casResults = cas.getResults();
+            for (ContractDesign cd : casResults) {
+                System.out.println(cd.getName());
+            }
         }
 
         PagedResult<DeployedContract> dcs = orgService.getDeployedContracts();
         List<? extends DeployedContract> dcsResults = dcs.getResults();
+        System.out.println("Deployed Contracts:");
         for (DeployedContract result : dcsResults) {
             System.out.println(result.getApiName());
+        }
+        while (dcs.getNext() != null) {
+            dcs = orgService.nextDeployedContracts(dcs);
+            dcsResults = dcs.getResults();
+            for (DeployedContract dc : dcsResults) {
+                System.out.println(dc.getApiName());
+            }
         }
 
         PagedResult<Blockchain> bcs = orgService.getBlockchains();
         List<? extends Blockchain> bcsResults = bcs.getResults();
+        System.out.println("Available Blockchains:");
         for (Blockchain result : bcsResults) {
             System.out.println(result.getName());
         }
 
         PagedResult<Storage> sts = orgService.getStorages();
         List<? extends Storage> stsResults = sts.getResults();
+        System.out.println("Available Storage:");
         for (Storage result : stsResults) {
             System.out.println(result.getName());
         }

@@ -90,63 +90,167 @@ public class OrganisationService extends SimbaClient {
     }
 
     public long getTransactionCount(String blockchain) throws SimbaException {
-        TransactionCount count = this.get(String.format("%suser/transactions/%s/count/", getEndpoint(), blockchain),
+        TransactionCount count = this.get(
+            String.format("%suser/transactions/%s/count/", getEndpoint(), blockchain),
             jsonResponseHandler(TransactionCount.class));
         return count.getCount();
     }
 
-    public long getTransactionCount(String blockchain, String address)
-        throws SimbaException {
+    public long getTransactionCount(String blockchain, String address) throws SimbaException {
         TransactionCount count = this.get(
             String.format("%suser/transactions/%s/count/%s/", getEndpoint(), blockchain, address),
             jsonResponseHandler(TransactionCount.class));
         return count.getCount();
     }
 
-    public PagedResult<Application> getApplications() throws SimbaException {
+    public PagedResult<Application> getApplications(int limit, int offset) throws SimbaException {
         return this.get(
-            String.format("%s%sorganisations/%s/applications/", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId()),
+            String.format("%s%sorganisations/%s/applications/?limit=%d&offset=%d", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId(), limit, offset),
             jsonResponseHandler(new TypeReference<PagedResult<Application>>() {
             }));
     }
 
-    public PagedResult<ContractDesign> getContractDesigns() throws SimbaException {
+    public PagedResult<Application> getApplications() throws SimbaException {
+        return this.getApplications(10, 0);
+    }
+
+    public PagedResult<ContractDesign> getContractDesigns(int limit, int offset) throws SimbaException {
         return this.get(
-            String.format("%s%sorganisations/%s/contract_designs/", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId()),
+            String.format("%s%sorganisations/%s/contract_designs/?limit=%d&offset=%d", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId(), limit, offset),
             jsonResponseHandler(new TypeReference<PagedResult<ContractDesign>>() {
             }));
     }
 
-    public PagedResult<ContractArtifact> getContractArtifacts() throws SimbaException {
+    public PagedResult<ContractDesign> getContractDesigns() throws SimbaException {
+        return this.getContractDesigns(10, 0);
+    }
+
+    public PagedResult<ContractArtifact> getContractArtifacts(int limit, int offset) throws SimbaException {
         return this.get(
-            String.format("%s%sorganisations/%s/contract_artifacts/", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId()),
+            String.format("%s%sorganisations/%s/contract_artifacts/?limit=%d&offset=%d", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId(), limit, offset),
             jsonResponseHandler(new TypeReference<PagedResult<ContractArtifact>>() {
             }));
     }
 
-    public PagedResult<DeployedContract> getDeployedContracts() throws SimbaException {
+    public PagedResult<ContractArtifact> getContractArtifacts() throws SimbaException {
+        return this.getContractArtifacts(10, 0);
+    }
+
+    public PagedResult<DeployedContract> getDeployedContracts(int limit, int offset) throws SimbaException {
         return this.get(
-            String.format("%s%sorganisations/%s/deployed_contracts/", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId()),
+            String.format("%s%sorganisations/%s/deployed_contracts/?limit=%d&offset=%d", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId(), limit, offset),
             jsonResponseHandler(new TypeReference<PagedResult<DeployedContract>>() {
             }));
     }
 
-    public PagedResult<Blockchain> getBlockchains() throws SimbaException {
+    public PagedResult<DeployedContract> getDeployedContracts() throws SimbaException {
+        return this.getDeployedContracts(10, 0);
+    }
+
+    public PagedResult<Blockchain> getBlockchains(int limit, int offset) throws SimbaException {
         return this.get(
-            String.format("%s%sorganisations/%s/blockchains/", getEndpoint(), getvPath(),
-                getConfig().getOrganisationId()),
+            String.format("%s%sorganisations/%s/blockchains/?limit=%d&offset=%d", getEndpoint(), getvPath(),
+                getConfig().getOrganisationId(), limit, offset),
             jsonResponseHandler(new TypeReference<PagedResult<Blockchain>>() {
             }));
     }
 
-    public PagedResult<Storage> getStorages() throws SimbaException {
-        return this.get(String.format("%s%sorganisations/%s/storage/", getEndpoint(), getvPath(),
-            getConfig().getOrganisationId()),
+    public PagedResult<Blockchain> getBlockchains() throws SimbaException {
+        return this.getBlockchains(10, 0);
+    }
+
+    public PagedResult<Storage> getStorages(int limit, int offset) throws SimbaException {
+        return this.get(String.format("%s%sorganisations/%s/storage/?limit=%d&offset=%d", getEndpoint(), getvPath(),
+            getConfig().getOrganisationId(), limit, offset),
             jsonResponseHandler(new TypeReference<PagedResult<Storage>>() {
+            }));
+    }
+
+    public PagedResult<Storage> getStorages() throws SimbaException {
+        return this.getStorages(10, 0);
+    }
+
+    public <R> PagedResult<Application> previousApplications(PagedResult<Application> results)
+        throws SimbaException {
+        if (results.getPrevious() == null) {
+            return null;
+        }
+        return this.get(results.getPrevious(),
+            jsonResponseHandler(new TypeReference<PagedResult<Application>>() {
+            }));
+    }
+
+    public PagedResult<Application> nextApplications(PagedResult<Application> results)
+        throws SimbaException {
+        if (results.getNext() == null) {
+            return null;
+        }
+        return this.get(results.getNext(),
+            jsonResponseHandler(new TypeReference<PagedResult<Application>>() {
+            }));
+    }
+
+    public <R> PagedResult<ContractDesign> previousContractDesigns(PagedResult<ContractDesign> results)
+        throws SimbaException {
+        if (results.getPrevious() == null) {
+            return null;
+        }
+        return this.get(results.getPrevious(),
+            jsonResponseHandler(new TypeReference<PagedResult<ContractDesign>>() {
+            }));
+    }
+
+    public PagedResult<ContractDesign> nextContractDesigns(PagedResult<ContractDesign> results)
+        throws SimbaException {
+        if (results.getNext() == null) {
+            return null;
+        }
+        return this.get(results.getNext(),
+            jsonResponseHandler(new TypeReference<PagedResult<ContractDesign>>() {
+            }));
+    }
+
+    public PagedResult<ContractArtifact> previousContractArtifacts(PagedResult<ContractArtifact> results)
+        throws SimbaException {
+        if (results.getPrevious() == null) {
+            return null;
+        }
+        return this.get(results.getPrevious(),
+            jsonResponseHandler(new TypeReference<PagedResult<ContractArtifact>>() {
+            }));
+    }
+
+    public PagedResult<ContractArtifact> nextContractArtifacts(PagedResult<ContractArtifact> results)
+        throws SimbaException {
+        if (results.getNext() == null) {
+            return null;
+        }
+        return this.get(results.getNext(),
+            jsonResponseHandler(new TypeReference<PagedResult<ContractArtifact>>() {
+            }));
+    }
+
+    public PagedResult<DeployedContract> previousDeployedContracts(PagedResult<DeployedContract> results)
+        throws SimbaException {
+        if (results.getPrevious() == null) {
+            return null;
+        }
+        return this.get(results.getPrevious(),
+            jsonResponseHandler(new TypeReference<PagedResult<DeployedContract>>() {
+            }));
+    }
+
+    public PagedResult<DeployedContract> nextDeployedContracts(PagedResult<DeployedContract> results)
+        throws SimbaException {
+        if (results.getNext() == null) {
+            return null;
+        }
+        return this.get(results.getNext(),
+            jsonResponseHandler(new TypeReference<PagedResult<DeployedContract>>() {
             }));
     }
 
