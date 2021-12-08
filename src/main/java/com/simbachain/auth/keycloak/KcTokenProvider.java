@@ -22,7 +22,7 @@
 
 package com.simbachain.auth.keycloak;
 
-import java.util.Base64;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,11 +55,20 @@ public class KcTokenProvider implements AccessTokenProvider {
     }
 
     private Map<String, String> post(CloseableHttpClient client, String endpoint,
-        Map<String, Object> data, Map<String, String> headers) throws Exception {
-
+        Map<String, String> data, Map<String, String> headers) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (String s : data.keySet()) {
+            sb.append(URLEncoder.encode(s, "UTF-8"))
+              .append("=")
+              .append(URLEncoder.encode(data.get(s), "UTF-8"));
+            if (count < data.keySet().size() - 1){
+                sb.append("&");    
+            }
+            count++;
+        }
         HttpPost httpPost = new HttpPost(endpoint);
-        String json = mapper.writeValueAsString(data);
-        StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+        StringEntity entity = new StringEntity(sb.toString(), ContentType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
         if (headers != null) {
             for (String s : headers.keySet()) {
@@ -97,16 +106,13 @@ public class KcTokenProvider implements AccessTokenProvider {
                 this.token = null;
             }
             if (this.token == null) {
-                Map<String, Object> data = new HashMap<>();
+                Map<String, String> data = new HashMap<>();
                 data.put("grant_type", "client_credentials");
+                data.put("client_id", credentials.getClientId());
+                data.put("client_secret", credentials.getClientSecret());
+                data.put("scope", credentials.getScopes());
                 
                 Map<String, String> headers = new HashMap<>();
-                String userCredentials = credentials.getClientId()
-                    + ":"
-                    + credentials.getClientSecret();
-                String basicAuth = "Basic " + new String(Base64.getEncoder()
-                                                               .encode(userCredentials.getBytes()));
-                headers.put("Authorization", basicAuth);
                 headers.put("Content-Type", "application/x-www-form-urlencoded");
 
                 Map<String, String> result = this.post(client, credentials.getTokenUrl(), data,
