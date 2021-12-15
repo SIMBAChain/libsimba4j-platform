@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.13](https://github.com/SIMBAChain/libsimba4j-platform/compare/v0.1.12...v0.1.13) (2021-12-15)
+
+### Features
+
+* Add KeyCloak Auth Provider
+
 ## [0.1.12](https://github.com/SIMBAChain/libsimba4j-platform/compare/v0.1.11...v0.1.12) (2021-05-23)
 
 ### Features
