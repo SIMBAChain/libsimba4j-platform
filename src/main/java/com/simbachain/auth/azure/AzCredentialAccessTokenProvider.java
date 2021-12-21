@@ -66,7 +66,7 @@ public class AzCredentialAccessTokenProvider implements AccessTokenProvider {
             if (!this.token.isValid()) {
                 ConfidentialClientApplication app = ConfidentialClientApplication.builder(
                     credentials.getClientId(),
-                    ClientCredentialFactory.create(credentials.getClientSecret()))
+                    ClientCredentialFactory.createFromSecret(credentials.getClientSecret()))
                                                                                  .authority(
                                                                                      String.format(
                                                                                          "%s%s",
