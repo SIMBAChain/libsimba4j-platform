@@ -57,7 +57,7 @@ public class ContractMetadata {
     private Map<String, ContractType> types = new HashMap<>();
 
     @JsonProperty
-    private Map<String, ContractType> enums = new HashMap<>();
+    private Map<String, List> enums = new HashMap<>();
 
     @JsonProperty
     private Map<String, Object> source = new HashMap<>();
@@ -137,11 +137,11 @@ public class ContractMetadata {
         this.types = types;
     }
 
-    public Map<String, ContractType> getEnums() {
+    public Map<String, List> getEnums() {
         return enums;
     }
 
-    public void setEnums(Map<String, ContractType> enums) {
+    public void setEnums(Map<String, List> enums) {
         this.enums = enums;
     }
 
