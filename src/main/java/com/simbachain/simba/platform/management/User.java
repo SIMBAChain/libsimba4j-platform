@@ -23,6 +23,7 @@
 package com.simbachain.simba.platform.management;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -40,6 +41,15 @@ public class User {
     
     @JsonProperty("last_name")
     private String lastName;
+
+    @JsonProperty("onboarding_complete")
+    private String onboardingComplete;
+
+    @JsonProperty("default_organisation")
+    private String defaultOrganisation;
+
+    @JsonProperty("permissions")
+    private Map<String, Map<String, String>> permissions;
     
     @JsonProperty
     private Boolean admin;
