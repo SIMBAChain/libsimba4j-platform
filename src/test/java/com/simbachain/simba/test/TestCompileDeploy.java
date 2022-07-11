@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.simbachain.auth.azure.AzConfig;
+import com.simbachain.auth.blocks.BlocksConfig;
 import com.simbachain.simba.CallResponse;
 import com.simbachain.simba.JsonData;
 import com.simbachain.simba.PagedResult;
@@ -43,31 +43,33 @@ import com.simbachain.simba.platform.management.OrganisationConfig;
 import com.simbachain.simba.platform.management.OrganisationService;
 import com.simbachain.simba.platform.management.Storage;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  */
-public class CompileDeployExample {
+public class TestCompileDeploy {
 
-    public static void main(String[] args)
+    @Test
+    public void testCompileDeploy()
         throws IOException, ExecutionException, InterruptedException {
         Dotenv dotenv = Dotenv.load();
-        
-        String tenant_id = dotenv.get("TENANT_ID");
+
+
         String client_id = dotenv.get("CLIENT_ID");
         String client_secret = dotenv.get("CLIENT_SECRET");
-        String appId = dotenv.get("APP_ID");
+        String tokenurl = dotenv.get("TOKEN_URL");
         String host = dotenv.get("HOST");
         String org = dotenv.get("ORG");
 
-        System.out.println("========= CREDENTIAL LOGIN ===========");
-        AzConfig config = new AzConfig(client_id, client_secret, tenant_id, appId,
-            AzConfig.Flow.CLIENT_CREDENTIAL);
-        OrganisationConfig orgConfig = new OrganisationConfig(org, config);
+        System.out.println("========= OAuth2 Client Credential Login ===========");
+        BlocksConfig authConfig = new BlocksConfig(client_id, client_secret, tokenurl);
+
+        OrganisationConfig orgConfig = new OrganisationConfig(org, authConfig);
         OrganisationService orgService = new OrganisationService(
             host, orgConfig);
         
-        InputStream in = CompileDeployExample.class.getResourceAsStream("/supply.sol");
+        InputStream in = TestCompileDeploy.class.getResourceAsStream("/supply.sol");
 
         String apiName = "supply_" + System.currentTimeMillis();
         ContractDesign design = orgService.compileContract(in, apiName, "sasa");

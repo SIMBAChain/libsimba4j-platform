@@ -31,20 +31,22 @@ import com.simbachain.simba.platform.ContractService;
 import com.simbachain.simba.platform.management.AuthenticatedUser;
 import com.simbachain.simba.platform.management.BlockchainIdentities;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  */
-public class KeyCloakCredentialExample
+public class TestKeyCloakCredential
 {
-    public static void main(String[] args) throws SimbaException {
+    @Test
+    public void testKeycloakCredentials() throws SimbaException {
         Dotenv dotenv = Dotenv.load();
-        String clientId = dotenv.get("CLIENT_ID");
-        String clientSecret = dotenv.get("CLIENT_SECRET");
-        String host = dotenv.get("HOST");
-        String authHost = dotenv.get("AUTH_HOST");
-        String realm = dotenv.get("REALM");
-        String org = dotenv.get("ORG");
+        String clientId = dotenv.get("KC_CLIENT_ID");
+        String clientSecret = dotenv.get("KC_CLIENT_SECRET");
+        String host = dotenv.get("KC_HOST");
+        String authHost = dotenv.get("KC_AUTH_HOST");
+        String realm = dotenv.get("KC_REALM");
+        String org = dotenv.get("KC_ORG");
         String app = "MountainApp";
         String contract = "mountainapi";
 

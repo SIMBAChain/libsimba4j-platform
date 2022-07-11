@@ -28,13 +28,15 @@ import com.simbachain.simba.platform.ContractService;
 import com.simbachain.simba.platform.management.OrganisationConfig;
 import com.simbachain.simba.platform.management.OrganisationService;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.junit.jupiter.api.Test;
 
 /**
  * Obtain a set of client ID and Secrets from Blocks
  */
-public class OAuth2CredentialExample {
+public class TestOAuth2Credential {
 
-    public static void main(String[] args) throws SimbaException {
+    @Test
+    public void testOAuth2Credentials() throws SimbaException {
         Dotenv dotenv = Dotenv.load();
 
         String client_id = dotenv.get("CLIENT_ID");
@@ -43,7 +45,7 @@ public class OAuth2CredentialExample {
         String host = dotenv.get("HOST");
         String org = dotenv.get("ORG");
 
-        System.out.println("========= USER/PASSWORD LOGIN ===========");
+        System.out.println("========= OAuth2 Client Credential Login ===========");
         BlocksConfig authConfig = new BlocksConfig(client_id, client_secret, tokenurl);
         OrganisationService orgService = new OrganisationService(
             host, new OrganisationConfig(org, authConfig));
