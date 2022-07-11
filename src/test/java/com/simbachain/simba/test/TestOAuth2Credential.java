@@ -37,7 +37,7 @@ public class TestOAuth2Credential {
 
     @Test
     public void testOAuth2Credentials() throws SimbaException {
-        Dotenv dotenv = Dotenv.load();
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
         String client_id = dotenv.get("CLIENT_ID");
         String client_secret = dotenv.get("CLIENT_SECRET");

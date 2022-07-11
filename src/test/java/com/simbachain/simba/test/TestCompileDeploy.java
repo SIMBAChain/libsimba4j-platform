@@ -53,7 +53,7 @@ public class TestCompileDeploy {
     @Test
     public void testCompileDeploy()
         throws IOException, ExecutionException, InterruptedException {
-        Dotenv dotenv = Dotenv.load();
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
 
         String client_id = dotenv.get("CLIENT_ID");

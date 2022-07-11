@@ -40,7 +40,7 @@ public class TestKeyCloakCredential
 {
     @Test
     public void testKeycloakCredentials() throws SimbaException {
-        Dotenv dotenv = Dotenv.load();
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
         String clientId = dotenv.get("KC_CLIENT_ID");
         String clientSecret = dotenv.get("KC_CLIENT_SECRET");
         String host = dotenv.get("KC_HOST");
