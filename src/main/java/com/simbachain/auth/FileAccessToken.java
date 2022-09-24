@@ -46,7 +46,7 @@ public class FileAccessToken extends AccessToken {
         File tokenFile = new File(this.path);
         try {
             if (tokenFile.exists()) {
-                log.info("FileAccessToken.FileAccessToken Token file exists.");
+                log.debug("FileAccessToken.FileAccessToken Token file exists.");
                 BufferedReader reader = new BufferedReader(new FileReader(tokenFile));
                 String tokenBits = reader.readLine();
                 String[] parts = tokenBits.split("@");
@@ -56,7 +56,7 @@ public class FileAccessToken extends AccessToken {
                 reader.close();
                 long expires = Long.parseLong(parts[0]);
                 if (expires > System.currentTimeMillis()) {
-                    log.info("FileAccessToken.FileAccessToken refreshing from contents");
+                    log.debug("FileAccessToken.FileAccessToken refreshing from contents");
                     super.refresh(parts[2], parts[1], expires);
                 }
             }
@@ -66,7 +66,6 @@ public class FileAccessToken extends AccessToken {
     }
 
     public void refresh(String token, String type, long expiry) {
-        log.info("FileAccessToken.refresh ENTER");
         super.refresh(token, type, expiry);
         File tokenFile = new File(this.path);
         try {
@@ -77,7 +76,6 @@ public class FileAccessToken extends AccessToken {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        log.info("FileAccessToken.refresh EXIT");
     }
 
     public void invalidate() {

@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.simbachain.SimbaConfig;
+import com.simbachain.SimbaConfigFile;
 import com.simbachain.auth.blocks.BlocksConfig;
 import com.simbachain.simba.Balance;
 import com.simbachain.simba.CallResponse;
@@ -60,7 +60,7 @@ public class CompileDeployExample {
 
     public static void main(String[] args)
         throws IOException, ExecutionException, InterruptedException {
-        SimbaConfig conf = new SimbaConfig();
+        SimbaConfigFile conf = new SimbaConfigFile();
 
         String clientId = conf.getAuthClientId();
         String clientSecret = conf.getAuthClientSecret();

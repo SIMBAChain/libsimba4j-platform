@@ -32,14 +32,19 @@ import io.github.cdimascio.dotenv.Dotenv;
  * Provides access to the following configuration values used across Simba client tools:
  * <p>
  * SIMBA_AUTH_CLIENT_ID is the user ID for the tool that they use to login.
+ * </p><p>
  * SIMBA_AUTH_CLIENT_SECRET is the secret used to gain a token via the OAuth client_credentials flow.
+ * </p><p>
  * SIMBA_API_BASE_URL is the root of the API URL
+ * </p><p>
  * SIMBA_AUTH_BASE_URL is the root of the auth provider’s URL.
+ * </p><p>
  * SIMBA_AUTH_SCOPE auth scope.
+ * </p><p>
  * SIMBA_AUTH_REALM
- * SIMBA_LOGGING_CONF
+ * </p><p>
  */
-public class SimbaConfig {
+public class SimbaConfigFile {
 
     public static final String SIMBA_HOME = "SIMBA_HOME";
     public static final String SIMBA_LOGGING_CONF = "SIMBA_LOGGING_CONF";
@@ -55,7 +60,7 @@ public class SimbaConfig {
 
     private final Dotenv dotenv;
 
-    public SimbaConfig() {
+    public SimbaConfigFile() {
         this.dotenv = this.loadConfig();
     }
 

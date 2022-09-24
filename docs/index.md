@@ -1,12 +1,12 @@
-# LibSimba4J Enterprise Platform Documentation
+# LibSimba4J Blocks Platform Documentation
 
-This page provides usage examples of the Java SIMBA Chain Enterprise Platform client.
+This page provides usage examples of the Java SIMBA Chain Blocks Platform client.
 
 JavaDocs are available <a href="./api-doc/index.html" target="_blank">here</a>
 
 ## Getting Started
 
-To use LibSimba4J Platform include it as a dependency. For Maven builds add the following dependency
+To use LibSimba4J include it as a dependency. For Maven builds add the following dependency
 to your pom file:
 
 ```
@@ -36,9 +36,15 @@ you have maven, cd into the top level directory and type:
 mvn install
 ```
 
-## Setting up a SIMBA Enterprise Client
 
-The first thing to do is configure authentication. SIMBA Enterprise Platform (SEP) uses OAuth 2.
+## Logging
+
+Libsimba4J uses SLF4J for logging. All logging is at Debug level.
+
+
+## Setting up a SIMBA Blocks Client
+
+The first thing to do is configure authentication. SIMBA Blocks Platform uses OAuth 2.
 
 The Interfaces in the `com.simbachain.auth` package provide a means to hook in your own auth.
 
@@ -52,10 +58,20 @@ public abstract class AuthConfig implements SimbaConfig {
 
     private final String clientId;
     private final String clientSecret;
+    private final boolean writeToFile;
 
-    public AuthConfig(String clientId, String clientSecret) {
+    public AuthConfig(String clientId, String clientSecret, boolean writeToFile) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
+        this.writeToFile = writeToFile;
+    }
+
+    public AuthConfig(String clientId, String clientSecret) {
+        this(clientId, clientSecret, false);
+    }
+
+    public AuthConfig getAuthConfig() {
+        return this;
     }
 
     public String getClientId() {
@@ -65,7 +81,11 @@ public abstract class AuthConfig implements SimbaConfig {
     public String getClientSecret() {
         return clientSecret;
     }
-    
+
+    public boolean isWriteToFile() {
+        return writeToFile;
+    }
+
     public abstract AccessTokenProvider getTokenProvider();
 }
 ```
@@ -90,27 +110,67 @@ public interface AccessTokenProvider {
 }
 ```
 
-The project contains Azure OAuth implementations of these classes. In this case, you need four
-pieces of information:
+### Configuration File
 
-* Tenant ID - This can retrieved from the `/authinfo` endpoint of the platform.
-* Client ID - this can be a registered application id for client credential flow, or a password for
-  user password flow.
-* Client Secret - this is either a registered application secret or password.
-* Application ID - this is used for the scope of request. It can retrieved from the `/authinfo`
-  endpoint of the platform.
+Configuration is loaded consistent with other SIMBA client tools.
+The config file should be in dotenv format and should be called `.simbachain.env` or `simbachain.env`
+(i.e. a visible variant) or `.env`.
 
-Given these fields, you can create an `AzConfig` instance. When you create the config, you define
-the flow to use - either client credential or user/password flow.
+This can be placed on the classpath, or can be placed anywhere if the
+environment variable `SIMBA_HOME` is set. This variable should point to the directory containing the
+dotenv file. The `SIMBA_HOME` variable defaults to the user's home directory, e.g. `~/`
+
+The search order for this file is:
+
+* `.simbachain.env` on the classpath
+* `simbachain.env` on the classpath
+* `.env` on the classpath
+* `SIMBA_HOME/.simbachain.env`
+* `SIMBA_HOME/simbachain.env`
+* `SIMBA_HOME/.env`
+
+The config setup supports in memory env vars taking precedence over values in the file.
+All environment variables for Libsimba4J are prefixed with `SIMBA_`.
+
+Two auth providers are currently supported: Blocks and KeyCloak.
+For Blocks the configuration will look something like
+below, i.e., the `SIMBA_AUTH_BASE_URL` and `SIMBA_API_BASE_URL` are the same:
+
+```shell
+SIMBA_AUTH_CLIENT_SECRET=...
+SIMBA_AUTH_CLIENT_ID=...
+SIMBA_AUTH_BASE_URL=https://my.blocks.server
+SIMBA_API_BASE_URL=https://my.blocks.server
+```
+
+For keycloak, the configuration will look more like, below:
+
+```shell
+SIMBA_AUTH_CLIENT_SECRET=...
+SIMBA_AUTH_CLIENT_ID=...
+SIMBA_AUTH_REALM=simbachain
+SIMBA_API_BASE_URL=https://my.blocks.server
+SIMBA_AUTH_BASE_URL=https://my.keycloak.server
+```
+
+These values can also be directly set an environment variables if you don't use a dot env file.
+
+The config is loaded using the `SimbaConfigFile` class. For example:
 
 ```java
-String tenantId = "tenant-id";
-String clientId = "my-client-id";
-String clientSecret = "client-secret";
-String appId = "app-id";
+import com.simbachain.SimbaConfigFile;
 
-AzConfig config=new AzConfig(clientId, clientSecret, tenantId, appId,
-        AzConfig.Flow.CLIENT_CREDENTIAL);
+SimbaConfigFile config = new SimbaConfigFile();
+
+String clientId = config.getAuthClientId();
+String clientSecret = config.getAuthClientSecret();
+String authHost = config.getAuthBAseUrl();
+String host = config.getApiBaseUrl();
+
+BlocksConfig authConfig = new BlocksConfig(clientId, clientSecret, authHost);
+AuthenticatedUser user = new AuthenticatedUser(host, authConfig);
+
+System.out.println("Authenticated user: " + user.whoami());
 ```
 
 Once you have an auth config established, you can create services. Let's start with the

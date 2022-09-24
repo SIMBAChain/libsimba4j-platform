@@ -22,7 +22,7 @@
 
 package com.simbachain.simba.test;
 
-import com.simbachain.SimbaConfig;
+import com.simbachain.SimbaConfigFile;
 import com.simbachain.SimbaException;
 import com.simbachain.auth.blocks.BlocksConfig;
 import com.simbachain.simba.AppConfig;
@@ -36,7 +36,7 @@ import com.simbachain.simba.management.BlockchainIdentities;
 public class BlocksCredentialExample
 {
     public static void main(String[] args) throws SimbaException {
-        SimbaConfig config = new SimbaConfig();
+        SimbaConfigFile config = new SimbaConfigFile();
 
         String clientId = config.getAuthClientId();
         String clientSecret = config.getAuthClientSecret();

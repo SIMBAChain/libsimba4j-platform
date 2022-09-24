@@ -22,7 +22,7 @@
 
 package com.simbachain.simba.test;
 
-import com.simbachain.SimbaConfig;
+import com.simbachain.SimbaConfigFile;
 import com.simbachain.SimbaException;
 import com.simbachain.auth.keycloak.KcAuthConfig;
 import com.simbachain.simba.ContractService;
@@ -36,7 +36,7 @@ import com.simbachain.simba.management.OrganisationService;
 public class KeyCloakCredentialExample
 {
     public static void main(String[] args) throws SimbaException {
-        SimbaConfig config = new SimbaConfig();
+        SimbaConfigFile config = new SimbaConfigFile();
 
         String realm = config.getAuthRealm();
         String clientId = config.getAuthClientId();
