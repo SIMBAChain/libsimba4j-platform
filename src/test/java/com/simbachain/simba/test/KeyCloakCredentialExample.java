@@ -22,15 +22,13 @@
 
 package com.simbachain.simba.test;
 
+import com.simbachain.SimbaConfig;
 import com.simbachain.SimbaException;
 import com.simbachain.auth.keycloak.KcAuthConfig;
-import com.simbachain.simba.CallResponse;
-import com.simbachain.simba.JsonData;
-import com.simbachain.simba.platform.AppConfig;
-import com.simbachain.simba.platform.ContractService;
-import com.simbachain.simba.platform.management.AuthenticatedUser;
-import com.simbachain.simba.platform.management.BlockchainIdentities;
-import io.github.cdimascio.dotenv.Dotenv;
+import com.simbachain.simba.ContractService;
+import com.simbachain.simba.management.AuthenticatedUser;
+import com.simbachain.simba.management.OrganisationConfig;
+import com.simbachain.simba.management.OrganisationService;
 
 /**
  *
@@ -38,31 +36,23 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class KeyCloakCredentialExample
 {
     public static void main(String[] args) throws SimbaException {
-        Dotenv dotenv = Dotenv.load();
-        String clientId = dotenv.get("CLIENT_ID");
-        String clientSecret = dotenv.get("CLIENT_SECRET");
-        String host = dotenv.get("HOST");
-        String authHost = dotenv.get("AUTH_HOST");
-        String realm = dotenv.get("REALM");
-        String org = dotenv.get("ORG");
-        String app = "MountainApp";
-        String contract = "mountainapi";
+        SimbaConfig config = new SimbaConfig();
 
-        KcAuthConfig authConfig = new KcAuthConfig(clientId, clientSecret, authHost, realm,
+        String realm = config.getAuthRealm();
+        String clientId = config.getAuthClientId();
+        String clientSecret = config.getAuthClientSecret();
+        String host = config.getAuthBAseUrl();
+        String org = config.get("ORG");
+        String contract = "supplychain_1614267039";
+
+        KcAuthConfig authConfig = new KcAuthConfig(clientId, clientSecret, host, realm,
                 "email", "profile", "roles", "web-origins");
         AuthenticatedUser user = new AuthenticatedUser(host, authConfig);
         System.out.println("Authenticated user: " + user.whoami());
-        AppConfig appConfig = new AppConfig(app, org, authConfig);
-        ContractService simba = new ContractService(host, contract, appConfig);
-        simba.init();
-        System.out.println("Metadata: " + simba.getMetadata());
-        System.out.println("Contract user: " + simba.whoami());
-        BlockchainIdentities ids = simba.getIdentities();
-        System.out.println("Wallet: " + ids.getWallet().getIdentities("ethereum", "ganache"));
-        System.out.println("Num transactions: " + simba.getTransactionCount("ganache"));
-
-        JsonData inputData = JsonData.with("elevationInMetres", 1230).and("__Mountain", "MtBaldy");
-        CallResponse result = simba.callMethod("climb", inputData);
-        System.out.println("Got back response: " + result);
+        OrganisationService orgService = new OrganisationService(
+            host, new OrganisationConfig(org, authConfig));
+        System.out.println(orgService.whoami());
+        ContractService simba1 = orgService.newContractService("myapi", "car");
+        System.out.println(simba1.getMetadata());
     }
 }

@@ -287,12 +287,13 @@ package com.supplychain;
 import com.simbachain.simba.JsonData;
 import com.simbachain.simba.CallResponse;
 import com.simbachain.SimbaException;
-import com.simbachain.simba.platform.ContractService;
-import com.simbachain.simba.platform.ContractClient;
+import com.simbachain.simba.ContractService;
+import com.simbachain.simba.ContractClient;
 import com.simbachain.simba.PagedResult;
 import com.simbachain.simba.Query;
 import com.simbachain.simba.Transaction;
 import com.simbachain.simba.Jsonable;
+
 import java.math.BigInteger;
 
 /**
@@ -315,23 +316,28 @@ public class SupplyChain extends ContractClient {
      * @return CallResponse containing the response.
      * @throws SimbaException if an error occurs. 
      */
-    public CallResponse supply(Supplier supplier, Supplier purchaser, Part part, BigInteger price, BigInteger dateTime) throws SimbaException {
+    public CallResponse supply(Supplier supplier,
+        Supplier purchaser,
+        Part part,
+        BigInteger price,
+        BigInteger dateTime) throws SimbaException {
         JsonData data = JsonData.jsonData();
         data = data.and("supplier", supplier.toJsonData());
         data = data.and("purchaser", purchaser.toJsonData());
         data = data.and("part", part.toJsonData());
-        data = data.and("price", price); 
-        data = data.and("dateTime", dateTime); 
+        data = data.and("price", price);
+        data = data.and("dateTime", dateTime);
         return this.simba.callMethod("supply", data);
     }
-    
+
     /**
      * Get transactions for the supply transaction.
      *
      * @param params Query.Params.
      * @return PagedResult of Transaction objects.
      */
-    public PagedResult<Transaction> getSupplyTransactions(Query.Params params) throws SimbaException {
+    public PagedResult<Transaction> getSupplyTransactions(Query.Params params)
+        throws SimbaException {
         return this.getTransactions("supply", params);
     }
 
@@ -345,7 +351,8 @@ public class SupplyChain extends ContractClient {
      * @return CallResponse containing the response.
      * @throws SimbaException if an error occurs. 
      */
-    public CallResponse assemble(Part part, Part[] subParts, String assemblyId, BigInteger dateTime) throws SimbaException {
+    public CallResponse assemble(Part part, Part[] subParts, String assemblyId, BigInteger dateTime)
+        throws SimbaException {
         JsonData data = JsonData.jsonData();
         data = data.and("part", part.toJsonData());
         java.util.List<JsonData> list = new java.util.ArrayList<>();
@@ -353,18 +360,19 @@ public class SupplyChain extends ContractClient {
             list.add(element.toJsonData());
         }
         data = data.and("subParts", list);
-        data = data.and("assemblyId", assemblyId); 
-        data = data.and("dateTime", dateTime); 
+        data = data.and("assemblyId", assemblyId);
+        data = data.and("dateTime", dateTime);
         return this.simba.callMethod("assemble", data);
     }
-    
+
     /**
      * Get transactions for the assemble transaction.
      *
      * @param params Query.Params.
      * @return PagedResult of Transaction objects.
      */
-    public PagedResult<Transaction> getAssembleTransactions(Query.Params params) throws SimbaException {
+    public PagedResult<Transaction> getAssembleTransactions(Query.Params params)
+        throws SimbaException {
         return this.getTransactions("assemble", params);
     }
 
@@ -378,7 +386,10 @@ public class SupplyChain extends ContractClient {
      * @return CallResponse containing the response.
      * @throws SimbaException if an error occurs. 
      */
-    public CallResponse distribute(Supplier distributor, Depot[] depots, Part part, BigInteger dateTime) throws SimbaException {
+    public CallResponse distribute(Supplier distributor,
+        Depot[] depots,
+        Part part,
+        BigInteger dateTime) throws SimbaException {
         JsonData data = JsonData.jsonData();
         data = data.and("distributor", distributor.toJsonData());
         java.util.List<JsonData> list = new java.util.ArrayList<>();
@@ -387,17 +398,18 @@ public class SupplyChain extends ContractClient {
         }
         data = data.and("depots", list);
         data = data.and("part", part.toJsonData());
-        data = data.and("dateTime", dateTime); 
+        data = data.and("dateTime", dateTime);
         return this.simba.callMethod("distribute", data);
     }
-    
+
     /**
      * Get transactions for the distribute transaction.
      *
      * @param params Query.Params.
      * @return PagedResult of Transaction objects.
      */
-    public PagedResult<Transaction> getDistributeTransactions(Query.Params params) throws SimbaException {
+    public PagedResult<Transaction> getDistributeTransactions(Query.Params params)
+        throws SimbaException {
         return this.getTransactions("distribute", params);
     }
 
@@ -411,22 +423,26 @@ public class SupplyChain extends ContractClient {
      * @return CallResponse containing the response.
      * @throws SimbaException if an error occurs. 
      */
-    public CallResponse nonConformance(Part part, DataSource source, String reason, BigInteger dateTime) throws SimbaException {
+    public CallResponse nonConformance(Part part,
+        DataSource source,
+        String reason,
+        BigInteger dateTime) throws SimbaException {
         JsonData data = JsonData.jsonData();
         data = data.and("part", part.toJsonData());
         data = data.and("source", source.toJsonData());
-        data = data.and("reason", reason); 
-        data = data.and("dateTime", dateTime); 
+        data = data.and("reason", reason);
+        data = data.and("dateTime", dateTime);
         return this.simba.callMethod("nonConformance", data);
     }
-    
+
     /**
      * Get transactions for the nonConformance transaction.
      *
      * @param params Query.Params.
      * @return PagedResult of Transaction objects.
      */
-    public PagedResult<Transaction> getNonConformanceTransactions(Query.Params params) throws SimbaException {
+    public PagedResult<Transaction> getNonConformanceTransactions(Query.Params params)
+        throws SimbaException {
         return this.getTransactions("nonConformance", params);
     }
 
@@ -448,14 +464,15 @@ public class SupplyChain extends ContractClient {
         data = data.and("parts", list);
         return this.simba.callMethod("systemAssembly", data);
     }
-    
+
     /**
      * Get transactions for the systemAssembly transaction.
      *
      * @param params Query.Params.
      * @return PagedResult of Transaction objects.
      */
-    public PagedResult<Transaction> getSystemAssemblyTransactions(Query.Params params) throws SimbaException {
+    public PagedResult<Transaction> getSystemAssemblyTransactions(Query.Params params)
+        throws SimbaException {
         return this.getTransactions("systemAssembly", params);
     }
 
@@ -468,7 +485,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Getter for __Supplier.
          * @return __Supplier
-         */         
+         */
         public String get__Supplier() {
             return __Supplier;
         }
@@ -476,7 +493,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Setter for __Supplier
          * @param __Supplier of type String.
-         */        
+         */
         public void set__Supplier(String __Supplier) {
             this.__Supplier = __Supplier;
         }
@@ -484,7 +501,7 @@ public class SupplyChain extends ContractClient {
         @Override
         public JsonData toJsonData() {
             JsonData data = JsonData.jsonData();
-            data = data.and("__Supplier", __Supplier); 
+            data = data.and("__Supplier", __Supplier);
             return data;
         }
     }
@@ -498,7 +515,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Getter for __Part.
          * @return __Part
-         */         
+         */
         public String get__Part() {
             return __Part;
         }
@@ -506,7 +523,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Setter for __Part
          * @param __Part of type String.
-         */        
+         */
         public void set__Part(String __Part) {
             this.__Part = __Part;
         }
@@ -514,7 +531,7 @@ public class SupplyChain extends ContractClient {
         @Override
         public JsonData toJsonData() {
             JsonData data = JsonData.jsonData();
-            data = data.and("__Part", __Part); 
+            data = data.and("__Part", __Part);
             return data;
         }
     }
@@ -528,7 +545,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Getter for __Depot.
          * @return __Depot
-         */         
+         */
         public String get__Depot() {
             return __Depot;
         }
@@ -536,7 +553,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Setter for __Depot
          * @param __Depot of type String.
-         */        
+         */
         public void set__Depot(String __Depot) {
             this.__Depot = __Depot;
         }
@@ -544,7 +561,7 @@ public class SupplyChain extends ContractClient {
         @Override
         public JsonData toJsonData() {
             JsonData data = JsonData.jsonData();
-            data = data.and("__Depot", __Depot); 
+            data = data.and("__Depot", __Depot);
             return data;
         }
     }
@@ -558,7 +575,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Getter for __DataSource.
          * @return __DataSource
-         */         
+         */
         public String get__DataSource() {
             return __DataSource;
         }
@@ -566,7 +583,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Setter for __DataSource
          * @param __DataSource of type String.
-         */        
+         */
         public void set__DataSource(String __DataSource) {
             this.__DataSource = __DataSource;
         }
@@ -574,7 +591,7 @@ public class SupplyChain extends ContractClient {
         @Override
         public JsonData toJsonData() {
             JsonData data = JsonData.jsonData();
-            data = data.and("__DataSource", __DataSource); 
+            data = data.and("__DataSource", __DataSource);
             return data;
         }
     }
@@ -588,7 +605,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Getter for __WeaponSystem.
          * @return __WeaponSystem
-         */         
+         */
         public String get__WeaponSystem() {
             return __WeaponSystem;
         }
@@ -596,7 +613,7 @@ public class SupplyChain extends ContractClient {
         /**
          * Setter for __WeaponSystem
          * @param __WeaponSystem of type String.
-         */        
+         */
         public void set__WeaponSystem(String __WeaponSystem) {
             this.__WeaponSystem = __WeaponSystem;
         }
@@ -604,7 +621,7 @@ public class SupplyChain extends ContractClient {
         @Override
         public JsonData toJsonData() {
             JsonData data = JsonData.jsonData();
-            data = data.and("__WeaponSystem", __WeaponSystem); 
+            data = data.and("__WeaponSystem", __WeaponSystem);
             return data;
         }
     }

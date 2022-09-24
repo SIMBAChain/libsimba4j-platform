@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0](https://github.com/SIMBAChain/libsimba4j-platform/compare/v0.1.14...v1.0.0) (2022-09-24)
+
+### Breaking Changes
+
+* Refactor to remove dependency on libsimba4J which is deprecated
+
+
 ## [0.1.14](https://github.com/SIMBAChain/libsimba4j-platform/compare/v0.1.13...v0.1.14) (2022-01-21)
 
 ### Bugs

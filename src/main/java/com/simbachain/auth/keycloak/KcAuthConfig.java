@@ -43,9 +43,14 @@ public class KcAuthConfig extends AuthConfig {
         while (host.endsWith("/")) {
             host = host.substring(0, host.length() - 1);
         }
+        if (scopes.length == 0) {
+            this.scopes = "email profile roles web-origins";
+        } else{
+            this.scopes = String.join(" ", scopes);
+        }
         this.host = host;
         this.realm = realm;
-        this.scopes = String.join(" ", scopes);
+        
     }
 
     public String getHost() {

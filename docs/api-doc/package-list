@@ -1,7 +1,9 @@
+com.simbachain
 com.simbachain.auth
-com.simbachain.auth.azure
+com.simbachain.auth.blocks
 com.simbachain.auth.keycloak
 com.simbachain.auth.local
-com.simbachain.simba.platform
-com.simbachain.simba.platform.gen
-com.simbachain.simba.platform.management
+com.simbachain.simba
+com.simbachain.simba.gen
+com.simbachain.simba.management
+com.simbachain.wallet

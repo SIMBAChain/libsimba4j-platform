@@ -43,6 +43,10 @@ public abstract class AuthConfig implements SimbaConfig {
         this(clientId, clientSecret, false);
     }
 
+    public AuthConfig getAuthConfig() {
+        return this;
+    }
+
     public String getClientId() {
         return clientId;
     }

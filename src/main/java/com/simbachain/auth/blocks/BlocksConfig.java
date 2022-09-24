@@ -34,9 +34,12 @@ public class BlocksConfig extends AuthConfig {
 
     public BlocksConfig(String clientId,
                         String clientSecret,
-                        String tokenUrl) {
+                        String authHost) {
         super(clientId, clientSecret);
-        this.tokenUrl = tokenUrl;
+        if (!authHost.endsWith("/")) {
+            authHost = authHost + "/";
+        }
+        this.tokenUrl = String.format("%s/o/token/", authHost);
     }
     public String getTokenUrl() {
         return tokenUrl;

@@ -22,8 +22,11 @@
 
 package com.simbachain.auth.blocks;
 
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,8 +38,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -60,8 +61,6 @@ public class BlocksTokenProvider implements AccessTokenProvider {
         Map<String, String> data, Map<String, String> headers) throws Exception {
 
         HttpPost httpPost = new HttpPost(endpoint);
-        String json = mapper.writeValueAsString(data);
-        StringEntity entity = new StringEntity(json, ContentType.APPLICATION_FORM_URLENCODED);
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
 

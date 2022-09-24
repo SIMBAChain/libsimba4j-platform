@@ -24,25 +24,34 @@ package com.simbachain.simba.test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.simbachain.auth.azure.AzConfig;
+import com.simbachain.SimbaConfig;
+import com.simbachain.auth.blocks.BlocksConfig;
+import com.simbachain.simba.Balance;
 import com.simbachain.simba.CallResponse;
+import com.simbachain.simba.ContractService;
 import com.simbachain.simba.JsonData;
 import com.simbachain.simba.PagedResult;
-import com.simbachain.simba.platform.ContractService;
-import com.simbachain.simba.platform.management.Application;
-import com.simbachain.simba.platform.management.Blockchain;
-import com.simbachain.simba.platform.management.ContractArtifact;
-import com.simbachain.simba.platform.management.ContractDesign;
-import com.simbachain.simba.platform.management.DeployedContract;
-import com.simbachain.simba.platform.management.DeploymentSpec;
-import com.simbachain.simba.platform.management.OrganisationConfig;
-import com.simbachain.simba.platform.management.OrganisationService;
-import com.simbachain.simba.platform.management.Storage;
-import io.github.cdimascio.dotenv.Dotenv;
+import com.simbachain.simba.Query;
+import com.simbachain.simba.Transaction;
+import com.simbachain.simba.management.Application;
+import com.simbachain.simba.management.AuthenticatedUser;
+import com.simbachain.simba.management.Blockchain;
+import com.simbachain.simba.management.BlockchainIdentities;
+import com.simbachain.simba.management.ContractArtifact;
+import com.simbachain.simba.management.ContractDesign;
+import com.simbachain.simba.management.DeployedContract;
+import com.simbachain.simba.management.DeploymentSpec;
+import com.simbachain.simba.management.NewApplication;
+import com.simbachain.simba.management.OrganisationConfig;
+import com.simbachain.simba.management.OrganisationService;
+import com.simbachain.simba.management.Storage;
 
 /**
  *
@@ -51,105 +60,90 @@ public class CompileDeployExample {
 
     public static void main(String[] args)
         throws IOException, ExecutionException, InterruptedException {
-        Dotenv dotenv = Dotenv.load();
-        
-        String tenant_id = dotenv.get("TENANT_ID");
-        String client_id = dotenv.get("CLIENT_ID");
-        String client_secret = dotenv.get("CLIENT_SECRET");
-        String appId = dotenv.get("APP_ID");
-        String host = dotenv.get("HOST");
-        String org = dotenv.get("ORG");
+        SimbaConfig conf = new SimbaConfig();
 
-        System.out.println("========= CREDENTIAL LOGIN ===========");
-        AzConfig config = new AzConfig(client_id, client_secret, tenant_id, appId,
-            AzConfig.Flow.CLIENT_CREDENTIAL);
+        String clientId = conf.getAuthClientId();
+        String clientSecret = conf.getAuthClientSecret();
+        String authHost = conf.getAuthBAseUrl();
+        String host = conf.getApiBaseUrl();
+        String org = "libsimba-1660833413";
+        
+        long now = System.currentTimeMillis();
+
+        BlocksConfig config = new BlocksConfig(clientId, clientSecret, authHost);
+
+        AuthenticatedUser user = new AuthenticatedUser(host, config);
+        System.out.println("Authenticated user: " + user.whoami());
+        Balance balance = user.getBalance("Quorum");
+        System.out.println("balance: " + balance);
+        BlockchainIdentities identities = user.getIdentities();
+        System.out.println("wallet: " + identities.getWallet());
+        
+        
         OrganisationConfig orgConfig = new OrganisationConfig(org, config);
         OrganisationService orgService = new OrganisationService(
             host, orgConfig);
         
-        InputStream in = CompileDeployExample.class.getResourceAsStream("/supply.sol");
-
-        String apiName = "supply_" + System.currentTimeMillis();
-        ContractDesign design = orgService.compileContract(in, apiName, "sasa");
-        System.out.println(design);
-        ContractArtifact artifact = orgService.createArtifact(design.getId());
-
-        PagedResult<Application> apps = orgService.getApplications(20, 0);
-        System.out.println("Available Applications:");
-        List<? extends Application> results = apps.getResults();
-        for (Application result : results) {
-            System.out.println(result.getName());
-        }
-
-        DeploymentSpec spec = new DeploymentSpec();
-        spec.setApiName(apiName);
-        spec.setBlockchain("Quorum");
-        spec.setStorage("azure");
-        spec.setAppName("neo-supplychain");
-
-        Future<DeployedContract> future = orgService.deployContract(artifact.getId(), spec);
-        DeployedContract contract = future.get();
-        System.out.println(contract);
-
+        NewApplication newApp = orgService.createApplication("libsimba4J-" + now, "Libsimba4J-" + now);
+        String appName = newApp.getName();
+        System.out.println("new App name:" + appName);
         PagedResult<ContractDesign> cds = orgService.getContractDesigns();
         List<? extends ContractDesign> cdsResults = cds.getResults();
-        System.out.println("Contract Designs:");
         for (ContractDesign result : cdsResults) {
             System.out.println(result.getName());
-        }
-        while (cds.getNext() != null) {
-            cds = orgService.nextContractDesigns(cds);
-            cdsResults = cds.getResults();
-            for (ContractDesign cd : cdsResults) {
-                System.out.println(cd.getName());
-            }
         }
 
         PagedResult<ContractArtifact> cas = orgService.getContractArtifacts();
         List<? extends ContractArtifact> casResults = cas.getResults();
-        System.out.println("Contract Artifacts:");
         for (ContractArtifact result : casResults) {
             System.out.println(result.getName());
         }
-        while (cas.getNext() != null) {
-            cas = orgService.nextContractArtifacts(cas);
-            casResults = cas.getResults();
-            for (ContractDesign cd : casResults) {
-                System.out.println(cd.getName());
-            }
-        }
-
-        PagedResult<DeployedContract> dcs = orgService.getDeployedContracts();
+        System.out.println("=================== List Deployed Contracts ===================");
+        PagedResult<DeployedContract> dcs = orgService.getDeployedContracts(Query.ex("api_name", "supply_1658670508692"), 10, 0);
         List<? extends DeployedContract> dcsResults = dcs.getResults();
-        System.out.println("Deployed Contracts:");
         for (DeployedContract result : dcsResults) {
             System.out.println(result.getApiName());
         }
-        while (dcs.getNext() != null) {
-            dcs = orgService.nextDeployedContracts(dcs);
-            dcsResults = dcs.getResults();
-            for (DeployedContract dc : dcsResults) {
-                System.out.println(dc.getApiName());
-            }
+
+        System.out.println("=================== List Applications ===================");
+        PagedResult<Application> apps = orgService.getApplications(Query.contains("name", "cif"));
+        List<? extends Application> appsResults = apps.getResults();
+        for (Application result : appsResults) {
+            System.out.println(result.getName());
         }
 
         PagedResult<Blockchain> bcs = orgService.getBlockchains();
         List<? extends Blockchain> bcsResults = bcs.getResults();
-        System.out.println("Available Blockchains:");
         for (Blockchain result : bcsResults) {
             System.out.println(result.getName());
         }
 
         PagedResult<Storage> sts = orgService.getStorages();
         List<? extends Storage> stsResults = sts.getResults();
-        System.out.println("Available Storage:");
         for (Storage result : stsResults) {
             System.out.println(result.getName());
         }
 
-        ContractService contractService = orgService.newContractService("neo-supplychain", apiName);
-        String path = contractService.generateContractPackage("com.supplychain", "./");
-        System.out.println(path);
+        InputStream in = CompileDeployExample.class.getResourceAsStream("/supply.sol");
+
+        String apiName = "supply_" + System.currentTimeMillis();
+        ContractDesign design = orgService.compileContract(in, apiName);
+        System.out.println(design);
+        ContractArtifact artifact = orgService.createArtifact(design.getId());
+
+        DeploymentSpec spec = new DeploymentSpec();
+        spec.setApiName(apiName);
+        spec.setBlockchain("Quorum");
+        spec.setStorage("azure");
+        spec.setAppName(newApp.getName());
+
+
+        Future<DeployedContract> future = orgService.deployContract(artifact.getId(), spec);
+        DeployedContract contract = future.get();
+        System.out.println(contract);
+
+        ContractService contractService = orgService.newContractService(newApp.getName(), apiName);
+        System.out.println("CompileDeployExample.main MD: " + contractService.getMetadata());
 
 
         JsonData supplyData = JsonData.with("price", 120)
@@ -157,10 +151,46 @@ public class CompileDeployExample {
                                       .and("supplier", JsonData.with("__Supplier", "Supplier3.32"))
                                       .and("purchaser", JsonData.with("__Supplier", "Supplier2.11"))
                                       .and("part", JsonData.with("__Part", "Part542"));
-        
-        CallResponse ret = contractService.callMethod("supply", supplyData);
+
+        Map<String, String> headers = new HashMap<>();
+
+        CallResponse ret = contractService.callMethod("supply", supplyData, headers);
         System.out.println("Got back response: " + ret);
+        
+        List<String> fields = new ArrayList<>();
+        fields.add("method");
+        fields.add("inputs");
+        fields.add("state");
+        
 
+        System.out.println("CompileDeployExample.main MD: " + contractService.getMetadata());
+        PagedResult<Transaction> txnResults = contractService.getTransactions("supply",
+            Query.empty(), fields);
+        List<? extends Transaction> txns = txnResults.getResults();
+        for (Transaction transaction : txns) {
+            System.out.printf("returned transaction: %s%n", transaction);
+        }
+        // Call next, if there are more results.
+        while (txnResults.getNext() != null) {
+            txnResults = contractService.next(txnResults);
+            txns = txnResults.getResults();
+            for (Transaction transaction : txns) {
+                System.out.printf("next returned transaction: %s%n", transaction);
+            }
+        }
+
+        txnResults = contractService.getTransactions("supply", Query.contains("inputs.part.__Part", "Part542"), fields);
+        txns = txnResults.getResults();
+        for (Transaction transaction : txns) {
+            System.out.println(String.format("returned transaction: %s", transaction));
+        }
+        // Call next, if there are more results.
+        while (txnResults.getNext() != null) {
+            txnResults = contractService.next(txnResults);
+            txns = txnResults.getResults();
+            for (Transaction transaction : txns) {
+                System.out.printf("next returned transaction: %s%n", transaction);
+            }
+        }
     }
-
 }

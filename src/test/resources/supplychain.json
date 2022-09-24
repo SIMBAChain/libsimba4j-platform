@@ -1,0 +1,232 @@
+{
+  "contract": {
+    "name": "SupplyChain",
+    "enums": {},
+    "types": {
+      "SupplyChain.Part": {
+        "components": [
+          {
+            "name": "__Part",
+            "type": "string"
+          }
+        ]
+      },
+      "SupplyChain.Depot": {
+        "components": [
+          {
+            "name": "__Depot",
+            "type": "string"
+          }
+        ]
+      },
+      "SupplyChain.Supplier": {
+        "components": [
+          {
+            "name": "__Supplier",
+            "type": "string"
+          }
+        ]
+      },
+      "SupplyChain.DataSource": {
+        "components": [
+          {
+            "name": "__DataSource",
+            "type": "string"
+          }
+        ]
+      },
+      "SupplyChain.WeaponSystem": {
+        "components": [
+          {
+            "name": "__WeaponSystem",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "assets": {
+      "SupplyChain.Part": {
+        "depends": [],
+        "methods": [
+          "nonConformance",
+          "assemble",
+          "systemAssembly",
+          "distribute",
+          "supply"
+        ]
+      },
+      "SupplyChain.Depot": {
+        "depends": [],
+        "methods": [
+          "nonConformance",
+          "assemble",
+          "systemAssembly",
+          "distribute",
+          "supply"
+        ]
+      },
+      "SupplyChain.Supplier": {
+        "depends": [],
+        "methods": [
+          "nonConformance",
+          "assemble",
+          "systemAssembly",
+          "distribute",
+          "supply"
+        ]
+      },
+      "SupplyChain.DataSource": {
+        "depends": [],
+        "methods": [
+          "nonConformance",
+          "assemble",
+          "systemAssembly",
+          "distribute",
+          "supply"
+        ]
+      },
+      "SupplyChain.WeaponSystem": {
+        "depends": [],
+        "methods": [
+          "nonConformance",
+          "assemble",
+          "systemAssembly",
+          "distribute",
+          "supply"
+        ]
+      }
+    },
+    "events": {},
+    "source": {
+      "lang": "solidity",
+      "version": "^0.7.0"
+    },
+    "methods": {
+      "supply": {
+        "emits": [],
+        "params": [
+          {
+            "name": "supplier",
+            "type": "struct SupplyChain.Supplier"
+          },
+          {
+            "name": "purchaser",
+            "type": "struct SupplyChain.Supplier"
+          },
+          {
+            "name": "part",
+            "type": "struct SupplyChain.Part"
+          },
+          {
+            "name": "price",
+            "type": "uint256"
+          },
+          {
+            "name": "dateTime",
+            "type": "uint256"
+          }
+        ],
+        "returns": [],
+        "accessor": false,
+        "visibility": "public"
+      },
+      "assemble": {
+        "emits": [],
+        "params": [
+          {
+            "name": "part",
+            "type": "struct SupplyChain.Part"
+          },
+          {
+            "name": "subParts",
+            "type": "struct SupplyChain.Part[]"
+          },
+          {
+            "name": "assemblyId",
+            "type": "string"
+          },
+          {
+            "name": "dateTime",
+            "type": "uint256"
+          }
+        ],
+        "returns": [],
+        "accessor": false,
+        "visibility": "public"
+      },
+      "distribute": {
+        "emits": [],
+        "params": [
+          {
+            "name": "distributor",
+            "type": "struct SupplyChain.Supplier"
+          },
+          {
+            "name": "depots",
+            "type": "struct SupplyChain.Depot[]"
+          },
+          {
+            "name": "part",
+            "type": "struct SupplyChain.Part"
+          },
+          {
+            "name": "dateTime",
+            "type": "uint256"
+          }
+        ],
+        "returns": [],
+        "accessor": false,
+        "visibility": "public"
+      },
+      "nonConformance": {
+        "emits": [],
+        "params": [
+          {
+            "name": "part",
+            "type": "struct SupplyChain.Part"
+          },
+          {
+            "name": "source",
+            "type": "struct SupplyChain.DataSource"
+          },
+          {
+            "name": "reason",
+            "type": "string"
+          },
+          {
+            "name": "dateTime",
+            "type": "uint256"
+          }
+        ],
+        "returns": [],
+        "accessor": false,
+        "visibility": "public"
+      },
+      "systemAssembly": {
+        "emits": [],
+        "params": [
+          {
+            "name": "system",
+            "type": "struct SupplyChain.WeaponSystem"
+          },
+          {
+            "name": "parts",
+            "type": "struct SupplyChain.Part[]"
+          }
+        ],
+        "returns": [],
+        "accessor": false,
+        "visibility": "public"
+      }
+    },
+    "abstract": false,
+    "constructor": {
+      "emits": [],
+      "params": [],
+      "returns": [],
+      "accessor": false,
+      "visibility": "public"
+    },
+    "inheritance": []
+  }
+}
