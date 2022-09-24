@@ -32,9 +32,8 @@ import org.web3j.crypto.Credentials;
 import org.web3j.crypto.MnemonicUtils;
 import org.web3j.crypto.WalletUtils;
 
-
 /**
- *  File based Wallet implementation.
+ * File based Wallet implementation.
  *  This supports standard wallet files as well as Bip39 wallets that
  *  have an associated mnemonic.
  */
@@ -51,20 +50,23 @@ public class FileWallet extends Wallet {
      * the name subdirectory that a single wallet file lives. That file will have the
      * name of the current UTC timestamp and the address in it.
      * NOTE: The name parameter may get mangled to ensure a valid directory name is used.
+     *
      * @param directory root directory
-     * @param name sub directory for locating a single wallet file.
+     * @param name      sub directory for locating a single wallet file.
      */
     public FileWallet(String directory, String name) {
         super();
         walletDir = new File(directory, mangleForFile(name));
-        if(!walletDir.exists() || walletDir.length() == 0) {
+        if (!walletDir.exists() || walletDir.length() == 0) {
             boolean created = walletDir.mkdirs();
             if (!created) {
-                throw new RuntimeException(String.format("Failed to create directory %s", walletDir.getAbsolutePath()));
-            }    
+                throw new RuntimeException(
+                    String.format("Failed to create directory %s", walletDir.getAbsolutePath()));
+            }
         }
-        if(walletDir.exists() && !walletDir.isDirectory()) {
-            throw new RuntimeException(String.format("Wallet directory %s is not a directory", walletDir.getAbsolutePath()));
+        if (walletDir.exists() && !walletDir.isDirectory()) {
+            throw new RuntimeException(String.format("Wallet directory %s is not a directory",
+                walletDir.getAbsolutePath()));
         }
     }
 
@@ -76,15 +78,17 @@ public class FileWallet extends Wallet {
      */
     @Override
     public synchronized boolean deleteWallet() throws SimbaException {
-        
+
         if (!walletDir.exists() || !walletDir.isDirectory()) {
             throw new SimbaException(
-                String.format("Unknown directory: %s", walletDir.getAbsolutePath()), SimbaException.SimbaError.WALLET_NOT_FOUND);
+                String.format("Unknown directory: %s", walletDir.getAbsolutePath()),
+                SimbaException.SimbaError.WALLET_NOT_FOUND);
         }
         try {
             return deleteWalletDir(walletDir);
         } catch (Exception e) {
-            throw new SimbaException("Cannot delete wallet", SimbaException.SimbaError.DELETE_FAILED);
+            throw new SimbaException("Cannot delete wallet",
+                SimbaException.SimbaError.DELETE_FAILED);
         }
     }
 
@@ -97,16 +101,17 @@ public class FileWallet extends Wallet {
      * @throws SimbaException if an error occurs.
      */
     @Override
-    public synchronized String generateWallet(String passkey)
-        throws SimbaException {
-        if(walletExists()) {
-            throw new SimbaException("Error generating wallet. A wallet already exists.", SimbaException.SimbaError.WALLET_EXISTS);
+    public synchronized String generateWallet(String passkey) throws SimbaException {
+        if (walletExists()) {
+            throw new SimbaException("Error generating wallet. A wallet already exists.",
+                SimbaException.SimbaError.WALLET_EXISTS);
         }
         try {
             String filename = WalletUtils.generateNewWalletFile(passkey, walletDir);
             return new File(walletDir, filename).getAbsolutePath();
         } catch (Exception e) {
-            throw new SimbaException("Error generating wallet", SimbaException.SimbaError.WALLET_GENERATE_FAILED, e);
+            throw new SimbaException("Error generating wallet",
+                SimbaException.SimbaError.WALLET_GENERATE_FAILED, e);
         }
     }
 
@@ -118,10 +123,12 @@ public class FileWallet extends Wallet {
         }
         try {
             Credentials creds = Credentials.create(privateKey);
-            String filename = WalletUtils.generateWalletFile(passkey, creds.getEcKeyPair(), walletDir, true);
+            String filename = WalletUtils.generateWalletFile(passkey, creds.getEcKeyPair(),
+                walletDir, true);
             return new File(walletDir, filename).getAbsolutePath();
         } catch (Exception e) {
-            throw new SimbaException("Error generating wallet", SimbaException.SimbaError.WALLET_GENERATE_FAILED, e);
+            throw new SimbaException("Error generating wallet",
+                SimbaException.SimbaError.WALLET_GENERATE_FAILED, e);
         }
     }
 
@@ -157,7 +164,8 @@ public class FileWallet extends Wallet {
     public synchronized String generateMnemonicWallet(String passkey, String mnemonic)
         throws SimbaException {
         if (walletExists()) {
-            throw new SimbaException("Error generating wallet. A wallet already exists at " + walletDir,
+            throw new SimbaException(
+                "Error generating wallet. A wallet already exists at " + walletDir,
                 SimbaException.SimbaError.WALLET_EXISTS);
         }
         try {
@@ -166,7 +174,8 @@ public class FileWallet extends Wallet {
             this.mnemonic = mnemonic;
             return new File(walletDir, bw.getFilename()).getAbsolutePath();
         } catch (Exception e) {
-            throw new SimbaException("Error generating wallet", SimbaException.SimbaError.WALLET_GENERATE_FAILED, e);
+            throw new SimbaException("Error generating wallet",
+                SimbaException.SimbaError.WALLET_GENERATE_FAILED, e);
         }
 
     }
@@ -179,17 +188,17 @@ public class FileWallet extends Wallet {
      * @throws SimbaException if an error occurs
      */
     @Override
-    public synchronized String loadWallet(String passkey)
-        throws SimbaException {
+    public synchronized String loadWallet(String passkey) throws SimbaException {
         try {
             File wallet = getWalletFile(walletDir);
             if (wallet == null) {
                 throw new SimbaException(
-                    String.format("Cannot find wallet at %s", walletDir.getAbsolutePath()), SimbaException.SimbaError.WALLET_NOT_FOUND);
+                    String.format("Cannot find wallet at %s", walletDir.getAbsolutePath()),
+                    SimbaException.SimbaError.WALLET_NOT_FOUND);
             }
             this.credentials = WalletUtils.loadCredentials(passkey, wallet);
             return wallet.getAbsolutePath();
-            
+
         } catch (Exception e) {
             throw new SimbaException(SimbaException.SimbaError.LOAD_FAILED, e);
         }
@@ -211,7 +220,8 @@ public class FileWallet extends Wallet {
                     String.format("Cannot find wallet at %s", walletDir.getAbsolutePath()),
                     SimbaException.SimbaError.WALLET_NOT_FOUND);
             }
-            int[] derivationPath = {44 | Bip32ECKeyPair.HARDENED_BIT, 60 | Bip32ECKeyPair.HARDENED_BIT,
+            int[] derivationPath = {44 | Bip32ECKeyPair.HARDENED_BIT,
+                                    60 | Bip32ECKeyPair.HARDENED_BIT,
                                     0 | Bip32ECKeyPair.HARDENED_BIT, 0, 0};
             Bip32ECKeyPair masterKeypair = Bip32ECKeyPair.generateKeyPair(
                 MnemonicUtils.generateSeed(mnemonic, null));
@@ -247,12 +257,13 @@ public class FileWallet extends Wallet {
      */
     @Override
     public synchronized boolean walletExists() throws SimbaException {
-        
+
         File[] files = walletDir.listFiles((File p, String filename) -> {
             return filename.startsWith("UTC--");
         });
         if (files == null) {
-            throw new SimbaException(String.format("Could not find wallet at %s", walletDir.getAbsolutePath()),
+            throw new SimbaException(
+                String.format("Could not find wallet at %s", walletDir.getAbsolutePath()),
                 SimbaException.SimbaError.WALLET_NOT_FOUND);
         }
         return files.length == 1;
@@ -274,10 +285,11 @@ public class FileWallet extends Wallet {
             return name.startsWith("UTC--");
         });
         if (files == null) {
-            throw new SimbaException(String.format("Could not find wallet at %s", dir.getAbsolutePath()),
+            throw new SimbaException(
+                String.format("Could not find wallet at %s", dir.getAbsolutePath()),
                 SimbaException.SimbaError.WALLET_NOT_FOUND);
         }
-        if(files.length != 1) {
+        if (files.length != 1) {
             throw new SimbaException(String.format("Multiple wallets at %s", dir.getAbsolutePath()),
                 SimbaException.SimbaError.MULTIPLE_WALLETS);
         }
@@ -297,12 +309,13 @@ public class FileWallet extends Wallet {
         }
         return name;
     }
-    
+
     private boolean deleteWalletDir(File f) {
         try {
             if (f.isDirectory()) {
-                for (File c : f.listFiles())
+                for (File c : f.listFiles()) {
                     deleteWalletDir(c);
+                }
             }
             return f.delete();
         } catch (Exception e) {

@@ -23,11 +23,11 @@
 package com.simbachain.simba;
 
 /**
- *  Interface for things that have an id.
+ * Interface for things that have an id.
  */
 public interface Ided {
-    
-    public void setId(String id);
-    
-    public String getId();
+
+    void setId(String id);
+
+    String getId();
 }

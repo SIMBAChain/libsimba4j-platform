@@ -45,12 +45,12 @@ public class KcAuthConfig extends AuthConfig {
         }
         if (scopes.length == 0) {
             this.scopes = "email profile roles web-origins";
-        } else{
+        } else {
             this.scopes = String.join(" ", scopes);
         }
         this.host = host;
         this.realm = realm;
-        
+
     }
 
     public String getHost() {
@@ -64,9 +64,10 @@ public class KcAuthConfig extends AuthConfig {
     public String getScopes() {
         return scopes;
     }
-    
+
     public String getTokenUrl() {
-        return String.format("%s/auth/realms/%s/protocol/openid-connect/token", getHost(), getRealm());
+        return String.format("%s/auth/realms/%s/protocol/openid-connect/token", getHost(),
+            getRealm());
     }
 
     @Override

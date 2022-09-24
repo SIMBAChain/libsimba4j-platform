@@ -28,14 +28,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 public class Parameter {
-    
+
     @JsonProperty
     private String name;
     @JsonProperty
     private String type;
-    @JsonProperty("default_value")
+    @JsonProperty ("default_value")
     private String defaultValue;
-    @JsonProperty("simba_type")
+    @JsonProperty ("simba_type")
     private String simbaType;
 
     public String getName() {

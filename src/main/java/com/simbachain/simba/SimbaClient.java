@@ -56,7 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  Base class for generic HTTP related stuff.
+ * Base class for generic HTTP related stuff.
  */
 public abstract class SimbaClient {
 
@@ -81,8 +81,10 @@ public abstract class SimbaClient {
         return endpoint;
     }
 
-    protected void validateParameters(Metadata metadata, String method, JsonData parameters, boolean files)
-        throws SimbaException {
+    protected void validateParameters(Metadata metadata,
+        String method,
+        JsonData parameters,
+        boolean files) throws SimbaException {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: Simba.validateParameters: "
                 + "method = ["
@@ -125,8 +127,9 @@ public abstract class SimbaClient {
         }
     }
 
-    protected void validateQueryParameters(Metadata metadata, String method, Query.Params parameters)
-        throws SimbaException {
+    protected void validateQueryParameters(Metadata metadata,
+        String method,
+        Query.Params parameters) throws SimbaException {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: Simba.validateQueryParameters: "
                 + "method = ["
@@ -481,13 +484,17 @@ public abstract class SimbaClient {
         }
     }
 
-    protected <R> R post(String endpoint, Map<String, Object> data, ResponseHandler<R> handler, Map<String, String> headers)
-        throws SimbaException {
+    protected <R> R post(String endpoint,
+        Map<String, Object> data,
+        ResponseHandler<R> handler,
+        Map<String, String> headers) throws SimbaException {
         return post(endpoint, data, handler, headers, new UploadFile[0]);
     }
 
-    protected <R> R post(String endpoint, JsonData data, ResponseHandler<R> handler, Map<String, String> headers)
-        throws SimbaException {
+    protected <R> R post(String endpoint,
+        JsonData data,
+        ResponseHandler<R> handler,
+        Map<String, String> headers) throws SimbaException {
         return post(endpoint, data, handler, headers, new UploadFile[0]);
     }
 
@@ -594,8 +601,8 @@ public abstract class SimbaClient {
 
     public static class HeaderedResponse<C> {
 
-        private Header[] headers;
-        private C response;
+        private final Header[] headers;
+        private final C response;
 
         public HeaderedResponse(Header[] headers, C response) {
             this.headers = headers;
@@ -628,9 +635,9 @@ public abstract class SimbaClient {
      */
     public static class UploadFile {
 
-        private String name;
-        private String mimeType;
-        private InputStream file;
+        private final String name;
+        private final String mimeType;
+        private final InputStream file;
 
         /**
          * Create an upload file from a File object.

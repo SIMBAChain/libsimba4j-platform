@@ -60,7 +60,7 @@ public class Manifest {
     }
 
     public String getMimetype() {
-        if(mimetype != null) {
+        if (mimetype != null) {
             return mimetype;
         }
         return "application/x-gzip";

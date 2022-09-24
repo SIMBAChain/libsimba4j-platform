@@ -69,7 +69,8 @@ public class Templates {
         repository = StringResourceLoader.getRepository();
     }
 
-    public static String output(Map<String, Object> parameters, String templateType) throws SimbaException {
+    public static String output(Map<String, Object> parameters, String templateType)
+        throws SimbaException {
         VelocityContext context = new VelocityContext();
         for (String s : parameters.keySet()) {
             context.put(s, parameters.get(s));

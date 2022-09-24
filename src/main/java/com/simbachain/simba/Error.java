@@ -29,11 +29,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- *  An Error object based on https://jsonapi.org/examples/#error-objects.
+ * An Error object based on https://jsonapi.org/examples/#error-objects.
  */
 @JsonIgnoreProperties (ignoreUnknown = true)
 public class Error {
-    
+
     @JsonProperty
     private String id;
     @JsonProperty
@@ -56,7 +56,7 @@ public class Error {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public String getCode() {
         return code;
     }

@@ -44,7 +44,7 @@ import org.apache.http.util.EntityUtils;
  *
  */
 public class KcTokenProvider implements AccessTokenProvider {
-    
+
     private final KcAuthConfig credentials;
     private AccessToken token = null;
     private long expires = 0L;
@@ -54,21 +54,26 @@ public class KcTokenProvider implements AccessTokenProvider {
         this.credentials = credentials;
     }
 
-    private Map<String, String> post(CloseableHttpClient client, String endpoint,
-        Map<String, String> data, Map<String, String> headers) throws Exception {
+    private Map<String, String> post(CloseableHttpClient client,
+        String endpoint,
+        Map<String, String> data,
+        Map<String, String> headers) throws Exception {
         StringBuilder sb = new StringBuilder();
         int count = 0;
         for (String s : data.keySet()) {
             sb.append(URLEncoder.encode(s, "UTF-8"))
               .append("=")
               .append(URLEncoder.encode(data.get(s), "UTF-8"));
-            if (count < data.keySet().size() - 1){
-                sb.append("&");    
+            if (count
+                < data.keySet()
+                      .size() - 1) {
+                sb.append("&");
             }
             count++;
         }
         HttpPost httpPost = new HttpPost(endpoint);
-        StringEntity entity = new StringEntity(sb.toString(), ContentType.APPLICATION_FORM_URLENCODED);
+        StringEntity entity = new StringEntity(sb.toString(),
+            ContentType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
         if (headers != null) {
             for (String s : headers.keySet()) {
@@ -111,13 +116,13 @@ public class KcTokenProvider implements AccessTokenProvider {
                 data.put("client_id", credentials.getClientId());
                 data.put("client_secret", credentials.getClientSecret());
                 data.put("scope", credentials.getScopes());
-                
+
                 Map<String, String> headers = new HashMap<>();
                 headers.put("Content-Type", "application/x-www-form-urlencoded");
 
                 Map<String, String> result = this.post(client, credentials.getTokenUrl(), data,
                     headers);
-                
+
                 long expires = now + (Long.parseLong(result.get("expires_in")) * 1000);
                 this.expires = expires - 5000;
                 this.token = new AccessToken(result.get("access_token"), result.get("token_type"),

@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties (ignoreUnknown = true)
 public class Balance {
-    
+
     @JsonProperty
     private BigInteger balance;
 
@@ -43,7 +43,7 @@ public class Balance {
 
     public Balance() {
     }
-    
+
     public BigInteger getBalance() {
         return balance;
     }

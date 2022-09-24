@@ -31,7 +31,6 @@ import java.util.concurrent.Future;
 
 import com.simbachain.SimbaException;
 
-
 /**
  * Main entry point to interacting with Simba.
  * The client has methods for invoking contract methods, checking transaction status and
@@ -39,9 +38,9 @@ import com.simbachain.SimbaException;
  */
 public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
 
-    private String contract;
+    private final String contract;
     protected Metadata metadata;
-    private C config;
+    private final C config;
 
     /**
      * Constructor overrriden by subclasses.
@@ -56,8 +55,6 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
         this.client = createClient();
         this.config = config;
     }
-
-
 
     /**
      * Get the contract or app name
@@ -81,7 +78,6 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
         return config;
     }
 
-
     /**
      * Initialize the client and retrieve the application metadata.
      * If created via the factory then this method will already have been called.
@@ -94,7 +90,7 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
             log.debug(this.metadata.toString());
         }
     }
-    
+
     protected abstract Metadata loadMetadata() throws SimbaException;
 
     /**
@@ -128,9 +124,10 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
      * @return a CallResponse object containing the unique ID of the call.
      * @throws SimbaException if an error occurs
      */
-    public abstract CallResponse callMethod(String method, JsonData parameters,
-        Map<String, String> headers, UploadFile... files)
-        throws SimbaException;
+    public abstract CallResponse callMethod(String method,
+        JsonData parameters,
+        Map<String, String> headers,
+        UploadFile... files) throws SimbaException;
 
     /**
      * Invoke a particular method of a smart contract via the SIMBA HTTP API
@@ -142,8 +139,9 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
      * @return a CallResponse object containing the unique ID of the call.
      * @throws SimbaException if an error occurs
      */
-    public abstract CallResponse callMethodSync(String method, JsonData parameters, UploadFile... files)
-        throws SimbaException;
+    public abstract CallResponse callMethodSync(String method,
+        JsonData parameters,
+        UploadFile... files) throws SimbaException;
 
     /**
      * Invoke a particular method of a smart contract via the SIMBA HTTP API
@@ -156,9 +154,10 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
      * @return a CallResponse object containing the unique ID of the call.
      * @throws SimbaException if an error occurs
      */
-    public abstract CallResponse callMethodSync(String method, JsonData parameters,
-        Map<String, String> headers, UploadFile... files)
-        throws SimbaException;
+    public abstract CallResponse callMethodSync(String method,
+        JsonData parameters,
+        Map<String, String> headers,
+        UploadFile... files) throws SimbaException;
 
     /**
      * Get the metadata JSON file for a bundle as a string.
@@ -264,7 +263,7 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
      */
     public abstract PagedResult<Transaction> previous(PagedResult<Transaction> result)
         throws SimbaException;
-    
+
     /**
      * Wait for a transaction to reach COMPLETED stage.
      *
@@ -355,7 +354,6 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
     }
 
     //****************************** END OF PUBLIC INTERFACE ******************************//
-
 
     private Future<Transaction> submit(String txnId,
         long interval,

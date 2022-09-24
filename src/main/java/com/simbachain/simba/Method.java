@@ -38,7 +38,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties (ignoreUnknown = true)
 public class Method {
-    
+
     @JsonProperty
     private List<String> emits = new ArrayList<>();
     @JsonProperty
@@ -99,26 +99,27 @@ public class Method {
     public void setReturns(List<Parameter> returns) {
         this.returns = returns;
     }
-    
+
     @JsonIgnore
     public com.simbachain.simba.Parameter getParameter(String name) {
         for (Parameter param : params) {
-            if (param.getName().equals(name)) {
+            if (param.getName()
+                     .equals(name)) {
                 return param;
             }
         }
         return null;
     }
-    
+
     @JsonIgnore
-    public Set<String> getParameterNames() { 
+    public Set<String> getParameterNames() {
         Set<String> set = new HashSet<>();
         for (Parameter param : params) {
             set.add(param.getName());
         }
         return set;
     }
-    
+
     @JsonIgnore
     public Map<String, com.simbachain.simba.Parameter> getParameterMap() {
         Map<String, com.simbachain.simba.Parameter> ret = new HashMap<>();

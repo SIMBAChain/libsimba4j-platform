@@ -30,6 +30,5 @@ import com.simbachain.auth.AuthConfig;
 public interface SimbaConfig {
 
     AuthConfig getAuthConfig();
-    
 
 }

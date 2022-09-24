@@ -28,20 +28,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Query parameters for querying for transactions.
+ * Query parameters for querying for transactions.
  *  Strings accept 'equals' and 'contains' semantics, boolean accept 'equals'
  *  semantics and numbers accept 'greater than', 'less than', 'greater than or equal',
  *  'less than or equal' and 'equals' semantics.
- *  
+ * <p>
  *  Usage example:
  *  <pre>
- *  Query.Params params = Query.in("name", "Java").ex("assetId", "1234").gte("number", 10);    
+ *  Query.Params params = Query.in("name", "Java").ex("assetId", "1234").gte("number", 10);
  *  </pre>
- *  
  */
 public class Query {
-    
-    
+
     public static class Param<T> {
         String name;
         T value;
@@ -54,7 +52,7 @@ public class Query {
         public String getName() {
             return name;
         }
-        
+
         public void setName(String name) {
             this.name = name;
         }
@@ -62,7 +60,7 @@ public class Query {
         public T getValue() {
             return value;
         }
-        
+
         protected String asString(String op) {
             try {
                 return name + op + "=" + URLEncoder.encode(value.toString(), "UTF-8");
@@ -83,13 +81,13 @@ public class Query {
             }
         }
     }
-    
+
     public static class Gt extends Param<Number> {
-        
+
         public Gt(String name, Number value) {
             super(name, value);
         }
-        
+
         public String toString() {
             return asString("_gt");
         }
@@ -111,7 +109,7 @@ public class Query {
         public String toJsonApiString() {
             return asJsonApiString(".lt");
         }
-        
+
     }
     public static class Gte extends Param<Number> {
 
@@ -271,10 +269,10 @@ public class Query {
             return asString("");
         }
     }
-    
+
     public static class Params {
-        private List<Param<?>> params = new ArrayList<>();
-        
+        private final List<Param<?>> params = new ArrayList<>();
+
         public Params gt(String name, Number value) {
             params.add(new Gt(name, value));
             return this;
@@ -334,7 +332,7 @@ public class Query {
             params.add(new Bool(name, value));
             return this;
         }
-        
+
         public Params str(String name, String value) {
             params.add(new Str(name, value));
             return this;
@@ -343,16 +341,16 @@ public class Query {
         public List<Param<?>> getParams() {
             return params;
         }
-        
+
         public String toString() {
-            if(params.isEmpty()) {
+            if (params.isEmpty()) {
                 return "";
             }
             StringBuilder sb = new StringBuilder("?");
             for (int i = 0; i < params.size(); i++) {
                 Param<?> param = params.get(i);
                 sb.append(param.toString());
-                if(i < params.size() - 1) {
+                if (i < params.size() - 1) {
                     sb.append("&");
                 }
             }
@@ -378,7 +376,7 @@ public class Query {
     public static Params empty() {
         return new Params();
     }
-    
+
     public static Params gt(String name, Number value) {
         Params p = new Params();
         p.gt(name, value);
@@ -456,5 +454,5 @@ public class Query {
         p.str(name, value);
         return p;
     }
-    
+
 }

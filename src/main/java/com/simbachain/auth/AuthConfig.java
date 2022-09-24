@@ -25,7 +25,7 @@ package com.simbachain.auth;
 import com.simbachain.simba.SimbaConfig;
 
 /**
- *  OAuth focussed simba config.
+ * OAuth focussed simba config.
  */
 public abstract class AuthConfig implements SimbaConfig {
 

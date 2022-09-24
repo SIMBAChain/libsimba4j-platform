@@ -31,9 +31,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 public class ContractType {
-    
+
     @JsonProperty
-    private List<Parameter>  components = new ArrayList<>();
+    private List<Parameter> components = new ArrayList<>();
 
     public List<Parameter> getComponents() {
         return components;

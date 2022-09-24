@@ -32,8 +32,8 @@ import java.util.Set;
  * Simple utility for building JSON objects to convert to a map.
  */
 public class JsonData {
-    
-    private Map<String, Object> map = new HashMap<>();
+
+    private final Map<String, Object> map = new HashMap<>();
 
     private JsonData() {
     }
@@ -45,7 +45,7 @@ public class JsonData {
     public static JsonData jsonData() {
         return new JsonData();
     }
-    
+
     public static JsonData with(String key, String value) {
         return new JsonData().and(key, value);
     }
@@ -445,12 +445,12 @@ public class JsonData {
         map.put(key, value);
         return this;
     }
-    
+
     public Map<String, Object> asMap() {
         Map<String, Object> ret = new HashMap<>();
         for (String s : map.keySet()) {
             Object o = map.get(s);
-            if(o instanceof JsonData) {
+            if (o instanceof JsonData) {
                 ret.put(s, ((JsonData) o).asMap());
             } else {
                 ret.put(s, o);
@@ -458,11 +458,11 @@ public class JsonData {
         }
         return ret;
     }
-    
+
     public JsonData copy() {
         return new JsonData(this.map);
     }
-    
+
     public Set<String> keys() {
         return map.keySet();
     }
@@ -504,27 +504,27 @@ public class JsonData {
             } else if (o instanceof Map) {
                 inserts.put(s, getMap((Map<String, Object>) o));
             } else {
-                if(isSupported(o.getClass(), o)) {
+                if (isSupported(o.getClass(), o)) {
                     inserts.put(s, o);
                 }
             }
         }
         return inserts;
     }
-    
+
     private boolean isSupported(Class<?> cls, Object value) {
-        if(cls.equals(int.class)
+        if (cls.equals(int.class)
             || cls.equals(long.class)
             || cls.equals(float.class)
             || cls.equals(double.class)
             || cls.equals(short.class)
             || cls.equals(char.class)
-            || cls.equals(boolean.class))  {
+            || cls.equals(boolean.class)) {
             return true;
         }
         if (cls.isArray()) {
             Class<?> type = cls.getComponentType();
-            while(type.isArray()) {
+            while (type.isArray()) {
                 type = type.getComponentType();
             }
             return isSupported(type, null);
@@ -552,5 +552,5 @@ public class JsonData {
         }
         return Boolean.class.isAssignableFrom(cls);
     }
-    
+
 }

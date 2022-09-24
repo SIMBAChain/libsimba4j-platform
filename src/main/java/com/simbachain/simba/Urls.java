@@ -71,8 +71,7 @@ public class Urls {
 
     private static final Object[][] urlPaths = {{PathName.WHOAMI, "user/whoami/"},
                                                 {PathName.WALLET, "user/wallet/"},
-                                                {PathName.TXN_COUNT,
-                                                 "user/transactions/%s/count/"},
+                                                {PathName.TXN_COUNT, "user/transactions/%s/count/"},
                                                 {PathName.ADDRESS_TXN_COUNT,
                                                  "user/transactions/%s/count/%s/"},
                                                 {PathName.APPLICATIONS,
@@ -85,12 +84,10 @@ public class Urls {
                                                  "v2/organisations/%s/deployed_contracts/"},
                                                 {PathName.BLOCKCHAINS,
                                                  "v2/organisations/%s/blockchains/"},
-                                                {PathName.STORAGE,
-                                                 "v2/organisations/%s/storage/"},
+                                                {PathName.STORAGE, "v2/organisations/%s/storage/"},
                                                 {PathName.ORG_TXNS,
                                                  "v2/organisations/%s/transactions/"},
-                                                {PathName.APP_TXNS,
-                                                 "v2/apps/%s/transactions/"},
+                                                {PathName.APP_TXNS, "v2/apps/%s/transactions/"},
                                                 {PathName.DEPLOY,
                                                  "v2/organisations/%s/contract_artifacts/%s/deploy/"},
                                                 {PathName.CONTRACT_API,
@@ -105,14 +102,10 @@ public class Urls {
                                                  "v2/apps/%s/contract/%s/bundle/%s/manifest/"},
                                                 {PathName.BUNDLE_FILE,
                                                  "v2/apps/%s/contract/%s/bundle/%s/filename/%s/"},
-                                                {PathName.BALANCE,
-                                                 "/user/account/%s/balance/"},
+                                                {PathName.BALANCE, "/user/account/%s/balance/"},
                                                 {PathName.ADDRESS_BALANCE,
                                                  "/user/account/%s/balance/%s/"},
-                                                {PathName.FUND,
-                                                 "/user/account/%s/fund/"}};
-    
-    
+                                                {PathName.FUND, "/user/account/%s/fund/"}};
 
     public static final Map<PathName, String> pathMap = Stream.of(urlPaths)
                                                               .collect(Collectors.toMap(

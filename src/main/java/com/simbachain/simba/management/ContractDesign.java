@@ -114,10 +114,11 @@ public class ContractDesign implements Ided {
     public void setCode(String code) {
         this.code = code;
     }
-    
+
     @JsonIgnore
     public String decodedCode() {
-        byte[] bytes = Base64.getDecoder().decode(getCode());
+        byte[] bytes = Base64.getDecoder()
+                             .decode(getCode());
         return new String(bytes, StandardCharsets.UTF_8);
     }
 

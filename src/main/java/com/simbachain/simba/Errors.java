@@ -29,11 +29,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A list of Error objects. defined at https://jsonapi.org/examples/#error-objects 
+ * A list of Error objects. defined at https://jsonapi.org/examples/#error-objects
  */
 @JsonIgnoreProperties (ignoreUnknown = true)
 public class Errors {
-    
+
     @JsonProperty
     private List<Error> errors = new ArrayList<>();
 

@@ -47,7 +47,7 @@ import org.apache.http.util.EntityUtils;
  *
  */
 public class BlocksTokenProvider implements AccessTokenProvider {
-    
+
     private final BlocksConfig credentials;
     private AccessToken token = null;
     private long expires = 0L;
@@ -57,8 +57,10 @@ public class BlocksTokenProvider implements AccessTokenProvider {
         this.credentials = credentials;
     }
 
-    private Map<String, String> post(CloseableHttpClient client, String endpoint,
-        Map<String, String> data, Map<String, String> headers) throws Exception {
+    private Map<String, String> post(CloseableHttpClient client,
+        String endpoint,
+        Map<String, String> data,
+        Map<String, String> headers) throws Exception {
 
         HttpPost httpPost = new HttpPost(endpoint);
 
@@ -107,7 +109,7 @@ public class BlocksTokenProvider implements AccessTokenProvider {
             if (this.token == null) {
                 Map<String, String> data = new HashMap<>();
                 data.put("grant_type", "client_credentials");
-                
+
                 Map<String, String> headers = new HashMap<>();
                 String userCredentials = credentials.getClientId()
                     + ":"
@@ -119,7 +121,7 @@ public class BlocksTokenProvider implements AccessTokenProvider {
 
                 Map<String, String> result = this.post(client, credentials.getTokenUrl(), data,
                     headers);
-                
+
                 long expires = now + (Long.parseLong(result.get("expires_in")) * 1000);
                 this.expires = expires - 5000;
                 this.token = new AccessToken(result.get("access_token"), result.get("token_type"),

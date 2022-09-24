@@ -28,10 +28,10 @@ import com.simbachain.simba.JsonData;
 import com.simbachain.simba.Jsonable;
 
 /**
- *  Class used to define deployment specification when deploying an artifact.
+ * Class used to define deployment specification when deploying an artifact.
  */
 public class DeploymentSpec implements Jsonable {
-    
+
     private String blockchain;
     private String storage;
     private String apiName;
@@ -126,9 +126,9 @@ public class DeploymentSpec implements Jsonable {
     @Override
     public JsonData toJsonData() {
         JsonData data = JsonData.with("blockchain", blockchain)
-            .and("storage", storage)
-            .and("api_name", apiName)
-            .and("singleton", singleton);
+                                .and("storage", storage)
+                                .and("api_name", apiName)
+                                .and("singleton", singleton);
         if (displayName != null) {
             data = data.and("display_name", displayName);
         }

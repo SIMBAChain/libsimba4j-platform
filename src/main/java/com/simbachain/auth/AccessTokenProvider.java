@@ -25,7 +25,7 @@ package com.simbachain.auth;
 import com.simbachain.SimbaException;
 
 /**
- *  Provides an AccessToken. AuthConfig implementations provide
+ * Provides an AccessToken. AuthConfig implementations provide
  *  access to an instance of this interface in order for clients to be able
  *  to grab a token.
  */
@@ -33,9 +33,10 @@ public interface AccessTokenProvider {
 
     /**
      * Get the token
-     * @return  an AccessToken
+     *
+     * @return an AccessToken
      * @throws SimbaException if an error occurs
      */
-    public AccessToken getToken() throws SimbaException;
+    AccessToken getToken() throws SimbaException;
 
 }

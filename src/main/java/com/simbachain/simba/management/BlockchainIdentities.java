@@ -37,7 +37,7 @@ public class BlockchainIdentities {
     private Wallet wallet;
 
     public Wallet getWallet() {
-        if (wallet == null){
+        if (wallet == null) {
             return Wallet.emptyWallet();
         }
         return wallet;
@@ -58,8 +58,8 @@ public class BlockchainIdentities {
 
     @JsonIgnoreProperties (ignoreUnknown = true)
     public static class Identity {
-        
-        @JsonProperty("pub")
+
+        @JsonProperty ("pub")
         private String address;
 
         @JsonProperty ("priv")
@@ -147,7 +147,8 @@ public class BlockchainIdentities {
         }
 
         @JsonIgnore
-        public Map<String, List<Identity>> getIdentityMap(String blockchainType, String blockchainName) {
+        public Map<String, List<Identity>> getIdentityMap(String blockchainType,
+            String blockchainName) {
             Map<String, Map<String, Map<String, List<Identity>>>> ids = getIdentities();
             Map<String, Map<String, List<Identity>>> typeMap = ids.get(blockchainType);
             if (typeMap != null) {
@@ -183,6 +184,5 @@ public class BlockchainIdentities {
             return sb.toString();
         }
     }
-    
 
 }

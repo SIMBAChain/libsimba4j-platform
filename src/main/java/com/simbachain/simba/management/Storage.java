@@ -26,20 +26,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simbachain.simba.Ided;
 
 /**
- *  A Storage object.
+ * A Storage object.
  */
 public class Storage implements Ided {
-    
+
     @JsonProperty
     private String id;
-    
+
     @JsonProperty
     private String name;
-    
-    @JsonProperty("display_name")
+
+    @JsonProperty ("display_name")
     private String displayName;
-    
-    @JsonProperty("storage_type")
+
+    @JsonProperty ("storage_type")
     private String storageType;
 
     @Override

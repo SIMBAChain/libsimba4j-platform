@@ -35,11 +35,11 @@ import org.slf4j.LoggerFactory;
  * Represents an OAuth 2 access token.
  */
 public class FileAccessToken extends AccessToken {
-    
+
     protected Logger log = LoggerFactory.getLogger(getClass().getName());
 
     private final String path;
-    
+
     public FileAccessToken(String path) {
         super();
         this.path = path;
@@ -50,7 +50,7 @@ public class FileAccessToken extends AccessToken {
                 BufferedReader reader = new BufferedReader(new FileReader(tokenFile));
                 String tokenBits = reader.readLine();
                 String[] parts = tokenBits.split("@");
-                if(parts.length != 3) {
+                if (parts.length != 3) {
                     throw new Exception("Unexpected token file contents: " + tokenBits);
                 }
                 reader.close();
@@ -58,7 +58,7 @@ public class FileAccessToken extends AccessToken {
                 if (expires > System.currentTimeMillis()) {
                     log.info("FileAccessToken.FileAccessToken refreshing from contents");
                     super.refresh(parts[2], parts[1], expires);
-                } 
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -79,7 +79,7 @@ public class FileAccessToken extends AccessToken {
         }
         log.info("FileAccessToken.refresh EXIT");
     }
-    
+
     public void invalidate() {
         super.invalidate();
         boolean deleted = new File(this.path).delete();

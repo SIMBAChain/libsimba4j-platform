@@ -28,36 +28,35 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- *  A Blockchain object.
- *
+ * A Blockchain object.
  */
 public class User {
-    
+
     @JsonProperty
     private String username;
-    
+
     @JsonProperty ("first_name")
     private String firstName;
-    
-    @JsonProperty("last_name")
+
+    @JsonProperty ("last_name")
     private String lastName;
 
-    @JsonProperty("onboarding_complete")
+    @JsonProperty ("onboarding_complete")
     private String onboardingComplete;
 
-    @JsonProperty("default_organisation")
+    @JsonProperty ("default_organisation")
     private String defaultOrganisation;
 
-    @JsonProperty("permissions")
+    @JsonProperty ("permissions")
     private Map<String, Map<String, String>> permissions;
-    
+
     @JsonProperty
     private Boolean admin;
-    
+
     @JsonProperty
     private String email;
-    
-    @JsonProperty("organisations")
+
+    @JsonProperty ("organisations")
     private List<Organisation> organisations;
 
     public String getUsername() {

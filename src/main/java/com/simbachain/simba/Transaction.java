@@ -41,14 +41,13 @@ public class Transaction implements Ided {
      * Possible states a transaction can be in.
      */
     public enum State {
-        RECEIVED, VALIDATED, OFFCHAIN_SUBMITTED, SIGNED,
-        INITIALIZED, SUBMITTED, FAILED, COMPLETED,
+        RECEIVED, VALIDATED, OFFCHAIN_SUBMITTED, SIGNED, INITIALIZED, SUBMITTED, FAILED, COMPLETED,
         ACCEPTED, TIMED_OUT, PENDING
     }
 
     @JsonProperty
     private String id;
-    @JsonProperty("request_id")
+    @JsonProperty ("request_id")
     private String requestId;
     @JsonProperty
     private String method;
@@ -66,36 +65,37 @@ public class Transaction implements Ided {
     private long confirmations;
     @JsonProperty
     private long value;
-    @JsonProperty("contract_address")
+    @JsonProperty ("contract_address")
     private String contractAddress;
     @JsonProperty
     private String origin;
-    @JsonProperty("transaction_type")
+    @JsonProperty ("transaction_type")
     private String transactionType;
-    @JsonProperty("from_address")
+    @JsonProperty ("from_address")
     private String sender;
     @JsonProperty
     private State state;
-    @JsonProperty("created_on")
+    @JsonProperty ("created_on")
     @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private Date created;
 
-    @JsonProperty("raw_transaction")
+    @JsonProperty ("raw_transaction")
     private Map<String, String> rawTransaction;
 
     @JsonIgnore
     private String app;
     @JsonIgnore
     private Map<String, Parameter> methodParameters = new HashMap<>();
-    
+
     public Date getCreated() {
         return created;
     }
-    
+
     public String getBlock() {
-        return receipt.getOrDefault("blockNumber", "").toString();
+        return receipt.getOrDefault("blockNumber", "")
+                      .toString();
     }
-    
+
     public String getApp() {
         return app;
     }
@@ -103,11 +103,12 @@ public class Transaction implements Ided {
     public void setApp(String app) {
         this.app = app;
     }
-    
+
     public String getBundleHash() {
-        return getInputs().getOrDefault("_bundleHash", "").toString();
+        return getInputs().getOrDefault("_bundleHash", "")
+                          .toString();
     }
-    
+
     public Map<String, Object> getInputs() {
         return inputs;
     }
@@ -115,7 +116,7 @@ public class Transaction implements Ided {
     public void setInputs(Map<String, Object> inputs) {
         this.inputs = inputs;
     }
-    
+
     public Map<String, Parameter> getMethodParameters() {
         return methodParameters;
     }
@@ -127,7 +128,7 @@ public class Transaction implements Ided {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public String getRequestId() {
         return requestId;
     }
@@ -135,7 +136,7 @@ public class Transaction implements Ided {
     public void setRequestId(String requestId) {
         this.requestId = requestId;
     }
-    
+
     public String getMethod() {
         return method;
     }
@@ -151,7 +152,7 @@ public class Transaction implements Ided {
     public void setReceipt(Map<String, Object> receipt) {
         this.receipt = receipt;
     }
-    
+
     public String getTxnHash() {
         return txnHash;
     }
@@ -207,7 +208,7 @@ public class Transaction implements Ided {
     public void setTransactionType(String transactionType) {
         this.transactionType = transactionType;
     }
-    
+
     public String getSender() {
         return sender;
     }
@@ -215,7 +216,7 @@ public class Transaction implements Ided {
     public void setSender(String sender) {
         this.sender = sender;
     }
-    
+
     public State getState() {
         return state;
     }

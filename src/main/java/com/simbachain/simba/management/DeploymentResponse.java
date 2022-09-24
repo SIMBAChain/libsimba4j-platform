@@ -25,10 +25,10 @@ package com.simbachain.simba.management;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- *  Response to a deployment.
+ * Response to a deployment.
  */
 public class DeploymentResponse {
-    
+
     @JsonProperty ("transaction_hash")
     private String transactionHash;
 
@@ -37,7 +37,7 @@ public class DeploymentResponse {
 
     @JsonProperty ("deployment_id")
     private String deploymentId;
-    
+
     @JsonProperty ("instance_id")
     private String instanceId;
 

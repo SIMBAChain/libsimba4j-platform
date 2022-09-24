@@ -25,23 +25,21 @@ package com.simbachain.simba;
 import java.util.List;
 
 /**
- *  This class encapsulates paged results. It contains a total count of results
- *  as well as a next and previous URL. 
- *  
+ * This class encapsulates paged results. It contains a total count of results
+ *  as well as a next and previous URL.
+ * <p>
  *  When a paged result is returned, the getNext() and getPrevious() methods can be called
  *  to retrieve the appropriate page URL and a Simba instance's next() or previous()
  *  methods can be called using theis class as a parameter.
  *  If there is no appropriate page null is returned.
- *  
  */
 public class PagedResult<R> {
-    
+
     private String method = null;
     private int count;
     private String next;
     private String previous;
     private List<? extends R> results;
-    
 
     public int getCount() {
         return count;

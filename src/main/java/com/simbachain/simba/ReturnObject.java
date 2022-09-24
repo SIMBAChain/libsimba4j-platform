@@ -28,8 +28,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 public class ReturnObject<R> {
-    
-    @JsonProperty("request_id")
+
+    @JsonProperty ("request_id")
     private String requestId;
     @JsonProperty
     private String state;

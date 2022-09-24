@@ -22,7 +22,6 @@
 
 package com.simbachain.auth.local;
 
-
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +44,7 @@ import org.apache.http.util.EntityUtils;
  *
  */
 public class LocalTokenProvider implements AccessTokenProvider {
-    
+
     private final LocalOAuthConfig credentials;
     private AccessToken token = null;
     private long expires = 0L;
@@ -55,8 +54,10 @@ public class LocalTokenProvider implements AccessTokenProvider {
         this.credentials = credentials;
     }
 
-    private Map<String, String> post(CloseableHttpClient client, String endpoint,
-        Map<String, Object> data, Map<String, String> headers) throws Exception {
+    private Map<String, String> post(CloseableHttpClient client,
+        String endpoint,
+        Map<String, Object> data,
+        Map<String, String> headers) throws Exception {
 
         HttpPost httpPost = new HttpPost(endpoint);
         String json = mapper.writeValueAsString(data);
@@ -100,7 +101,7 @@ public class LocalTokenProvider implements AccessTokenProvider {
             if (this.token == null) {
                 Map<String, Object> data = new HashMap<>();
                 data.put("grant_type", "client_credentials");
-                
+
                 Map<String, String> headers = new HashMap<>();
                 String userCredentials = credentials.getClientId()
                     + ":"
@@ -112,7 +113,7 @@ public class LocalTokenProvider implements AccessTokenProvider {
 
                 Map<String, String> result = this.post(client, credentials.getTokenUrl(), data,
                     headers);
-                
+
                 long expires = now + (Long.parseLong(result.get("expires_in")) * 1000);
                 this.expires = expires - 5000;
                 this.token = new AccessToken(result.get("access_token"), result.get("token_type"),

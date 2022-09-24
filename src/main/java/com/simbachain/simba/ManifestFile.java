@@ -26,14 +26,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- *  Metadata about a file in a bundle. At a minimum this contains the name, mime type
+ * Metadata about a file in a bundle. At a minimum this contains the name, mime type
  *  and size of a file. It may additionally contain the hash of the file, the hash algorithm
  *  and a uid.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties (ignoreUnknown = true)
 public class ManifestFile {
 
-    
     @JsonProperty
     private String name;
     @JsonProperty
@@ -61,7 +60,7 @@ public class ManifestFile {
 
     public String getMimetype() {
         if (mimetype != null) {
-            return mimetype;    
+            return mimetype;
         }
         return mime;
     }

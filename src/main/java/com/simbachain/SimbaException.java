@@ -27,39 +27,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  General Exception class for Simba Errors.
+ * General Exception class for Simba Errors.
  *  Each Exception has a SimbaError value to help
  *  identify the process that caused the exception.
- *  
+ * <p>
  *  For HTTP_ERROR types the exception will also include the HTTP status code.
  */
 public class SimbaException extends IOException {
 
-    private SimbaError type;
-    private Map<String, Object> properties = new HashMap<>();
+    private final SimbaError type;
+    private final Map<String, Object> properties = new HashMap<>();
 
     /**
      * Flavours of Wallet Exception
      */
     public enum SimbaError {
 
-        INVALID_CONFIG,
-        INVALID_CREDENTIALS,
-        METADATA_NOT_AVAILABLE,
-        WALLET_NOT_FOUND, SIGN_REJECTED,
-        SIGN_FAILED,
-        WALLET_GENERATE_FAILED,
-        DELETE_FAILED,
-        LOAD_FAILED,
-        MULTIPLE_WALLETS,
-        WALLET_EXISTS,
-        MESSAGE_ERROR,
-        HTTP_ERROR,
-        AUTHENTICATION_ERROR,
-        FILE_ERROR,
-        TRANSACTION_ERROR,
-        EXECUTION_ERROR,
-        PROCESSING_ERROR
+        INVALID_CONFIG, INVALID_CREDENTIALS, METADATA_NOT_AVAILABLE, WALLET_NOT_FOUND,
+        SIGN_REJECTED, SIGN_FAILED, WALLET_GENERATE_FAILED, DELETE_FAILED, LOAD_FAILED,
+        MULTIPLE_WALLETS, WALLET_EXISTS, MESSAGE_ERROR, HTTP_ERROR, AUTHENTICATION_ERROR,
+        FILE_ERROR, TRANSACTION_ERROR, EXECUTION_ERROR, PROCESSING_ERROR
     }
 
     public SimbaException(String message, SimbaError type) {
@@ -79,6 +66,7 @@ public class SimbaException extends IOException {
 
     /**
      * The SimbaError enum
+     *
      * @return the SimbaError associated with this exception.
      */
     public SimbaError getType() {
@@ -87,15 +75,16 @@ public class SimbaException extends IOException {
 
     /**
      * The HTTP status code. May be null.
-     * @return The HTTP status code. 
+     *
+     * @return The HTTP status code.
      */
     public int getHttpStatus() {
         Object o = properties.get("HTTP_STATUS");
-        if(o != null) {
+        if (o != null) {
             try {
                 return Integer.parseInt(o.toString());
             } catch (NumberFormatException e) {
-                
+
             }
         }
         return -1;
@@ -104,15 +93,15 @@ public class SimbaException extends IOException {
     public void setHttpStatus(int httpStatus) {
         properties.put("HTTP_STATUS", httpStatus);
     }
-    
+
     public void setProperty(String key, Object value) {
         properties.put(key, value);
     }
-    
+
     public Object getProperty(String key) {
         return properties.get(key);
     }
-    
+
     public void setProperties(Map<String, Object> props) {
         properties.putAll(props);
     }

@@ -27,15 +27,15 @@ package com.simbachain.simba;
  * The response contains a unique request identifier. This can either be
  * an ID generated for the request, or a transaction hash associated with the request
  * if the request is creating a trasnaction.
- * 
- * Additionally the response may contain a state attribute and an error string. 
+ * <p>
+ * Additionally the response may contain a state attribute and an error string.
  */
 public class CallResponse {
 
-    private String requestIdentitier;
-    
+    private final String requestIdentitier;
+
     private String status;
-    
+
     private String error;
 
     public CallResponse(String requestIdentitier) {

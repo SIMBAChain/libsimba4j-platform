@@ -28,8 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simbachain.simba.Ided;
 
-
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties (ignoreUnknown = true)
 public class DeployedContract implements Ided {
 
     @JsonProperty

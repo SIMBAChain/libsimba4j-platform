@@ -29,21 +29,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simbachain.simba.Ided;
 
 /**
- *  A newly created Application object.
+ * A newly created Application object.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties (ignoreUnknown = true)
 public class NewApplication implements Ided {
-    
+
     @JsonProperty
     private String id;
-    
+
     @JsonProperty
     private String name;
-    
-    @JsonProperty("display_name")
+
+    @JsonProperty ("display_name")
     private String displayName;
-    
-    @JsonProperty("created_on")
+
+    @JsonProperty ("created_on")
     private Date createdOn;
 
     @JsonProperty

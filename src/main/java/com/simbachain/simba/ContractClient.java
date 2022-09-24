@@ -28,10 +28,10 @@ import java.util.concurrent.Future;
 import com.simbachain.SimbaException;
 
 /**
- *  Base class for generated clients. Mostly just to wrap general simba functionality.
+ * Base class for generated clients. Mostly just to wrap general simba functionality.
  */
 public class ContractClient {
-    
+
     protected final ContractService simba;
 
     public ContractClient(ContractService simba) {
@@ -63,8 +63,8 @@ public class ContractClient {
      * @return the number of bytes written to the output stream
      * @throws SimbaException if an error occurs
      */
-    public long getBundleForTransaction(String transactionIdOrHash,
-        OutputStream outputStream) throws SimbaException {
+    public long getBundleForTransaction(String transactionIdOrHash, OutputStream outputStream)
+        throws SimbaException {
         return simba.getBundleForTransaction(transactionIdOrHash, outputStream);
     }
 
@@ -115,7 +115,8 @@ public class ContractClient {
         String fileName,
         OutputStream outputStream,
         boolean close) throws SimbaException {
-        return simba.getBundleFileForTransaction(transactionIdOrHash, fileName, outputStream, close);
+        return simba.getBundleFileForTransaction(transactionIdOrHash, fileName, outputStream,
+            close);
     }
 
     /**
@@ -148,8 +149,7 @@ public class ContractClient {
      * @return a new paged result from calling getNext() or null if there is no next URL.
      * @throws SimbaException if an error occurs
      */
-    public PagedResult<Transaction> next(PagedResult<Transaction> result)
-        throws SimbaException {
+    public PagedResult<Transaction> next(PagedResult<Transaction> result) throws SimbaException {
         return simba.next(result);
     }
 
@@ -191,5 +191,5 @@ public class ContractClient {
     public Future<Transaction> waitForTransactionCompletion(String txnId) throws SimbaException {
         return simba.waitForTransactionCompletion(txnId);
     }
-    
+
 }

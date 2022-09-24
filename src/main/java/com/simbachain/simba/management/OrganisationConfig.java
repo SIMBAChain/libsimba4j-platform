@@ -29,9 +29,9 @@ import com.simbachain.simba.SimbaConfig;
  *
  */
 public class OrganisationConfig implements SimbaConfig {
-    
+
     private final String organisationId;
-    
+
     private final AuthConfig authConfig;
 
     public OrganisationConfig(String organisationId, AuthConfig authConfig) {

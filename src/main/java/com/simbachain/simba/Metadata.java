@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  *
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties (ignoreUnknown = true)
 public class Metadata {
 
     @JsonProperty ("api_name")
@@ -83,7 +83,7 @@ public class Metadata {
     public String getNetworkType() {
         return networkType;
     }
-    
+
     public boolean isPoa() {
         return poa;
     }
@@ -99,15 +99,16 @@ public class Metadata {
     public boolean isSimbaFaucet() {
         return simbaFaucet;
     }
-    
+
     public String getType() {
         return "platform";
     }
-    
+
     public Method getMethod(String name) {
-        return getContract().getMethods().get(name);
+        return getContract().getMethods()
+                            .get(name);
     }
-    
+
     public String getFileIndicator() {
         return "_bundleHash";
     }

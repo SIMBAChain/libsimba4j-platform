@@ -23,14 +23,15 @@
 package com.simbachain.simba;
 
 /**
- *  Interface supported by classes that can turn themselves into JsonData.
+ * Interface supported by classes that can turn themselves into JsonData.
  */
 public interface Jsonable {
 
     /**
      * Convert oneself into JsonData
+     *
      * @return a JsonData object
      */
-    public JsonData toJsonData();
+    JsonData toJsonData();
 
 }

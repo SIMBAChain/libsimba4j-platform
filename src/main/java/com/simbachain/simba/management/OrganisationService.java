@@ -67,7 +67,7 @@ public class OrganisationService extends SimbaClient {
     public OrganisationConfig getConfig() {
         return config;
     }
-    
+
     public Wallet getWallet() {
         return wallet;
     }
@@ -101,21 +101,24 @@ public class OrganisationService extends SimbaClient {
     }
 
     public NewApplication createApplication(String name, String displayName) throws SimbaException {
-        JsonData data = JsonData.with("name", name).and("display_name", displayName);
-        return this.post(Urls.url(getEndpoint(), Urls.PathName.APPLICATIONS, getConfig().getOrganisationId()),
+        JsonData data = JsonData.with("name", name)
+                                .and("display_name", displayName);
+        return this.post(
+            Urls.url(getEndpoint(), Urls.PathName.APPLICATIONS, getConfig().getOrganisationId()),
             data, jsonResponseHandler(NewApplication.class));
     }
 
     public PagedResult<Application> getApplications(int limit, int offset) throws SimbaException {
         return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.APPLICATIONS, Urls.Paging.paging(offset, limit), getConfig().getOrganisationId()),
+            Urls.url(getEndpoint(), Urls.PathName.APPLICATIONS, Urls.Paging.paging(offset, limit),
+                getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<Application>>() {
             }));
     }
 
     public PagedResult<Application> getApplications(Query.Params params) throws SimbaException {
-        return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.APPLICATIONS, params, getConfig().getOrganisationId()),
+        return this.get(Urls.url(getEndpoint(), Urls.PathName.APPLICATIONS, params,
+                getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<Application>>() {
             }));
     }
@@ -124,11 +127,10 @@ public class OrganisationService extends SimbaClient {
         return this.getApplications(10, 0);
     }
 
-    public PagedResult<ContractDesign> getContractDesigns(int limit, int offset) throws SimbaException {
-        return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.CONTRACT_DESIGNS,
-                Urls.Paging.paging(offset, limit),
-                getConfig().getOrganisationId()),
+    public PagedResult<ContractDesign> getContractDesigns(int limit, int offset)
+        throws SimbaException {
+        return this.get(Urls.url(getEndpoint(), Urls.PathName.CONTRACT_DESIGNS,
+                Urls.Paging.paging(offset, limit), getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<ContractDesign>>() {
             }));
     }
@@ -137,11 +139,10 @@ public class OrganisationService extends SimbaClient {
         return this.getContractDesigns(10, 0);
     }
 
-    public PagedResult<ContractArtifact> getContractArtifacts(int limit, int offset) throws SimbaException {
-        return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.CONTRACT_ARTIFACTS,
-                Urls.Paging.paging(offset, limit),
-                getConfig().getOrganisationId()),
+    public PagedResult<ContractArtifact> getContractArtifacts(int limit, int offset)
+        throws SimbaException {
+        return this.get(Urls.url(getEndpoint(), Urls.PathName.CONTRACT_ARTIFACTS,
+                Urls.Paging.paging(offset, limit), getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<ContractArtifact>>() {
             }));
     }
@@ -150,21 +151,19 @@ public class OrganisationService extends SimbaClient {
         return this.getContractArtifacts(10, 0);
     }
 
-    public PagedResult<DeployedContract> getDeployedContracts(int limit, int offset) throws SimbaException {
-        return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.DEPLOYED_CONTRACTS,
-                Urls.Paging.paging(offset, limit),
-                getConfig().getOrganisationId()),
+    public PagedResult<DeployedContract> getDeployedContracts(int limit, int offset)
+        throws SimbaException {
+        return this.get(Urls.url(getEndpoint(), Urls.PathName.DEPLOYED_CONTRACTS,
+                Urls.Paging.paging(offset, limit), getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<DeployedContract>>() {
             }));
     }
 
-    public PagedResult<DeployedContract> getDeployedContracts(Query.Params params, int limit, int offset) throws SimbaException {
-        return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.DEPLOYED_CONTRACTS,
-                params,
-                Urls.Paging.paging(offset, limit),
-                getConfig().getOrganisationId()),
+    public PagedResult<DeployedContract> getDeployedContracts(Query.Params params,
+        int limit,
+        int offset) throws SimbaException {
+        return this.get(Urls.url(getEndpoint(), Urls.PathName.DEPLOYED_CONTRACTS, params,
+                Urls.Paging.paging(offset, limit), getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<DeployedContract>>() {
             }));
     }
@@ -175,8 +174,7 @@ public class OrganisationService extends SimbaClient {
 
     public PagedResult<Blockchain> getBlockchains(int limit, int offset) throws SimbaException {
         return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.BLOCKCHAINS,
-                Urls.Paging.paging(offset, limit),
+            Urls.url(getEndpoint(), Urls.PathName.BLOCKCHAINS, Urls.Paging.paging(offset, limit),
                 getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<Blockchain>>() {
             }));
@@ -188,8 +186,7 @@ public class OrganisationService extends SimbaClient {
 
     public PagedResult<Storage> getStorages(int limit, int offset) throws SimbaException {
         return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.STORAGE,
-                Urls.Paging.paging(offset, limit),
+            Urls.url(getEndpoint(), Urls.PathName.STORAGE, Urls.Paging.paging(offset, limit),
                 getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<Storage>>() {
             }));
@@ -281,38 +278,28 @@ public class OrganisationService extends SimbaClient {
 
     public Application getApplication(String applicationId) throws SimbaException {
         return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.APPLICATIONS,
-                getConfig().getOrganisationId(),
-                applicationId),
-            jsonResponseHandler(Application.class));
+            Urls.url(getEndpoint(), Urls.PathName.APPLICATIONS, getConfig().getOrganisationId(),
+                applicationId), jsonResponseHandler(Application.class));
     }
 
     public ContractDesign getContractDesign(String designId) throws SimbaException {
         return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.CONTRACT_DESIGNS,
-                getConfig().getOrganisationId(),
-                designId),
-            jsonResponseHandler(ContractDesign.class));
+            Urls.url(getEndpoint(), Urls.PathName.CONTRACT_DESIGNS, getConfig().getOrganisationId(),
+                designId), jsonResponseHandler(ContractDesign.class));
     }
 
     public ContractArtifact getContractArtifact(String artifactId) throws SimbaException {
-        return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.CONTRACT_ARTIFACTS,
-                getConfig().getOrganisationId(),
-                artifactId),
+        return this.get(Urls.url(getEndpoint(), Urls.PathName.CONTRACT_ARTIFACTS,
+                getConfig().getOrganisationId(), artifactId),
             jsonResponseHandler(ContractArtifact.class));
     }
 
     public DeployedContract getDeployedContract(String id) throws SimbaException {
-        return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.DEPLOYED_CONTRACTS,
-                getConfig().getOrganisationId(),
-                id),
-            jsonResponseHandler(DeployedContract.class));
+        return this.get(Urls.url(getEndpoint(), Urls.PathName.DEPLOYED_CONTRACTS,
+            getConfig().getOrganisationId(), id), jsonResponseHandler(DeployedContract.class));
     }
 
-    public ContractDesign compileContract(InputStream contract, String name)
-        throws SimbaException {
+    public ContractDesign compileContract(InputStream contract, String name) throws SimbaException {
         String contractCode = new BufferedReader(new InputStreamReader(contract)).lines()
                                                                                  .parallel()
                                                                                  .collect(
@@ -349,20 +336,14 @@ public class OrganisationService extends SimbaClient {
                                 .and("name", name)
                                 .and("model", model)
                                 .and("mode", "code");
-        return this.post(
-            Urls.url(getEndpoint(), Urls.PathName.CONTRACT_DESIGNS,
-                getConfig().getOrganisationId()),
-            data,
-            jsonResponseHandler(ContractDesign.class));
+        return this.post(Urls.url(getEndpoint(), Urls.PathName.CONTRACT_DESIGNS,
+            getConfig().getOrganisationId()), data, jsonResponseHandler(ContractDesign.class));
     }
 
     public ContractArtifact createArtifact(String designId) throws SimbaException {
         JsonData data = JsonData.with("design_id", designId);
-        return this.post(
-            Urls.url(getEndpoint(), Urls.PathName.CONTRACT_ARTIFACTS,
-                getConfig().getOrganisationId()),
-            data,
-            jsonResponseHandler(ContractArtifact.class));
+        return this.post(Urls.url(getEndpoint(), Urls.PathName.CONTRACT_ARTIFACTS,
+            getConfig().getOrganisationId()), data, jsonResponseHandler(ContractArtifact.class));
     }
 
     public Future<DeployedContract> deployContract(String artifactId,
@@ -370,23 +351,21 @@ public class OrganisationService extends SimbaClient {
         Map<String, String> headers) throws SimbaException {
         JsonData data = spec.toJsonData();
         DeploymentResponse response = this.post(
-            Urls.url(getEndpoint(), Urls.PathName.DEPLOY,
-                getConfig().getOrganisationId(), artifactId), data,
-            jsonResponseHandler(DeploymentResponse.class), headers);
+            Urls.url(getEndpoint(), Urls.PathName.DEPLOY, getConfig().getOrganisationId(),
+                artifactId), data, jsonResponseHandler(DeploymentResponse.class), headers);
         if (this.wallet != null
             && response.getTransactionHash() == null
             && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()) != null) {
             String txnId = response.getTransactionId();
             Transaction txn = this.get(
-                Urls.url(getEndpoint(), Urls.PathName.APP_TXNS,
-                    spec.getAppName(), txnId),
+                Urls.url(getEndpoint(), Urls.PathName.APP_TXNS, spec.getAppName(), txnId),
                 jsonResponseHandler(new TypeReference<Transaction>() {
                 }));
             Map<String, String> raw = txn.getRawTransaction();
             RawTransaction rawTransaction = Signing.createSigningTransaction(raw);
             String signedTransaction = this.wallet.sign(rawTransaction);
-            String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXNS,
-                spec.getAppName(), txnId);
+            String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXNS, spec.getAppName(),
+                txnId);
             txn = this.post(endpoint, JsonData.with("transaction", signedTransaction),
                 jsonResponseHandler(new TypeReference<Transaction>() {
                 }));

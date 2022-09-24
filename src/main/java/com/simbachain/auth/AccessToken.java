@@ -22,7 +22,6 @@
 
 package com.simbachain.auth;
 
-
 /**
  * Represents an OAuth 2 access token.
  */
@@ -65,7 +64,7 @@ public class AccessToken {
         this.expiry = expiry;
         this.valid = true;
     }
-    
+
     public void invalidate() {
         this.valid = false;
     }

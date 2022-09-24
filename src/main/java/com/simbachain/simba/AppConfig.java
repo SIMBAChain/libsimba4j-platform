@@ -29,7 +29,7 @@ import com.simbachain.simba.management.OrganisationConfig;
  *
  */
 public class AppConfig extends OrganisationConfig {
-    
+
     private final String appName;
 
     public AppConfig(String appName, String organisationId, AuthConfig authConfig) {

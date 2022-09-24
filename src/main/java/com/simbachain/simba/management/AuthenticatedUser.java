@@ -36,7 +36,7 @@ import com.simbachain.simba.Urls;
  *
  */
 public class AuthenticatedUser extends SimbaClient {
-    
+
     private final AuthConfig config;
 
     public AuthenticatedUser(String endpoint, AuthConfig config) {

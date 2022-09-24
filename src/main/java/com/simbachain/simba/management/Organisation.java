@@ -26,18 +26,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simbachain.simba.Ided;
 
 /**
- *  A Blockchain object.
- *
+ * A Blockchain object.
  */
 public class Organisation implements Ided {
-    
+
     @JsonProperty
     private String id;
-    
+
     @JsonProperty
     private String name;
-    
-    @JsonProperty("display_name")
+
+    @JsonProperty ("display_name")
     private String displayName;
 
     @Override

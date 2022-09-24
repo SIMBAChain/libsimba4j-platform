@@ -141,9 +141,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         }
         String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXNS, getConfig().getAppName(),
             txnId);
-        Transaction txn = this.get(endpoint,
-            jsonResponseHandler(new TypeReference<Transaction>() {
-            }));
+        Transaction txn = this.get(endpoint, jsonResponseHandler(new TypeReference<Transaction>() {
+        }));
         String method = txn.getMethod();
         com.simbachain.simba.Method m = getMetadata().getMethod(method);
         if (m != null) {
@@ -276,8 +275,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         String signedTransaction = this.wallet.sign(rawTransaction);
         String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXNS, getConfig().getAppName(),
             transactionId);
-        Transaction txn = this.post(endpoint,
-            JsonData.with("transaction", signedTransaction),
+        Transaction txn = this.post(endpoint, JsonData.with("transaction", signedTransaction),
             jsonResponseHandler(new TypeReference<Transaction>() {
             }));
         CallResponse methodResponse = new CallResponse(txn.getId());
@@ -315,7 +313,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         Transaction txn = this.post(endpoint, parameters,
             jsonResponseHandler(new TypeReference<Transaction>() {
             }), headers, files);
-        if (txn.getState() == com.simbachain.simba.Transaction.State.PENDING && this.wallet != null) {
+        if (txn.getState() == com.simbachain.simba.Transaction.State.PENDING
+            && this.wallet != null) {
             Map<String, String> raw = txn.getRawTransaction();
             return signAndSubmit(txn.getId(), raw);
         } else {
@@ -355,7 +354,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         Transaction txn = this.post(endpoint, parameters,
             jsonResponseHandler(new TypeReference<Transaction>() {
             }), headers, files);
-        if (txn.getState() == com.simbachain.simba.Transaction.State.SUBMITTED && this.wallet != null) {
+        if (txn.getState() == com.simbachain.simba.Transaction.State.SUBMITTED
+            && this.wallet != null) {
             Map<String, String> raw = txn.getRawTransaction();
             return signAndSubmit(txn.getId(), raw);
         } else {
@@ -463,8 +463,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
 
     @Override
     @SuppressWarnings ("unchecked")
-    public PagedResult<com.simbachain.simba.Transaction> getTransactions(String method, Query.Params params)
-        throws SimbaException {
+    public PagedResult<com.simbachain.simba.Transaction> getTransactions(String method,
+        Query.Params params) throws SimbaException {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: SimbaPlatform.getTransactions: "
                 + "method = ["
@@ -488,7 +488,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
 
     @Override
     @SuppressWarnings ("unchecked")
-    public PagedResult<com.simbachain.simba.Transaction> next(PagedResult<com.simbachain.simba.Transaction> results) throws SimbaException {
+    public PagedResult<com.simbachain.simba.Transaction> next(PagedResult<com.simbachain.simba.Transaction> results)
+        throws SimbaException {
         if (results.getNext() == null) {
             return null;
         }
@@ -505,7 +506,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         if (results.getPrevious() == null) {
             return null;
         }
-        PagedResult<? extends com.simbachain.simba.Transaction> result = this.get(results.getPrevious(),
+        PagedResult<? extends com.simbachain.simba.Transaction> result = this.get(
+            results.getPrevious(),
             jsonResponseHandler(new TypeReference<PagedResult<Transaction>>() {
             }));
 

@@ -33,16 +33,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 public class ContractMetadata {
-    
+
     @JsonProperty
     private String version;
 
     @JsonProperty
     private String name;
 
-    @JsonProperty("abstract")
+    @JsonProperty ("abstract")
     private boolean isAbstract;
-    
+
     @JsonProperty
     private Map<String, Method> methods = new HashMap<>();
 

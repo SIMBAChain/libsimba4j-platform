@@ -27,11 +27,12 @@ import java.util.List;
 import com.simbachain.SimbaException;
 
 /**
- *  Extension interface to allow filtering on returned fields.
+ * Extension interface to allow filtering on returned fields.
  */
 public interface FieldFiltered {
 
-    PagedResult<Transaction> getTransactions(String method, Query.Params params, List<String> fields)
-        throws SimbaException;
+    PagedResult<Transaction> getTransactions(String method,
+        Query.Params params,
+        List<String> fields) throws SimbaException;
 
 }

@@ -33,10 +33,7 @@ public class LocalOAuthConfig extends AuthConfig {
     private final String user;
     private final String tokenUrl;
 
-    public LocalOAuthConfig(String clientId,
-        String clientSecret,
-        String user,
-        String tokenUrl) {
+    public LocalOAuthConfig(String clientId, String clientSecret, String user, String tokenUrl) {
         super(clientId, clientSecret);
         this.user = user;
         this.tokenUrl = tokenUrl;
@@ -45,7 +42,7 @@ public class LocalOAuthConfig extends AuthConfig {
     public String getUser() {
         return user;
     }
-    
+
     public String getTokenUrl() {
         return tokenUrl;
     }

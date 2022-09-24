@@ -28,24 +28,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simbachain.simba.Ided;
 
 /**
- *  A Blockchain object.
- *
+ * A Blockchain object.
  */
 public class Blockchain implements Ided {
-    
+
     @JsonProperty
     private String id;
-    
+
     @JsonProperty
     private String name;
-    
-    @JsonProperty("display_name")
+
+    @JsonProperty ("display_name")
     private String displayName;
-    
-    @JsonProperty("global_id")
+
+    @JsonProperty ("global_id")
     private String globalId;
-    
-    @JsonProperty("blockchain_type")
+
+    @JsonProperty ("blockchain_type")
     private String blockchainYType;
 
     @JsonProperty ("poa")
@@ -56,8 +55,8 @@ public class Blockchain implements Ided {
 
     @JsonProperty ("currency_unit")
     private String currencyUnit;
-    
-    @JsonProperty("supported_contract_types")
+
+    @JsonProperty ("supported_contract_types")
     private List<String> supportedContractTypes;
 
     @JsonProperty ("consensus_alg")
@@ -101,7 +100,7 @@ public class Blockchain implements Ided {
 
     @JsonProperty ("high_fee_percentile")
     private Integer highFeePercentile;
-    
+
     @Override
     public String getId() {
         return id;

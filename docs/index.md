@@ -13,7 +13,7 @@ to your pom file:
 <dependency>
     <groupId>com.simbachain</groupId>
     <artifactId>libsimba4j-platform</artifactId>
-    <version>0.1.14</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.simbachain:libsimba4j-platform:0.1.14'
+    implementation 'com.simbachain:libsimba4j-platform:1.0.0'
 }
 ```
 
