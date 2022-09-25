@@ -42,7 +42,7 @@ public class AuthenticatedUser extends SimbaClient {
     public AuthenticatedUser(String endpoint, AuthConfig config) {
         super(endpoint);
         this.config = config;
-        this.client = createClient();
+        this.client = config.getClientFactory().createClient();
     }
 
     @Override

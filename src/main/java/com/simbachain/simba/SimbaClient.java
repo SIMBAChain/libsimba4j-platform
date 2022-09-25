@@ -50,7 +50,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,16 +170,7 @@ public abstract class SimbaClient {
      * @throws SimbaException if the headers cannot be set.
      */
     protected abstract Map<String, String> getApiHeaders() throws SimbaException;
-
-    /**
-     * Create an HTTP client.
-     *
-     * @return a CloseableHttpClient
-     * @see org.apache.http.impl.client.CloseableHttpClient
-     */
-    protected CloseableHttpClient createClient() {
-        return HttpClients.createDefault();
-    }
+    
 
     protected IOException createException(String mime, int status, String reason, String body) {
         if (log.isDebugEnabled()) {

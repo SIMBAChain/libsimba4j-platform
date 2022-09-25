@@ -32,12 +32,16 @@ public class BlocksConfig extends AuthConfig {
 
     private final String tokenUrl;
 
-    public BlocksConfig(String clientId, String clientSecret, String authHost) {
-        super(clientId, clientSecret);
+    public BlocksConfig(String clientId, String clientSecret, String authHost, boolean writeToFile, String tokenDir) {
+        super(clientId, clientSecret, writeToFile, tokenDir);
         if (!authHost.endsWith("/")) {
             authHost = authHost + "/";
         }
         this.tokenUrl = String.format("%s/o/token/", authHost);
+    }
+    
+    public BlocksConfig(String clientId, String clientSecret, String authHost) {
+        this(clientId, clientSecret, authHost, false, null);
     }
 
     public String getTokenUrl() {
@@ -45,7 +49,7 @@ public class BlocksConfig extends AuthConfig {
     }
 
     @Override
-    public AccessTokenProvider getTokenProvider() {
+    public AccessTokenProvider<BlocksConfig> getTokenProvider() {
         return new BlocksTokenProvider(this);
     }
 }

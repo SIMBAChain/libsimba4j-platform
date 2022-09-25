@@ -61,7 +61,7 @@ public class OrganisationService extends SimbaClient {
     public OrganisationService(String endpoint, OrganisationConfig config) {
         super(endpoint);
         this.config = config;
-        this.client = createClient();
+        this.client = config.getClientFactory().createClient();
     }
 
     public OrganisationConfig getConfig() {

@@ -24,12 +24,12 @@ package com.simbachain.auth.blocks;
 
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simbachain.SimbaException;
 import com.simbachain.auth.AccessToken;
 import com.simbachain.auth.AccessTokenProvider;
@@ -39,22 +39,16 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 /**
  *
  */
-public class BlocksTokenProvider implements AccessTokenProvider {
+public class BlocksTokenProvider extends AccessTokenProvider<BlocksConfig> {
 
-    private final BlocksConfig credentials;
-    private AccessToken token = null;
-    private long expires = 0L;
-    protected static ObjectMapper mapper = new ObjectMapper();
-
-    public BlocksTokenProvider(BlocksConfig credentials) {
-        this.credentials = credentials;
+    public BlocksTokenProvider(BlocksConfig config) {
+        super(config);
     }
 
     private Map<String, String> post(CloseableHttpClient client,
@@ -100,35 +94,37 @@ public class BlocksTokenProvider implements AccessTokenProvider {
 
     @Override
     public AccessToken getToken() throws SimbaException {
-        CloseableHttpClient client = HttpClients.createDefault();
+        CloseableHttpClient client = this.getConfig()
+                                         .getClientFactory()
+                                         .createClient();
         try {
+            AccessToken token = this.getCachedToken(this.getConfig()
+                                                        .getClientId());
+            if (token != null) {
+                return token;
+            }
+
+            Map<String, String> data = new HashMap<>();
+            data.put("grant_type", "client_credentials");
+
+            Map<String, String> headers = new HashMap<>();
+            String userCredentials = getConfig().getClientId()
+                + ":"
+                + getConfig().getClientSecret();
+            String basicAuth = "Basic " + new String(Base64.getEncoder()
+                                                           .encode(userCredentials.getBytes()));
+            headers.put("Authorization", basicAuth);
+            headers.put("Content-Type", "application/x-www-form-urlencoded");
+
+            Map<String, String> result = this.post(client, getConfig().getTokenUrl(), data, headers);
+            
             long now = System.currentTimeMillis();
-            if (now >= this.expires) {
-                this.token = null;
-            }
-            if (this.token == null) {
-                Map<String, String> data = new HashMap<>();
-                data.put("grant_type", "client_credentials");
+            long expires = now + (Long.parseLong(result.get("expires_in")) * 1000);
+            token = new AccessToken(result.get("access_token"), result.get("token_type"),
+                new Date(expires));
+            cacheToken(getConfig().getClientId(), token);
 
-                Map<String, String> headers = new HashMap<>();
-                String userCredentials = credentials.getClientId()
-                    + ":"
-                    + credentials.getClientSecret();
-                String basicAuth = "Basic " + new String(Base64.getEncoder()
-                                                               .encode(userCredentials.getBytes()));
-                headers.put("Authorization", basicAuth);
-                headers.put("Content-Type", "application/x-www-form-urlencoded");
-
-                Map<String, String> result = this.post(client, credentials.getTokenUrl(), data,
-                    headers);
-
-                long expires = now + (Long.parseLong(result.get("expires_in")) * 1000);
-                this.expires = expires - 5000;
-                this.token = new AccessToken(result.get("access_token"), result.get("token_type"),
-                    expires);
-            }
-            return this.token;
-
+            return token;
         } catch (Exception e) {
             throw new SimbaException(e.getMessage(), SimbaException.SimbaError.AUTHENTICATION_ERROR,
                 e);

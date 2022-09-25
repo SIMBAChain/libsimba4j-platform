@@ -46,7 +46,7 @@ public class BlocksCredentialExample
         String org = config.get("ORG");
         String contract = "cif";
 
-        BlocksConfig authConfig = new BlocksConfig(clientId, clientSecret, authHost);
+        BlocksConfig authConfig = new BlocksConfig(clientId, clientSecret, authHost, true, null);
         AuthenticatedUser user = new AuthenticatedUser(host, authConfig);
         System.out.println("Authenticated user: " + user.whoami());
         AppConfig appConfig = new AppConfig(app, org, authConfig);

@@ -41,7 +41,6 @@ mvn install
 
 Libsimba4J uses SLF4J for logging. All logging is at Debug level.
 
-
 ## Setting up a SIMBA Blocks Client
 
 The first thing to do is configure authentication. SIMBA Blocks Platform uses OAuth 2.
@@ -54,20 +53,22 @@ expiry. `AccessTokenProvider`
 objects should be able to renew tokens transparently.
 
 ```java
-public abstract class AuthConfig implements SimbaConfig {
+public abstract class AuthConfig extends SimbaConfig {
 
     private final String clientId;
     private final String clientSecret;
     private final boolean writeToFile;
+    private final String tokenDir;
 
-    public AuthConfig(String clientId, String clientSecret, boolean writeToFile) {
+    public AuthConfig(String clientId, String clientSecret, boolean writeToFile, String tokenDir) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.writeToFile = writeToFile;
+        this.tokenDir = tokenDir;
     }
 
     public AuthConfig(String clientId, String clientSecret) {
-        this(clientId, clientSecret, false);
+        this(clientId, clientSecret, false, null);
     }
 
     public AuthConfig getAuthConfig() {
@@ -86,27 +87,11 @@ public abstract class AuthConfig implements SimbaConfig {
         return writeToFile;
     }
 
-    public abstract AccessTokenProvider getTokenProvider();
-}
-```
+    public String getTokenDir() {
+        return tokenDir;
+    }
 
-The `AccessTokenProvider` interface is shown below.
-
-```java
-/**
- *  Provides an AccessToken. AuthConfig implementations provide
- *  access to an instance of this interface in order for clients to be able
- *  to grab a token.
- */
-public interface AccessTokenProvider {
-
-    /**
-     * Get the token
-     * @return  an AccessToken
-     * @throws SimbaException if an error occurs
-     */
-    public AccessToken getToken() throws SimbaException;
-
+    public abstract AccessTokenProvider<? extends AuthConfig> getTokenProvider();
 }
 ```
 
@@ -154,6 +139,9 @@ SIMBA_AUTH_BASE_URL=https://my.keycloak.server
 ```
 
 These values can also be directly set an environment variables if you don't use a dot env file.
+                              
+Other values can be stored in the env file if required. Any values set directly as environment
+valiables will override values in the file.
 
 The config is loaded using the `SimbaConfigFile` class. For example:
 
@@ -184,10 +172,9 @@ Then create an `OrganisationService` passing in the org config and the root endp
 service.
 
 ```java
-AzConfig config=new AzConfig(clientId,clientSecret,tenantId,appId,
-        AzConfig.Flow.CLIENT_CREDENTIAL);
+BlocksConfig authConfig = new BlocksConfig(clientId, clientSecret, authHost);
 OrganisationConfig orgConfig = new OrganisationConfig("simbachain", config);
-OrganisationService orgService = new OrganisationService("https://api.my.simbachain.com/", orgConfig);
+OrganisationService orgService = new OrganisationService(host, orgConfig);
 ```
 
 List applications, contract design, artifacts and deployed contracts:

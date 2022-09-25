@@ -27,8 +27,14 @@ import com.simbachain.auth.AuthConfig;
 /**
  * Interface to credentials used by a SIMBA HTTP client.
  */
-public interface SimbaConfig {
+public abstract class SimbaConfig {
+    
+    protected HttpClientFactory clientFactory = new HttpClientFactory();
 
-    AuthConfig getAuthConfig();
+    public abstract AuthConfig getAuthConfig();
+
+    public HttpClientFactory getClientFactory() {
+        return clientFactory;
+    }
 
 }

@@ -42,7 +42,7 @@ import io.github.cdimascio.dotenv.Dotenv;
  * SIMBA_AUTH_SCOPE auth scope.
  * </p><p>
  * SIMBA_AUTH_REALM
- * </p><p>
+ * </p>
  */
 public class SimbaConfigFile {
 

@@ -39,7 +39,17 @@ public class KcAuthConfig extends AuthConfig {
         String host,
         String realm,
         String... scopes) {
-        super(clientId, clientSecret);
+        this(clientId, clientSecret, host, realm, false, null, scopes);
+    }
+
+    public KcAuthConfig(String clientId,
+        String clientSecret,
+        String host,
+        String realm,
+        boolean writeToFile,
+        String tokenDir,
+        String... scopes) {
+        super(clientId, clientSecret, writeToFile, tokenDir);
         while (host.endsWith("/")) {
             host = host.substring(0, host.length() - 1);
         }
@@ -71,7 +81,7 @@ public class KcAuthConfig extends AuthConfig {
     }
 
     @Override
-    public AccessTokenProvider getTokenProvider() {
+    public AccessTokenProvider<KcAuthConfig> getTokenProvider() {
         return new KcTokenProvider(this);
     }
 }

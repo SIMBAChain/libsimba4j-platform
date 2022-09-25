@@ -27,20 +27,22 @@ import com.simbachain.simba.SimbaConfig;
 /**
  * OAuth focussed simba config.
  */
-public abstract class AuthConfig implements SimbaConfig {
+public abstract class AuthConfig extends SimbaConfig {
 
     private final String clientId;
     private final String clientSecret;
     private final boolean writeToFile;
+    private final String tokenDir;
 
-    public AuthConfig(String clientId, String clientSecret, boolean writeToFile) {
+    public AuthConfig(String clientId, String clientSecret, boolean writeToFile, String tokenDir) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.writeToFile = writeToFile;
+        this.tokenDir = tokenDir;
     }
 
     public AuthConfig(String clientId, String clientSecret) {
-        this(clientId, clientSecret, false);
+        this(clientId, clientSecret, false, null);
     }
 
     public AuthConfig getAuthConfig() {
@@ -59,5 +61,9 @@ public abstract class AuthConfig implements SimbaConfig {
         return writeToFile;
     }
 
-    public abstract AccessTokenProvider getTokenProvider();
+    public String getTokenDir() {
+        return tokenDir;
+    }
+
+    public abstract AccessTokenProvider<? extends AuthConfig> getTokenProvider();
 }

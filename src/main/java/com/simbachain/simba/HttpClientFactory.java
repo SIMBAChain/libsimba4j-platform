@@ -20,35 +20,27 @@
  * SOFTWARE.
  */
 
-package com.simbachain.auth.local;
+package com.simbachain.simba;
 
-import com.simbachain.auth.AccessTokenProvider;
-import com.simbachain.auth.AuthConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 /**
  *
  */
-public class LocalOAuthConfig extends AuthConfig {
+public class HttpClientFactory {
+    
+    private final CloseableHttpClient client = HttpClients.createDefault();
 
-    private final String user;
-    private final String tokenUrl;
-
-    public LocalOAuthConfig(String clientId, String clientSecret, String user, String tokenUrl) {
-        super(clientId, clientSecret);
-        this.user = user;
-        this.tokenUrl = tokenUrl;
+    /**
+     * Create an HTTP client.
+     *
+     * @return a CloseableHttpClient
+     * @see org.apache.http.impl.client.CloseableHttpClient
+     */
+    public CloseableHttpClient createClient() {
+        return client;
     }
+    
 
-    public String getUser() {
-        return user;
-    }
-
-    public String getTokenUrl() {
-        return tokenUrl;
-    }
-
-    @Override
-    public AccessTokenProvider<LocalOAuthConfig> getTokenProvider() {
-        return new LocalTokenProvider(this);
-    }
 }

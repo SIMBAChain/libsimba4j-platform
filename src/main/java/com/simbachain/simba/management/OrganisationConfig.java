@@ -28,7 +28,7 @@ import com.simbachain.simba.SimbaConfig;
 /**
  *
  */
-public class OrganisationConfig implements SimbaConfig {
+public class OrganisationConfig extends SimbaConfig {
 
     private final String organisationId;
 

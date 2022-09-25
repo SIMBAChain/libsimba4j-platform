@@ -52,7 +52,7 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
     public Simba(String endpoint, String contract, C config) {
         super(endpoint);
         this.contract = contract;
-        this.client = createClient();
+        this.client = config.getClientFactory().createClient();
         this.config = config;
     }
 

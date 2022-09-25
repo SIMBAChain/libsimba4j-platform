@@ -22,24 +22,34 @@
 
 package com.simbachain.auth;
 
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Represents an OAuth 2 access token.
  */
 public class AccessToken {
 
+    @JsonProperty
     private String token;
+    @JsonProperty
     private String type;
-    private long expiry;
+    @JsonProperty
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+    private Date expires;
+    
     private boolean valid;
 
-    public AccessToken(String token, String type, long expiry) {
+    public AccessToken(String token, String type, Date expires) {
         this.token = token;
         this.type = type;
-        this.expiry = expiry;
+        this.expires = expires;
     }
 
     public AccessToken() {
-        this("", "", 0L);
+        this("", "", new Date());
     }
 
     public String getToken() {
@@ -50,23 +60,8 @@ public class AccessToken {
         return type;
     }
 
-    public long getExpiry() {
-        return expiry;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
-    public void refresh(String token, String type, long expiry) {
-        this.token = token;
-        this.type = type;
-        this.expiry = expiry;
-        this.valid = true;
-    }
-
-    public void invalidate() {
-        this.valid = false;
+    public Date getExpires() {
+        return expires;
     }
 
     @Override
@@ -79,7 +74,7 @@ public class AccessToken {
           .append(type)
           .append('\'');
         sb.append(", expiry=")
-          .append(expiry);
+          .append(expires);
         sb.append(", valid=")
           .append(valid);
         sb.append('}');

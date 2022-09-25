@@ -42,7 +42,7 @@ import com.simbachain.wallet.Wallet;
 import org.web3j.crypto.RawTransaction;
 
 /**
- * Enterprise Platform Implementation of SIMBA API as a Contract service
+ * Blocks Platform Implementation of SIMBA API as a Contract service
  */
 public class ContractService extends Simba<AppConfig> implements FieldFiltered {
 
