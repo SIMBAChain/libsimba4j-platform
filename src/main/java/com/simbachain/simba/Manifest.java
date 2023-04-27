@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,8 +38,9 @@ public class Manifest {
     @JsonProperty
     private String digest;
     @JsonProperty
-    private String mimetype;
     private String hash;
+    @JsonProperty
+    private long time;
     @JsonProperty
     private List<ManifestFile> files = new ArrayList<>();
 
@@ -59,15 +60,12 @@ public class Manifest {
         this.alg = alg;
     }
 
-    public String getMimetype() {
-        if (mimetype != null) {
-            return mimetype;
-        }
-        return "application/x-gzip";
+    public long getTime() {
+        return time;
     }
 
-    public void setMimetype(String mimetype) {
-        this.mimetype = mimetype;
+    public void setTime(long time) {
+        this.time = time;
     }
 
     public String getDigest() {
@@ -95,8 +93,8 @@ public class Manifest {
         sb.append(", digest='")
           .append(digest)
           .append('\'');
-        sb.append(", mimetype='")
-          .append(getMimetype())
+        sb.append(", time='")
+          .append(time)
           .append('\'');
         sb.append(", hash='")
           .append(hash)

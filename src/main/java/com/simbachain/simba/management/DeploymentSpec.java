@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,16 +32,22 @@ import com.simbachain.simba.Jsonable;
  */
 public class DeploymentSpec implements Jsonable {
 
+    private String artifactId;
     private String blockchain;
     private String storage;
     private String apiName;
     private String appName;
     private String displayName;
-    private String assetType;
-    private String preTxnHook;
-    private Boolean singleton = false;
     private String deployedAddress;
     private Map<String, Object> args;
+
+    public String getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
 
     public String getBlockchain() {
         return blockchain;
@@ -83,30 +89,6 @@ public class DeploymentSpec implements Jsonable {
         this.displayName = displayName;
     }
 
-    public String getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(String assetType) {
-        this.assetType = assetType;
-    }
-
-    public String getPreTxnHook() {
-        return preTxnHook;
-    }
-
-    public void setPreTxnHook(String preTxnHook) {
-        this.preTxnHook = preTxnHook;
-    }
-
-    public Boolean getSingleton() {
-        return singleton;
-    }
-
-    public void setSingleton(Boolean singleton) {
-        this.singleton = singleton;
-    }
-
     public String getDeployedAddress() {
         return deployedAddress;
     }
@@ -128,18 +110,12 @@ public class DeploymentSpec implements Jsonable {
         JsonData data = JsonData.with("blockchain", blockchain)
                                 .and("storage", storage)
                                 .and("api_name", apiName)
-                                .and("singleton", singleton);
+                                .and("artifact_id", artifactId);
         if (displayName != null) {
             data = data.and("display_name", displayName);
         }
         if (appName != null) {
             data = data.and("app_name", appName);
-        }
-        if (assetType != null) {
-            data = data.and("asset_type", assetType);
-        }
-        if (preTxnHook != null) {
-            data = data.and("pre_txn_hook", preTxnHook);
         }
         if (deployedAddress != null) {
             data = data.and("deployed_address", deployedAddress);

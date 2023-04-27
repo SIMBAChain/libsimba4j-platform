@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,14 @@
 
 package com.simbachain.simba.management;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simbachain.simba.Ided;
 
 /**
  * A Blockchain object.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Organisation implements Ided {
 
     @JsonProperty

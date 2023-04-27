@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -110,7 +110,12 @@ public class Builder {
             javaMethod.setJsonDataName(dataName);
             String headersName = getHeadersName(paramNames);
             javaMethod.setHeadersName(headersName);
+            int count = 0;
             for (Parameter aReturn : returns) {
+                if (aReturn.getName() == null) {
+                    aReturn.setName("return" + count);
+                    count++;
+                }
                 javaMethod.addReturn(createComponent(aReturn));
             }
             if (javaMethod.isAccessor()) {

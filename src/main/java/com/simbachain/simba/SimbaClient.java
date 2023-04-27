@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -171,6 +171,13 @@ public abstract class SimbaClient {
      */
     protected abstract Map<String, String> getApiHeaders() throws SimbaException;
     
+    protected String truncateLogString(String value) {
+        if (value != null && value.length() > 1000) {
+            value = value.substring(0, 1000) + "...";
+        }
+        return value;
+    }   
+    
 
     protected IOException createException(String mime, int status, String reason, String body) {
         if (log.isDebugEnabled()) {
@@ -305,6 +312,7 @@ public abstract class SimbaClient {
                 ContentType contentType = ContentType.getOrDefault(entity);
                 mime = contentType.getMimeType();
                 responseString = EntityUtils.toString(entity);
+                log.debug("jsonResponseHandler response string: " + truncateLogString(responseString));
             }
             if (status >= 200 && status < 300) {
                 return mapper.readValue(responseString, cls);
@@ -334,6 +342,7 @@ public abstract class SimbaClient {
                 ContentType contentType = ContentType.getOrDefault(entity);
                 mime = contentType.getMimeType();
                 responseString = EntityUtils.toString(entity);
+                log.debug("jsonResponseHandler response string: " + truncateLogString(responseString));
             }
             if (status >= 200 && status < 300) {
                 return mapper.readValue(responseString, tf);
@@ -363,6 +372,7 @@ public abstract class SimbaClient {
                 ContentType contentType = ContentType.getOrDefault(entity);
                 mime = contentType.getMimeType();
                 responseString = EntityUtils.toString(entity);
+                log.debug("jsonResponseHandler response string: " + truncateLogString(responseString));
             }
             if (status >= 200 && status < 300) {
                 Header[] headers = response.getAllHeaders();

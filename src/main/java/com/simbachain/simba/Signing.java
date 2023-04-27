@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,29 +36,46 @@ public class Signing {
     private Signing() {
     }
 
-    public static BigInteger getBitInt(String value) {
-        if (value == null
-            || value.trim()
-                    .length() == 0) {
-            return BigInteger.ZERO;
+    public static BigInteger getBigInt(Object value) {
+        if (value == null) {
+            return null;
         }
-        value = value.trim();
-        if (value.startsWith("0x")) {
-            return Numeric.toBigInt(value);
+        if(value instanceof BigInteger) {
+            return (BigInteger) value;
         }
-        return new BigInteger(value);
+        if (value instanceof String) {
+            String stringVal = ((String)value).trim(); 
+            if (stringVal.length() == 0) {
+                return BigInteger.ZERO;
+            }
+            if (stringVal.startsWith("0x")) {
+                return Numeric.toBigInt(stringVal);
+            }
+            return new BigInteger(stringVal);
+        } else if (value instanceof Number) {
+            long longVal = ((Number)value).longValue();
+            return new BigInteger(String.valueOf(longVal));
+        }
+        return null;
     }
 
-    public static RawTransaction createSigningTransaction(Map<String, String> raw) {
-
-        String nonce = raw.get("nonce");
-        String gasPrice = raw.get("gasPrice");
-        String gasLimit = raw.getOrDefault("gas", raw.get("gasLimit"));
-        BigInteger value = getBitInt(raw.getOrDefault("value", ""));
-        String to = raw.get("to");
-        String data = raw.getOrDefault("data", null);
-
-        return RawTransaction.createTransaction(getBitInt(nonce), getBitInt(gasPrice),
-            getBitInt(gasLimit), to, value, data);
+    public static RawTransaction createSigningTransaction(Map<String, Object> raw) {
+        Object chainId = raw.get("chainId");
+        Object nonce = raw.get("nonce");
+        Object gasLimit = raw.getOrDefault("gas", raw.get("gasLimit"));
+        BigInteger value = getBigInt(raw.getOrDefault("value", ""));
+        Object to = raw.get("to");
+        Object data = raw.getOrDefault("data", null);
+        Object gasPrice = raw.get("gasPrice");
+        Object maxPriorityFeePerGas = raw.get("maxPriorityFeePerGas");
+        Object maxFeePerGas = raw.get("maxFeePerGas");
+        if (gasPrice != null) {
+            return RawTransaction.createTransaction(getBigInt(nonce), getBigInt(gasPrice),
+                getBigInt(gasLimit), (String) to, value, (String) data);
+        }  else {
+            return RawTransaction.createTransaction(getBigInt(chainId).longValue(), getBigInt(nonce),
+                getBigInt(gasLimit), (String) to, value, (String) data, getBigInt(maxPriorityFeePerGas),
+                getBigInt(maxFeePerGas));
+        }
     }
 }

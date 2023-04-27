@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,31 +22,42 @@
 
 package com.simbachain.auth;
 
-import com.simbachain.simba.SimbaConfig;
+import com.simbachain.simba.HttpClientFactory;
+import com.simbachain.simba.HttpConfig;
 
 /**
- * OAuth focussed simba config.
+ * OAuth config.
  */
-public abstract class AuthConfig extends SimbaConfig {
+public abstract class AuthConfig implements HttpConfig {
 
+    private final HttpClientFactory clientFactory;
     private final String clientId;
     private final String clientSecret;
     private final boolean writeToFile;
     private final String tokenDir;
 
-    public AuthConfig(String clientId, String clientSecret, boolean writeToFile, String tokenDir) {
+    public AuthConfig(HttpClientFactory clientFactory, String clientId, String clientSecret, boolean writeToFile, String tokenDir) {
+        this.clientFactory = clientFactory;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.writeToFile = writeToFile;
         this.tokenDir = tokenDir;
     }
-
-    public AuthConfig(String clientId, String clientSecret) {
-        this(clientId, clientSecret, false, null);
+    
+    public HttpClientFactory getClientFactory() {
+        return clientFactory;
     }
 
-    public AuthConfig getAuthConfig() {
-        return this;
+    public AuthConfig(String clientId, String clientSecret, boolean writeToFile, String tokenDir) {
+        this(new HttpClientFactory(), clientId, clientSecret, writeToFile, tokenDir);
+    }
+
+    public AuthConfig(HttpClientFactory clientFactory, String clientId, String clientSecret) {
+        this(clientFactory, clientId, clientSecret, false, null);
+    }
+
+    public AuthConfig(String clientId, String clientSecret) {
+        this(new HttpClientFactory(), clientId, clientSecret, false, null);
     }
 
     public String getClientId() {

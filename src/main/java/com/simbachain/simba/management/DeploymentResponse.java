@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,51 +22,48 @@
 
 package com.simbachain.simba.management;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.simbachain.simba.Ided;
 
 /**
  * Response to a deployment.
  */
-public class DeploymentResponse {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class DeploymentResponse implements Ided {
 
-    @JsonProperty ("transaction_hash")
-    private String transactionHash;
+    @JsonProperty ("id")
+    private String id;
+    
+    @JsonProperty ("current_txn")
+    private String currentTransaction;
 
-    @JsonProperty ("transaction_id")
-    private String transactionId;
-
-    @JsonProperty ("deployment_id")
-    private String deploymentId;
-
-    @JsonProperty ("instance_id")
-    private String instanceId;
+    @JsonProperty ("primary")
+    private Map<String, Object> primary;
 
     @JsonProperty
     private String state;
 
-    public String getTransactionHash() {
-        return transactionHash;
+    @Override
+    public String getId() {
+        return id;
     }
 
-    public void setTransactionHash(String transactionHash) {
-        this.transactionHash = transactionHash;
+    @Override
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getTransactionId() {
-        return transactionId;
+    public String getCurrentTransaction() {
+        return currentTransaction;
     }
 
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
+    public void setCurrentTransaction(String currentTransaction) {
+        this.currentTransaction = currentTransaction;
     }
 
-    public String getDeploymentId() {
-        return deploymentId;
-    }
-
-    public void setDeploymentId(String deploymentId) {
-        this.deploymentId = deploymentId;
-    }
 
     public String getState() {
         return state;
@@ -76,28 +73,15 @@ public class DeploymentResponse {
         this.state = state;
     }
 
-    public String getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
+    public String getDeployedArtifactId() {
+        return (String)primary.get("deployed_artifact_id");
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("DeploymentResponse{");
-        sb.append("transactionHash='")
-          .append(transactionHash)
-          .append('\'');
-        sb.append(", transactionId='")
-          .append(transactionId)
-          .append('\'');
-        sb.append(", deploymentId='")
-          .append(deploymentId)
-          .append('\'');
-        sb.append(", instanceId='")
-          .append(instanceId)
+        sb.append("primary='")
+          .append(primary)
           .append('\'');
         sb.append(", state='")
           .append(state)

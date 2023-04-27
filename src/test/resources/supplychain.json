@@ -196,6 +196,10 @@
           {
             "name": "dateTime",
             "type": "uint256"
+          },
+          {
+            "name": "_bundleHash",
+            "type": "string"
           }
         ],
         "returns": [],
@@ -216,6 +220,22 @@
         ],
         "returns": [],
         "accessor": false,
+        "visibility": "public"
+      },
+      "getSupplier": {
+        "emits": [],
+        "params": [
+          {
+            "name": "pk",
+            "type": "string"
+          }
+        ],
+        "returns": [
+          {
+            "type": "string"
+          }
+        ],
+        "accessor": true,
         "visibility": "public"
       }
     },

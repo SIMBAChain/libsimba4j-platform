@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -99,7 +99,7 @@ public class KcTokenProvider extends AccessTokenProvider<KcAuthConfig> {
     @Override
     public AccessToken getToken() throws SimbaException {
         CloseableHttpClient client = getConfig().getClientFactory()
-                                                .createClient();
+                                                .getClient();
 
         try {
             AccessToken token = this.getCachedToken(this.getConfig()

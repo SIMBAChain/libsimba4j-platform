@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +54,7 @@ public class SimbaConfigFile {
     public static final String SIMBA_AUTH_BASE_URL = "SIMBA_AUTH_BASE_URL";
     public static final String SIMBA_AUTH_SCOPE = "SIMBA_AUTH_SCOPE";
     public static final String SIMBA_AUTH_REALM = "SIMBA_AUTH_REALM";
+    public static final String SIMBA_TOKEN_DIR = "SIMBA_TOKEN_DIR";
     public static final String ENV_FILENAME = "simbachain.env";
     public static final String ENV_DOT_FILENAME = ".simbachain.env";
     public static final String ENV_DEFAULT = ".env";
@@ -154,6 +155,10 @@ public class SimbaConfigFile {
 
     public String getLoggingConf() {
         return dotenv.get(SIMBA_LOGGING_CONF);
+    }
+
+    public String getTokenDir() {
+        return dotenv.get(SIMBA_TOKEN_DIR);
     }
 
 }

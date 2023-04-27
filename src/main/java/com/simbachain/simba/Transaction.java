@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -80,7 +80,7 @@ public class Transaction implements Ided {
     private Date created;
 
     @JsonProperty ("raw_transaction")
-    private Map<String, String> rawTransaction;
+    private Map<String, Object> rawTransaction;
 
     @JsonIgnore
     private String app;
@@ -241,11 +241,11 @@ public class Transaction implements Ided {
         this.contractAddress = contractAddress;
     }
 
-    public Map<String, String> getRawTransaction() {
+    public Map<String, Object> getRawTransaction() {
         return rawTransaction;
     }
 
-    public void setRawTransaction(Map<String, String> rawTransaction) {
+    public void setRawTransaction(Map<String, Object> rawTransaction) {
         this.rawTransaction = rawTransaction;
     }
 

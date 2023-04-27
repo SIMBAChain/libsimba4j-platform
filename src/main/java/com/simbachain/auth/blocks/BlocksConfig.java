@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ package com.simbachain.auth.blocks;
 
 import com.simbachain.auth.AccessTokenProvider;
 import com.simbachain.auth.AuthConfig;
+import com.simbachain.simba.HttpClientFactory;
 
 /**
  *
@@ -32,12 +33,24 @@ public class BlocksConfig extends AuthConfig {
 
     private final String tokenUrl;
 
+    public BlocksConfig(HttpClientFactory clientFactory, String clientId, String clientSecret, String authHost, boolean writeToFile, String tokenDir) {
+        super(clientFactory, clientId, clientSecret, writeToFile, tokenDir);
+        if (!authHost.endsWith("/")) {
+            authHost = authHost + "/";
+        }
+        this.tokenUrl = String.format("%s/o/token/", authHost);
+    }
+
     public BlocksConfig(String clientId, String clientSecret, String authHost, boolean writeToFile, String tokenDir) {
         super(clientId, clientSecret, writeToFile, tokenDir);
         if (!authHost.endsWith("/")) {
             authHost = authHost + "/";
         }
         this.tokenUrl = String.format("%s/o/token/", authHost);
+    }
+
+    public BlocksConfig(HttpClientFactory clientFactory, String clientId, String clientSecret, String authHost) {
+        this(clientFactory, clientId, clientSecret, authHost, false, null);
     }
     
     public BlocksConfig(String clientId, String clientSecret, String authHost) {

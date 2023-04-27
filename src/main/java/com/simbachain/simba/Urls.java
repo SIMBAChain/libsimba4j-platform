@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,8 @@ public class Urls {
 
     public enum PathName {
         WHOAMI, WALLET, APPLICATIONS, TXN_COUNT, ADDRESS_TXN_COUNT, CONTRACT_DESIGNS,
-        CONTRACT_ARTIFACTS, DEPLOYED_CONTRACTS, BLOCKCHAINS, STORAGE, ORG_TXNS, APP_TXNS, DEPLOY,
+        CONTRACT_ARTIFACTS, CONTRACT_ARTIFACT, DEPLOYED_CONTRACTS, DEPLOYED_CONTRACT,
+        BLOCKCHAINS, STORAGES, ORG_TXNS, ORG_TXN, APP_TXNS, APP_TXN, DEPLOY,
         CONTRACT_API, CONTRACT_METHOD, CONTRACT_METHOD_SYNC, BUNDLE_MANIFEST, BUNDLE, BUNDLE_FILE,
         BALANCE, ADDRESS_BALANCE, FUND
     }
@@ -80,16 +81,23 @@ public class Urls {
                                                  "v2/organisations/%s/contract_designs/"},
                                                 {PathName.CONTRACT_ARTIFACTS,
                                                  "v2/organisations/%s/contract_artifacts/"},
+                                                {PathName.CONTRACT_ARTIFACT,
+                                                 "v2/organisations/%s/contract_artifacts/%s/"},
                                                 {PathName.DEPLOYED_CONTRACTS,
                                                  "v2/organisations/%s/deployed_contracts/"},
+                                                {PathName.DEPLOYED_CONTRACT,
+                                                 "v2/organisations/%s/deployed_contracts/%s/"},
                                                 {PathName.BLOCKCHAINS,
                                                  "v2/organisations/%s/blockchains/"},
-                                                {PathName.STORAGE, "v2/organisations/%s/storage/"},
+                                                {PathName.STORAGES, "v2/organisations/%s/storage/"},
                                                 {PathName.ORG_TXNS,
                                                  "v2/organisations/%s/transactions/"},
+                                                {PathName.ORG_TXN,
+                                                 "v2/organisations/%s/transactions/%s/"},
                                                 {PathName.APP_TXNS, "v2/apps/%s/transactions/"},
+                                                {PathName.APP_TXN, "v2/apps/%s/transactions/%s/"},
                                                 {PathName.DEPLOY,
-                                                 "v2/organisations/%s/contract_artifacts/%s/deploy/"},
+                                                 "v2/organisations/%s/deployments/"},
                                                 {PathName.CONTRACT_API,
                                                  "v2/apps/%s/contract/%s/info/"},
                                                 {PathName.CONTRACT_METHOD,
@@ -102,10 +110,10 @@ public class Urls {
                                                  "v2/apps/%s/contract/%s/bundle/%s/manifest/"},
                                                 {PathName.BUNDLE_FILE,
                                                  "v2/apps/%s/contract/%s/bundle/%s/filename/%s/"},
-                                                {PathName.BALANCE, "/user/account/%s/balance/"},
+                                                {PathName.BALANCE, "user/account/%s/balance/"},
                                                 {PathName.ADDRESS_BALANCE,
-                                                 "/user/account/%s/balance/%s/"},
-                                                {PathName.FUND, "/user/account/%s/fund/"}};
+                                                 "user/account/%s/balance/%s/"},
+                                                {PathName.FUND, "user/account/%s/fund/"}};
 
     public static final Map<PathName, String> pathMap = Stream.of(urlPaths)
                                                               .collect(Collectors.toMap(

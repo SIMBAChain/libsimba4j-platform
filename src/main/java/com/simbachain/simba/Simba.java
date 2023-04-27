@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import com.simbachain.SimbaException;
+import org.apache.http.client.ResponseHandler;
 
 /**
  * Main entry point to interacting with Simba.
@@ -52,7 +53,7 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
     public Simba(String endpoint, String contract, C config) {
         super(endpoint);
         this.contract = contract;
-        this.client = config.getClientFactory().createClient();
+        this.client = config.getClientFactory().getClient();
         this.config = config;
     }
 
@@ -162,36 +163,36 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
     /**
      * Get the metadata JSON file for a bundle as a string.
      *
-     * @param transactionIdOrHash The transaction ID or hash
+     * @param bundleHash The transaction ID or hash
      * @return a String that is the JSON manifest file.
      * @throws SimbaException if an error occurs
      */
-    public abstract Manifest getBundleMetadataForTransaction(String transactionIdOrHash)
+    public abstract Manifest getBundleMetadataForTransaction(String bundleHash)
         throws SimbaException;
 
     /**
      * Get the bundle file itself for a given transaction.
      * The output stream is closed once complete.
      *
-     * @param transactionIdOrHash The transaction ID or hash
+     * @param bundleHash The transaction ID or hash
      * @param outputStream        An output stream to write the bundle file to.
      * @return the number of bytes written to the output stream
      * @throws SimbaException if an error occurs
      */
-    public abstract long getBundleForTransaction(String transactionIdOrHash,
+    public abstract long getBundleForTransaction(String bundleHash,
         OutputStream outputStream) throws SimbaException;
 
     /**
      * Get a file from the bundle file for a given transaction with the given index.
      * The output stream is closed once complete.
      *
-     * @param transactionIdOrHash The transaction ID or hash
+     * @param bundleHash The transaction ID or hash
      * @param fileName            the file name
      * @param outputStream        An output stream to write the bundle file to.
      * @return the number of bytes written to the output stream
      * @throws SimbaException if an error occurs
      */
-    public abstract long getBundleFileForTransaction(String transactionIdOrHash,
+    public abstract long getBundleFileForTransaction(String bundleHash,
         String fileName,
         OutputStream outputStream) throws SimbaException;
 
@@ -199,13 +200,13 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
      * Get the bundle file itself for a given transaction.
      * The output stream is closed once complete.
      *
-     * @param transactionIdOrHash The transaction ID or hash
+     * @param bundleHash The transaction ID or hash
      * @param outputStream        An output stream to write the bundle file to.
      * @param close               Whether or not to close the output stream on completion.
      * @return the number of bytes written to the output stream
      * @throws SimbaException if an error occurs
      */
-    public abstract long getBundleForTransaction(String transactionIdOrHash,
+    public abstract long getBundleForTransaction(String bundleHash,
         OutputStream outputStream,
         boolean close) throws SimbaException;
 
@@ -213,14 +214,14 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
      * Get a file from the bundle file for a given transaction with the given index.
      * The output stream is closed once complete.
      *
-     * @param transactionIdOrHash The transaction ID or hash
+     * @param bundleHash The transaction ID or hash
      * @param fileName            the file name
      * @param outputStream        An output stream to write the bundle file to.
      * @param close               Whether or not to close the output stream on completion.
      * @return the number of bytes written to the output stream
      * @throws SimbaException if an error occurs
      */
-    public abstract long getBundleFileForTransaction(String transactionIdOrHash,
+    public abstract long getBundleFileForTransaction(String bundleHash,
         String fileName,
         OutputStream outputStream,
         boolean close) throws SimbaException;
@@ -316,6 +317,11 @@ public abstract class Simba<C extends SimbaConfig> extends SimbaClient {
      */
     public Future<Transaction> waitForTransactionSubmitted(String txnId) throws SimbaException {
         return submit(txnId, 1000, 10, Transaction.State.SUBMITTED);
+    }
+
+    @Override
+    protected <C> ResponseHandler<C> jsonResponseHandler(Class<C> cls) {
+        return super.jsonResponseHandler(cls);
     }
 
     private class TransactionCallable implements Callable<Transaction> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ package com.simbachain.auth.local;
 
 import com.simbachain.auth.AccessTokenProvider;
 import com.simbachain.auth.AuthConfig;
+import com.simbachain.simba.HttpClientFactory;
 
 /**
  *
@@ -33,7 +34,20 @@ public class LocalOAuthConfig extends AuthConfig {
     private final String user;
     private final String tokenUrl;
 
-    public LocalOAuthConfig(String clientId, String clientSecret, String user, String tokenUrl) {
+    public LocalOAuthConfig(HttpClientFactory clientFactory,
+        String clientId,
+        String clientSecret,
+        String user,
+        String tokenUrl) {
+        super(clientFactory, clientId, clientSecret);
+        this.user = user;
+        this.tokenUrl = tokenUrl;
+    }
+
+    public LocalOAuthConfig(String clientId,
+        String clientSecret,
+        String user,
+        String tokenUrl) {
         super(clientId, clientSecret);
         this.user = user;
         this.tokenUrl = tokenUrl;

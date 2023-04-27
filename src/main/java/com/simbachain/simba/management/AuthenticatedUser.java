@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ public class AuthenticatedUser extends SimbaClient {
     public AuthenticatedUser(String endpoint, AuthConfig config) {
         super(endpoint);
         this.config = config;
-        this.client = config.getClientFactory().createClient();
+        this.client = config.getClientFactory().getClient();
     }
 
     @Override

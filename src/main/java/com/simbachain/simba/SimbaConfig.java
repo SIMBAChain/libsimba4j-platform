@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,14 +27,23 @@ import com.simbachain.auth.AuthConfig;
 /**
  * Interface to credentials used by a SIMBA HTTP client.
  */
-public abstract class SimbaConfig {
+public abstract class SimbaConfig implements HttpConfig {
     
-    protected HttpClientFactory clientFactory = new HttpClientFactory();
+    private final HttpClientFactory clientFactory;
 
-    public abstract AuthConfig getAuthConfig();
+    public SimbaConfig(HttpClientFactory clientFactory) {
+        this.clientFactory = clientFactory;
+    }
+
+    public SimbaConfig() {
+        this(new HttpClientFactory());
+    }
 
     public HttpClientFactory getClientFactory() {
         return clientFactory;
     }
+
+    public abstract AuthConfig getAuthConfig();
+
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,16 +29,25 @@ import org.apache.http.impl.client.HttpClients;
  *
  */
 public class HttpClientFactory {
+
+    private final CloseableHttpClient client;
+        
+    public HttpClientFactory() {
+        this.client =  loadClient();
+    }
     
-    private final CloseableHttpClient client = HttpClients.createDefault();
+    protected CloseableHttpClient loadClient() {
+        return HttpClients.createDefault();
+    }
+    
 
     /**
-     * Create an HTTP client.
+     * Return an HTTP client.
      *
      * @return a CloseableHttpClient
      * @see org.apache.http.impl.client.CloseableHttpClient
      */
-    public CloseableHttpClient createClient() {
+    public CloseableHttpClient getClient() {
         return client;
     }
     

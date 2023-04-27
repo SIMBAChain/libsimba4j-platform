@@ -46,7 +46,8 @@ contract SupplyChain {
         Part memory part,
         DataSource memory source,
         string memory reason,
-        uint dateTime
+        uint256 dateTime,
+        string memory _bundleHash
     ) public {
     }
 
@@ -62,5 +63,11 @@ contract SupplyChain {
         WeaponSystem memory system,
         Part[] memory parts
     ) public {
+    }
+    
+    function getSupplier (
+        string memory pk
+    ) public view returns (string memory){
+        return pk;
     }
 }

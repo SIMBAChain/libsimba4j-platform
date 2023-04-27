@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ public class OrganisationService extends SimbaClient {
     public OrganisationService(String endpoint, OrganisationConfig config) {
         super(endpoint);
         this.config = config;
-        this.client = config.getClientFactory().createClient();
+        this.client = config.getClientFactory().getClient();
     }
 
     public OrganisationConfig getConfig() {
@@ -186,7 +186,7 @@ public class OrganisationService extends SimbaClient {
 
     public PagedResult<Storage> getStorages(int limit, int offset) throws SimbaException {
         return this.get(
-            Urls.url(getEndpoint(), Urls.PathName.STORAGE, Urls.Paging.paging(offset, limit),
+            Urls.url(getEndpoint(), Urls.PathName.STORAGES, Urls.Paging.paging(offset, limit),
                 getConfig().getOrganisationId()),
             jsonResponseHandler(new TypeReference<PagedResult<Storage>>() {
             }));
@@ -289,13 +289,13 @@ public class OrganisationService extends SimbaClient {
     }
 
     public ContractArtifact getContractArtifact(String artifactId) throws SimbaException {
-        return this.get(Urls.url(getEndpoint(), Urls.PathName.CONTRACT_ARTIFACTS,
+        return this.get(Urls.url(getEndpoint(), Urls.PathName.CONTRACT_ARTIFACT,
                 getConfig().getOrganisationId(), artifactId),
             jsonResponseHandler(ContractArtifact.class));
     }
 
     public DeployedContract getDeployedContract(String id) throws SimbaException {
-        return this.get(Urls.url(getEndpoint(), Urls.PathName.DEPLOYED_CONTRACTS,
+        return this.get(Urls.url(getEndpoint(), Urls.PathName.DEPLOYED_CONTRACT,
             getConfig().getOrganisationId(), id), jsonResponseHandler(DeployedContract.class));
     }
 
@@ -346,55 +346,51 @@ public class OrganisationService extends SimbaClient {
             getConfig().getOrganisationId()), data, jsonResponseHandler(ContractArtifact.class));
     }
 
-    public Future<DeployedContract> deployContract(String artifactId,
-        DeploymentSpec spec,
+    public Future<DeployedContract> deployContract(DeploymentSpec spec,
         Map<String, String> headers) throws SimbaException {
         JsonData data = spec.toJsonData();
         DeploymentResponse response = this.post(
-            Urls.url(getEndpoint(), Urls.PathName.DEPLOY, getConfig().getOrganisationId(),
-                artifactId), data, jsonResponseHandler(DeploymentResponse.class), headers);
+            Urls.url(getEndpoint(), Urls.PathName.DEPLOY, getConfig().getOrganisationId()),
+            data, jsonResponseHandler(DeploymentResponse.class), headers);
         if (this.wallet != null
-            && response.getTransactionHash() == null
-            && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()) != null) {
-            String txnId = response.getTransactionId();
+            && response.getState().equals("EXECUTING")
+            && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()) != null
+            && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()).equals(this.wallet.getAddress())) {
+            String txnId = response.getCurrentTransaction();
             Transaction txn = this.get(
-                Urls.url(getEndpoint(), Urls.PathName.APP_TXNS, spec.getAppName(), txnId),
+                Urls.url(getEndpoint(), Urls.PathName.ORG_TXN, config.getOrganisationId(), txnId),
                 jsonResponseHandler(new TypeReference<Transaction>() {
                 }));
-            Map<String, String> raw = txn.getRawTransaction();
+            Map<String, Object> raw = txn.getRawTransaction();
             RawTransaction rawTransaction = Signing.createSigningTransaction(raw);
-            String signedTransaction = this.wallet.sign(rawTransaction);
-            String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXNS, spec.getAppName(),
+            Object chainId = raw.get("chainId");
+            String signedTransaction;
+            if (chainId instanceof Long) {
+                signedTransaction = this.wallet.sign(rawTransaction, (Long)chainId);
+            } else {
+                signedTransaction = this.wallet.sign(rawTransaction);
+            }
+            String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXN, spec.getAppName(),
                 txnId);
-            txn = this.post(endpoint, JsonData.with("transaction", signedTransaction),
+            this.post(endpoint, JsonData.with("transaction", signedTransaction),
                 jsonResponseHandler(new TypeReference<Transaction>() {
                 }));
-            if (txn.getState()
-                   .equals(com.simbachain.simba.Transaction.State.SUBMITTED)) {
-                response.setTransactionHash(txn.getTxnHash());
-            }
         }
-        return waitForContractDeployment(response.getInstanceId());
+        return waitForContractDeployment(response.getDeployedArtifactId());
     }
 
-    public Future<DeployedContract> deployContract(String artifactId, DeploymentSpec spec)
+    public Future<DeployedContract> deployContract(DeploymentSpec spec)
         throws SimbaException {
         Map<String, String> headers = new HashMap<>();
-        if (this.wallet != null) {
-            headers.put(ContractService.Headers.HTTP_HEADER_SENDER.getValue(),
-                this.wallet.getAddress());
-        }
-        return deployContract(artifactId, spec, headers);
+        return deployContract(spec, headers);
     }
 
     public ContractService newContractService(String appName, String contractName)
         throws SimbaException {
         ContractService service = new ContractService(getEndpoint(), contractName,
-            new AppConfig(appName, contractName, config.getAuthConfig()));
+            new AppConfig(appName, config.getOrganisationId(), config.getAuthConfig()));
         service.init();
-        if (this.wallet != null) {
-            service.setWallet(this.wallet);
-        }
+        service.setWallet(this.wallet);
         return service;
     }
 

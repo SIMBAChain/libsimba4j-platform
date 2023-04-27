@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 SIMBA Chain Inc.
+ * Copyright 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,7 +24,6 @@ import java.io.File;
 
 import com.simbachain.SimbaException;
 import com.simbachain.wallet.FileWallet;
-import com.simbachain.wallet.Wallet;
 import org.web3j.crypto.Keys;
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -44,14 +43,14 @@ public class WalletTest {
 
     @Test
     public void testFileWallet() throws SimbaException {
-        
-        Wallet wallet = new FileWallet("target/test-classes/keys", "wallet test");
+
+        FileWallet wallet = new FileWallet("target/test-classes/keys", "wallet test");
         String file = wallet.loadOrCreateWallet("password");
         assertTrue(file.contains("UTC--"));
         String addr = wallet.getAddress();
         assertTrue(addr.startsWith("0x"));
 
-        Wallet wallet1 = new FileWallet("target/test-classes/keys", "wallet   test");
+        FileWallet wallet1 = new FileWallet("target/test-classes/keys", "wallet   test");
         String file1 = wallet1.loadOrCreateWallet("password");
         assertTrue(file1.contains("UTC--"));
         assertNotEquals(wallet.getAddress(), wallet1.getAddress());
@@ -65,7 +64,7 @@ public class WalletTest {
     @Test
     public void testMnemonicWallet() throws SimbaException {
 
-        Wallet wallet = new FileWallet("target/test-classes/keys", "mnemonic");
+        FileWallet wallet = new FileWallet("target/test-classes/keys", "mnemonic");
         String file = wallet.loadOrCreateMnemonicWallet("password", "laundry pave energy busy stable near lobster teach address day gate index");
         assertTrue(file.contains("UTC--"));
         String addr = wallet.getAddress();
@@ -73,7 +72,7 @@ public class WalletTest {
         String m = wallet.getMnemonic();
         assertTrue(m != null);
 
-        Wallet wallet1 = new FileWallet("target/test-classes/keys", "mnemonic1");
+        FileWallet wallet1 = new FileWallet("target/test-classes/keys", "mnemonic1");
         String file1 = wallet1.loadOrCreateMnemonicWallet("password", m);
         assertTrue(file1.contains("UTC--"));
         assertEquals(wallet.getAddress(), wallet1.getAddress());
@@ -88,7 +87,7 @@ public class WalletTest {
     @Test
     public void testNewMnemonicWallet() throws SimbaException {
 
-        Wallet wallet = new FileWallet("target/test-classes/keys", "mnemonicnew");
+        FileWallet wallet = new FileWallet("target/test-classes/keys", "mnemonicnew");
         String file = wallet.generateMnemonicWallet("password");
         wallet.loadMnemonicWallet(wallet.getMnemonic());
         assertTrue(file.contains("UTC--"));
@@ -100,7 +99,7 @@ public class WalletTest {
         assertTrue(addr.startsWith("0x"));
 
 
-        Wallet wallet1 = new FileWallet("target/test-classes/keys", "mnemonicnew1");
+        FileWallet wallet1 = new FileWallet("target/test-classes/keys", "mnemonicnew1");
         String file1 = wallet1.loadOrCreateMnemonicWallet("password", wallet.getMnemonic());
         assertTrue(file1.contains("UTC--"));
         assertEquals(wallet.getAddress(), wallet1.getAddress());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,6 @@ public class FileWallet extends Wallet {
      * @return This returns true if deletion succeeds, false if it fails.
      * @throws SimbaException if an error occurs during the attempt to delete.
      */
-    @Override
     public synchronized boolean deleteWallet() throws SimbaException {
 
         if (!walletDir.exists() || !walletDir.isDirectory()) {
@@ -100,7 +99,6 @@ public class FileWallet extends Wallet {
      * on the Wallet implementation.
      * @throws SimbaException if an error occurs.
      */
-    @Override
     public synchronized String generateWallet(String passkey) throws SimbaException {
         if (walletExists()) {
             throw new SimbaException("Error generating wallet. A wallet already exists.",
@@ -114,8 +112,7 @@ public class FileWallet extends Wallet {
                 SimbaException.SimbaError.WALLET_GENERATE_FAILED, e);
         }
     }
-
-    @Override
+    
     public String generateWallet(String passkey, String privateKey) throws SimbaException {
         if (walletExists()) {
             throw new SimbaException("Error generating wallet. A wallet already exists.",
@@ -142,7 +139,6 @@ public class FileWallet extends Wallet {
      * @return return the location of the Wallet.
      * @throws SimbaException if an error occurs.
      */
-    @Override
     public String generateMnemonicWallet(String passkey) throws SimbaException {
         byte[] initialEntropy = new byte[32];
         secureRandom.nextBytes(initialEntropy);
@@ -160,7 +156,6 @@ public class FileWallet extends Wallet {
      * @return return the location of the Wallet.
      * @throws SimbaException if an error occurs.
      */
-    @Override
     public synchronized String generateMnemonicWallet(String passkey, String mnemonic)
         throws SimbaException {
         if (walletExists()) {
@@ -187,7 +182,6 @@ public class FileWallet extends Wallet {
      * @return The location of the Wallet.
      * @throws SimbaException if an error occurs
      */
-    @Override
     public synchronized String loadWallet(String passkey) throws SimbaException {
         try {
             File wallet = getWalletFile(walletDir);
@@ -211,7 +205,6 @@ public class FileWallet extends Wallet {
      * @return The location of the Wallet.
      * @throws SimbaException if an error occurs
      */
-    @Override
     public synchronized String loadMnemonicWallet(String mnemonic) throws SimbaException {
         try {
             File wallet = getWalletFile(walletDir);
@@ -243,7 +236,6 @@ public class FileWallet extends Wallet {
      * @return The mnemonic of the wallet if create as a Bip32 Wallet.
      * @throws SimbaException if an error occurs
      */
-    @Override
     public String getMnemonic() throws SimbaException {
         return mnemonic;
     }
@@ -255,12 +247,9 @@ public class FileWallet extends Wallet {
      * @return Return true if the Wallet exists, false otherwise.
      * @throws SimbaException if an error occurs.
      */
-    @Override
     public synchronized boolean walletExists() throws SimbaException {
 
-        File[] files = walletDir.listFiles((File p, String filename) -> {
-            return filename.startsWith("UTC--");
-        });
+        File[] files = walletDir.listFiles((File p, String filename) -> filename.startsWith("UTC--"));
         if (files == null) {
             throw new SimbaException(
                 String.format("Could not find wallet at %s", walletDir.getAbsolutePath()),
@@ -322,6 +311,56 @@ public class FileWallet extends Wallet {
             return false;
         }
     }
+
+    /**
+     * Convenience method to check if the Wallet exists and if not, create it. Then try to load it.
+     *
+     * @param passkey The password to possibly create and then load the Wallet.
+     * @return The location of the Wallet.
+     * @throws SimbaException if an error occurs.
+     */
+    public String loadOrCreateWallet(String passkey) throws SimbaException {
+
+        if (!walletExists()) {
+            generateWallet(passkey);
+        }
+        return loadWallet(passkey);
+    }
+
+    /**
+     * Convenience method to check if the Wallet exists and if not, create it. Then try to load it.
+     *
+     * @param passkey  The password to possibly create and then load the Wallet.
+     * @param mnemonic The mnemonic to use.
+     * @return The location of the Wallet.
+     * @throws SimbaException if an error occurs.
+     */
+    public String loadOrCreateMnemonicWallet(String passkey, String mnemonic)
+        throws SimbaException {
+
+        if (!walletExists()) {
+            generateMnemonicWallet(passkey, mnemonic);
+        }
+        return loadMnemonicWallet(mnemonic);
+    }
+
+    /**
+     * Convenience method to check if the Wallet exists and if not, create it. Then try to load it.
+     *
+     * @param passkey    The password to possibly create and then load the Wallet.
+     * @param privateKey The private key to use.
+     * @return The location of the Wallet.
+     * @throws SimbaException if an error occurs.
+     */
+    public String loadOrCreatePrivateKeyWallet(String passkey, String privateKey)
+        throws SimbaException {
+
+        if (!walletExists()) {
+            generateWallet(passkey, privateKey);
+        }
+        return loadWallet(passkey);
+    }
+
 
 }
 

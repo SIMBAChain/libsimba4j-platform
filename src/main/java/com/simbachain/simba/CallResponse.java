@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ package com.simbachain.simba;
  * The return value of a call to a method using POST.
  * The response contains a unique request identifier. This can either be
  * an ID generated for the request, or a transaction hash associated with the request
- * if the request is creating a trasnaction.
+ * if the request is creating a transaction.
  * <p>
  * Additionally the response may contain a state attribute and an error string.
  */

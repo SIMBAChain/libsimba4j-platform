@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 SIMBA Chain Inc.
+ * Copyright (c) 2023 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ package com.simbachain.auth.keycloak;
 
 import com.simbachain.auth.AccessTokenProvider;
 import com.simbachain.auth.AuthConfig;
+import com.simbachain.simba.HttpClientFactory;
 
 /**
  *
@@ -42,7 +43,41 @@ public class KcAuthConfig extends AuthConfig {
         this(clientId, clientSecret, host, realm, false, null, scopes);
     }
 
-    public KcAuthConfig(String clientId,
+    public KcAuthConfig(HttpClientFactory clientFactory,
+        String clientId,
+        String clientSecret,
+        String host,
+        String realm,
+        String... scopes) {
+        this(clientFactory, clientId, clientSecret, host, realm, false, null, scopes);
+    }
+
+    public KcAuthConfig(
+        HttpClientFactory clientFactory,
+        String clientId,
+        String clientSecret,
+        String host,
+        String realm,
+        boolean writeToFile,
+        String tokenDir,
+        String... scopes) {
+        super(clientFactory, clientId, clientSecret, writeToFile, tokenDir);
+        while (host.endsWith("/")) {
+            host = host.substring(0, host.length() - 1);
+        }
+        if (scopes.length == 0) {
+            this.scopes = "email profile roles web-origins";
+        } else {
+            this.scopes = String.join(" ", scopes);
+        }
+        this.host = host;
+        this.realm = realm;
+
+    }
+
+
+    public KcAuthConfig(
+        String clientId,
         String clientSecret,
         String host,
         String realm,

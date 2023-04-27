@@ -36,6 +36,78 @@ you have maven, cd into the top level directory and type:
 mvn install
 ```
 
+## Configuration File
+
+Configuration is loaded consistent with other SIMBA client tools.
+The config file should be in dotenv format and should be called `.simbachain.env` or `simbachain.env`
+(i.e. a visible variant) or `.env`.
+
+This can be placed on the classpath, or can be placed anywhere if the
+environment variable `SIMBA_HOME` is set. This variable should point to the directory containing the
+dotenv file. The `SIMBA_HOME` variable defaults to the user's home directory, e.g. `~/`
+
+The search order for this file is:
+
+* `.simbachain.env` on the classpath
+* `simbachain.env` on the classpath
+* `.env` on the classpath
+* `SIMBA_HOME/.simbachain.env`
+* `SIMBA_HOME/simbachain.env`
+* `SIMBA_HOME/.env`
+
+The config setup supports in memory env vars taking precedence over values in the file.
+All environment variables for Libsimba4J are prefixed with `SIMBA_`.
+
+### Auth Configuration
+
+SIMBA Blocks Platform uses OAuth 2.
+Two auth providers are currently supported: Blocks and Keycloak.
+
+*NOTE: The Blocks provider is currently the default and should be used in all cases. The Keycloak
+provider **may** be used in the future.*
+
+For Blocks the configuration will look something like
+below, i.e., the `SIMBA_AUTH_BASE_URL` and `SIMBA_API_BASE_URL` are the same:
+
+```shell
+SIMBA_AUTH_CLIENT_SECRET=...
+SIMBA_AUTH_CLIENT_ID=...
+SIMBA_AUTH_BASE_URL=https://my.blocks.server
+SIMBA_API_BASE_URL=https://my.blocks.server
+```
+
+For keycloak, the configuration will look more like, below:
+
+```shell
+SIMBA_AUTH_CLIENT_SECRET=...
+SIMBA_AUTH_CLIENT_ID=...
+SIMBA_AUTH_REALM=simbachain
+SIMBA_API_BASE_URL=https://my.blocks.server
+SIMBA_AUTH_BASE_URL=https://my.keycloak.server
+```
+
+These values can also be directly set an environment variables if you don't use a dot env file.
+
+Other values can be stored in the env file if required. Any values set directly as environment
+variables will override values in the file.
+
+The config is loaded using the `SimbaConfigFile` class. For example:
+
+```java
+import com.simbachain.SimbaConfigFile;
+
+SimbaConfigFile config = new SimbaConfigFile();
+
+String clientId = config.getAuthClientId();
+String clientSecret = config.getAuthClientSecret();
+String authHost = config.getAuthBAseUrl();
+String host = config.getApiBaseUrl();
+
+BlocksConfig authConfig = new BlocksConfig(clientId, clientSecret, authHost);
+AuthenticatedUser user = new AuthenticatedUser(host, authConfig);
+
+System.out.println("Authenticated user: " + user.whoami());
+```
 
 ## Logging
 
@@ -43,7 +115,23 @@ Libsimba4J uses SLF4J for logging. All logging is at Debug level.
 
 ## Setting up a SIMBA Blocks Client
 
-The first thing to do is configure authentication. SIMBA Blocks Platform uses OAuth 2.
+The first thing to do is configure authentication. See above for configuring auth.
+
+Once you have an auth config established, you can create services. Let's start with the
+`OrganisationService`. This provides management tasks to list resources, and deploy code and
+contracts. The following example shows how this is done.
+
+First create an `OrganisationConfig` instance. This takes your auth config and the name of an
+organisation you are a member of.
+
+Then create an `OrganisationService` passing in the org config and the root endpoint of the SEP
+service.
+
+```java
+BlocksConfig authConfig = new BlocksConfig(clientId, clientSecret, authHost);
+OrganisationConfig orgConfig = new OrganisationConfig("simbachain", config);
+OrganisationService orgService = new OrganisationService(host, orgConfig);
+```
 
 The Interfaces in the `com.simbachain.auth` package provide a means to hook in your own auth.
 
@@ -95,87 +183,6 @@ public abstract class AuthConfig extends SimbaConfig {
 }
 ```
 
-### Configuration File
-
-Configuration is loaded consistent with other SIMBA client tools.
-The config file should be in dotenv format and should be called `.simbachain.env` or `simbachain.env`
-(i.e. a visible variant) or `.env`.
-
-This can be placed on the classpath, or can be placed anywhere if the
-environment variable `SIMBA_HOME` is set. This variable should point to the directory containing the
-dotenv file. The `SIMBA_HOME` variable defaults to the user's home directory, e.g. `~/`
-
-The search order for this file is:
-
-* `.simbachain.env` on the classpath
-* `simbachain.env` on the classpath
-* `.env` on the classpath
-* `SIMBA_HOME/.simbachain.env`
-* `SIMBA_HOME/simbachain.env`
-* `SIMBA_HOME/.env`
-
-The config setup supports in memory env vars taking precedence over values in the file.
-All environment variables for Libsimba4J are prefixed with `SIMBA_`.
-
-Two auth providers are currently supported: Blocks and KeyCloak.
-For Blocks the configuration will look something like
-below, i.e., the `SIMBA_AUTH_BASE_URL` and `SIMBA_API_BASE_URL` are the same:
-
-```shell
-SIMBA_AUTH_CLIENT_SECRET=...
-SIMBA_AUTH_CLIENT_ID=...
-SIMBA_AUTH_BASE_URL=https://my.blocks.server
-SIMBA_API_BASE_URL=https://my.blocks.server
-```
-
-For keycloak, the configuration will look more like, below:
-
-```shell
-SIMBA_AUTH_CLIENT_SECRET=...
-SIMBA_AUTH_CLIENT_ID=...
-SIMBA_AUTH_REALM=simbachain
-SIMBA_API_BASE_URL=https://my.blocks.server
-SIMBA_AUTH_BASE_URL=https://my.keycloak.server
-```
-
-These values can also be directly set an environment variables if you don't use a dot env file.
-                              
-Other values can be stored in the env file if required. Any values set directly as environment
-valiables will override values in the file.
-
-The config is loaded using the `SimbaConfigFile` class. For example:
-
-```java
-import com.simbachain.SimbaConfigFile;
-
-SimbaConfigFile config = new SimbaConfigFile();
-
-String clientId = config.getAuthClientId();
-String clientSecret = config.getAuthClientSecret();
-String authHost = config.getAuthBAseUrl();
-String host = config.getApiBaseUrl();
-
-BlocksConfig authConfig = new BlocksConfig(clientId, clientSecret, authHost);
-AuthenticatedUser user = new AuthenticatedUser(host, authConfig);
-
-System.out.println("Authenticated user: " + user.whoami());
-```
-
-Once you have an auth config established, you can create services. Let's start with the
-`OrganisationService`. This provides management tasks to list resources, and deploy code and
-contracts. The following example shows how this is done.
-
-First create an `OrganisationConfig` instance. This takes your auth config and the name of an
-organisation you are a member of.
-
-Then create an `OrganisationService` passing in the org config and the root endpoint of the SEP
-service.
-
-```java
-BlocksConfig authConfig = new BlocksConfig(clientId, clientSecret, authHost);
-OrganisationConfig orgConfig = new OrganisationConfig("simbachain", config);
-OrganisationService orgService = new OrganisationService(host, orgConfig);
-```
 
 List applications, contract design, artifacts and deployed contracts:
 
