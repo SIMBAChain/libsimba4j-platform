@@ -25,8 +25,6 @@ package com.simbachain.simba.management;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -299,43 +297,24 @@ public class OrganisationService extends SimbaClient {
             getConfig().getOrganisationId(), id), jsonResponseHandler(DeployedContract.class));
     }
 
-    public ContractDesign compileContract(InputStream contract, String name) throws SimbaException {
+    public ContractDesign compileContract(InputStream contract, CompilationSpec spec) throws SimbaException {
         String contractCode = new BufferedReader(new InputStreamReader(contract)).lines()
                                                                                  .parallel()
                                                                                  .collect(
                                                                                      Collectors.joining(
                                                                                          "\n"));
-        return compileContract(contractCode, name, "aat", true);
+        spec.setCode(contractCode);
+        return compileContract(spec);
     }
 
-    public ContractDesign compileContract(InputStream contract, String name, String model)
+    public ContractDesign compileContract(String contractCode, CompilationSpec spec)
         throws SimbaException {
-        String contractCode = new BufferedReader(new InputStreamReader(contract)).lines()
-                                                                                 .parallel()
-                                                                                 .collect(
-                                                                                     Collectors.joining(
-                                                                                         "\n"));
-        return compileContract(contractCode, name, model, true);
+        spec.setCode(contractCode);
+        return compileContract(spec);
     }
 
-    public ContractDesign compileContract(String contractBase64Code, String name, String model)
-        throws SimbaException {
-        return compileContract(contractBase64Code, name, model, false);
-    }
-
-    public ContractDesign compileContract(String contractCode,
-        String name,
-        String model,
-        boolean encodeCode) throws SimbaException {
-        if (encodeCode) {
-            contractCode = Base64.getEncoder()
-                                 .encodeToString(contractCode.getBytes(StandardCharsets.UTF_8));
-        }
-        JsonData data = JsonData.with("code", contractCode)
-                                .and("language", "solidity")
-                                .and("name", name)
-                                .and("model", model)
-                                .and("mode", "code");
+    public ContractDesign compileContract(CompilationSpec spec) throws SimbaException {
+        JsonData data = spec.toJsonData();
         return this.post(Urls.url(getEndpoint(), Urls.PathName.CONTRACT_DESIGNS,
             getConfig().getOrganisationId()), data, jsonResponseHandler(ContractDesign.class));
     }

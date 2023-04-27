@@ -24,6 +24,7 @@ package com.simbachain.simba.test;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -52,6 +53,7 @@ import com.simbachain.simba.management.Application;
 import com.simbachain.simba.management.AuthenticatedUser;
 import com.simbachain.simba.management.Blockchain;
 import com.simbachain.simba.management.BlockchainIdentities;
+import com.simbachain.simba.management.CompilationSpec;
 import com.simbachain.simba.management.ContractArtifact;
 import com.simbachain.simba.management.ContractDesign;
 import com.simbachain.simba.management.DeployedContract;
@@ -62,7 +64,10 @@ import com.simbachain.simba.management.OrganisationService;
 import com.simbachain.simba.management.Storage;
 import com.simbachain.wallet.Account;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -76,20 +81,23 @@ public class TestApi {
             return mockClient.getHttpClientMock();
         }
     }
-    
-    @Test
-    public void testApi() throws IOException, ExecutionException, InterruptedException {
 
+    private static BlocksConfig config;
+    private static String host;
+    private static String org;
+    
+    @BeforeClass
+    public static void setup() {
         String clientId = "foo";
         String clientSecret = "bar";
         String authHost = "https://localhost";
-        String host = "https://localhost";
-        String org = "libsimba";
-
-        long now = System.currentTimeMillis();
-
-        BlocksConfig config = new BlocksConfig(new MockFactory(), clientId, clientSecret, authHost);
-
+        config = new BlocksConfig(new MockFactory(), clientId, clientSecret, authHost);
+        host = "https://localhost";
+        org = "libsimba";
+    }
+    
+    @Test
+    public void testAuthenticatedUser() throws IOException, ExecutionException, InterruptedException {
         // whoami
         System.out.println("=================== whoami ===================");
         AuthenticatedUser user = new AuthenticatedUser(host, config);
@@ -100,21 +108,19 @@ public class TestApi {
         System.out.println("=================== List Wallets ===================");
         BlockchainIdentities identities = user.getIdentities();
         System.out.println("wallet: " + identities.getWallet());
-        List<BlockchainIdentities.Identity> idents = identities.getWallet().getIdentities("ethereum", "Quorum");
+        List<BlockchainIdentities.Identity> idents = identities.getWallet()
+                                                               .getIdentities("ethereum", "Quorum");
         for (BlockchainIdentities.Identity ident : idents) {
             System.out.println("balance for " + ident + " is " + user.getBalance("Quorum"));
         }
+    }
 
-
+    @Test
+    public void testOrg() throws IOException {
         OrganisationConfig orgConfig = new OrganisationConfig(org, config);
-        OrganisationService orgService = new OrganisationService(
-            host, orgConfig);
+        OrganisationService orgService = new OrganisationService(host, orgConfig);
 
-        // create app
-        System.out.println("=================== Create Applications ===================");
-        NewApplication newApp = orgService.createApplication("libsimba4J-" + now, "Libsimba4J-" + now);
-        String appName = newApp.getName();
-        System.out.println("new App name:" + appName);
+
         System.out.println("=================== List Designs ===================");
         PagedResult<ContractDesign> cds = orgService.getContractDesigns();
         List<? extends ContractDesign> cdsResults = cds.getResults();
@@ -156,22 +162,31 @@ public class TestApi {
         for (Storage result : stsResults) {
             System.out.println(result.getName());
         }
-
+    }
+    
+    @Test
+    public void testContract() throws IOException, ExecutionException, InterruptedException {
+        OrganisationConfig orgConfig = new OrganisationConfig(org, config);
+        OrganisationService orgService = new OrganisationService(host, orgConfig);
+        // create app
+        System.out.println("=================== Create Applications ===================");
+        NewApplication newApp = orgService.createApplication("libsimba4J", "Libsimba4J");
         InputStream in = TestApi.class.getResourceAsStream("/supply.sol");
 
         System.out.println("=================== Compile Design ===================");
-        String apiName = "supply_" + System.currentTimeMillis();
-        ContractDesign design = orgService.compileContract(in, apiName);
-        System.out.println(design);
+        String apiName = "supply";
+        CompilationSpec compSpec = new CompilationSpec().withName(apiName);
+        ContractDesign design = orgService.compileContract(in, compSpec);
+        
         System.out.println("=================== Create Artifact ===================");
         ContractArtifact artifact = orgService.createArtifact(design.getId());
 
-        DeploymentSpec spec = new DeploymentSpec();
-        spec.setArtifactId(artifact.getId());
-        spec.setApiName(apiName);
-        spec.setBlockchain("Quorum");
-        spec.setStorage("azure");
-        spec.setAppName(newApp.getName());
+        DeploymentSpec spec = new DeploymentSpec()
+            .withArtifactId(artifact.getId())
+            .withApiName(apiName)
+            .withBlockchain("Quorum")
+            .withStorage("azure")
+            .withAppName(newApp.getName());
 
 
         System.out.println("=================== Deploy Contract ===================");
@@ -200,8 +215,6 @@ public class TestApi {
         fields.add("method");
         fields.add("inputs");
         fields.add("state");
-
-
 
         System.out.println("=================== List Transactions ===================");
         System.out.println("CompileDeployExample.main MD: " + contractService.getMetadata());
@@ -244,9 +257,10 @@ public class TestApi {
 
         headers = new HashMap<>();
 
-        InputStream image = TestApi.class.getResourceAsStream("/Glyndower.jpg");
-        SimbaClient.UploadFile uploadFile = new SimbaClient.UploadFile("Glyndwr", "image/jpg", image);
-        CallResponse bundleCall = contractService.callMethod("nonConformance", nonConformanceData, headers, uploadFile);
+        byte[] text = "Hello World".getBytes();
+        SimbaClient.UploadFile uploadFile = new SimbaClient.UploadFile("Message", "text/plain", text);
+        CallResponse bundleCall = contractService.callMethod("nonConformance", nonConformanceData,
+            headers, uploadFile);
         System.out.println("Got back response: " + bundleCall);
         Future<Transaction> ftxn = contractService.waitForTransactionCompletion(bundleCall.getRequestIdentitier());
         Transaction txn = ftxn.get();
@@ -256,36 +270,40 @@ public class TestApi {
         String bundleHash = (String) inputs.get("_bundleHash");
         System.out.println("Bundle Hash: " + bundleHash);
         File cwd = new File(System.getProperty("user.dir"));
+        long now = System.currentTimeMillis();
         File dataDir = new File(cwd, "data-" + now);
         dataDir.mkdirs();
-        File imgFile = new File(dataDir, "Glyndowner.jpg");
-        BufferedOutputStream imgOut = new BufferedOutputStream(new FileOutputStream(imgFile));
-        contractService.getBundleFileForTransaction(bundleHash, "Glyndwr", imgOut);
-        InputStream downloaded = new FileInputStream(new File(dataDir, "Glyndowner.jpg"));
-        InputStream orig = TestApi.class.getResourceAsStream("/Glyndower.jpg");
-        long size = TestApi.filesCompareByByte(downloaded, orig);
+        File txtFile = new File(dataDir, "message.txt");
+        BufferedOutputStream txtOut = new BufferedOutputStream(new FileOutputStream(txtFile));
+        contractService.getBundleFileForTransaction(bundleHash, "Message", txtOut);
+        InputStream downloaded = new FileInputStream(new File(dataDir, "message.txt"));
+        long size = TestApi.compareBytes(downloaded, new ByteArrayInputStream(text));
+        assertEquals(-1, size);
         System.out.println("common size: " + size);
         Manifest manifest = contractService.getBundleMetadataForTransaction(bundleHash);
         System.out.println("Manifest: " + manifest);
 
 
-        new File(dataDir, "Glyndowner.jpg").delete();
+        new File(dataDir, "message.txt").delete();
         dataDir.delete();
 
-        CallReturn<String> getterResponse = contractService.callGetter("getSupplier", String.class, JsonData.with("pk", "1234567890"));
+        CallReturn<String> getterResponse = contractService.callGetter("getSupplier", String.class,
+            JsonData.with("pk", "1234567890"));
         System.out.println("getter response: " + getterResponse.getReturnValue());
+    }
+    @Test
+    public void testSelfSignedContract() throws IOException, ExecutionException, InterruptedException {
+        OrganisationConfig orgConfig = new OrganisationConfig(org, config);
+        OrganisationService orgService = new OrganisationService(host, orgConfig);
 
-
-        DeploymentSpec ssSpec = new DeploymentSpec();
-        ssSpec.setArtifactId(artifact.getId());
-        String ssApiName = apiName + "-self-signed";
-        ssSpec.setApiName(ssApiName);
-        ssSpec.setBlockchain("Quorum");
-        ssSpec.setStorage("azure");
-        ssSpec.setAppName(newApp.getName());
-
-
-        System.out.println("=================== Deploy Contract ===================");
+        DeploymentSpec ssSpec = new DeploymentSpec()
+            .withArtifactId("12345")
+            .withApiName("supply-self-signed")
+            .withBlockchain("Quorum")
+            .withStorage("azure")
+            .withAppName("libsimba4J");
+        
+        System.out.println("=================== Deploy Self Signed Contract ===================");
         Account acc = new Account("22aabb811efca4e6f4748bd18a46b502fa85549df9fa07da649c0a148d7d5530");
         orgService.setWallet(acc);
         Map<String, String> deployHeaders = new HashMap<>();
@@ -295,7 +313,7 @@ public class TestApi {
         DeployedContract ssContract = ssFuture.get();
         System.out.println("deployed contract address: " + ssContract.getAddress());
 
-        ContractService ssContractService = orgService.newContractService(newApp.getName(), apiName + "-self-signed");
+        ContractService ssContractService = orgService.newContractService("my-app", "supply-self-signed");
 
 
         JsonData ssSupplyData = JsonData.with("price", 120)
@@ -304,17 +322,66 @@ public class TestApi {
                                         .and("purchaser", JsonData.with("__Supplier", "Supplier2.12"))
                                         .and("part", JsonData.with("__Part", "Part542"));
 
-        headers = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
         headers.put(ContractService.Headers.HTTP_HEADER_SENDER.getValue(), acc.getAddress());
 
         CallResponse signedRet = ssContractService.callMethod("supply", ssSupplyData, headers);
         System.out.println("Got back response: " + signedRet);
 
         ssContractService.removeWallet();
-
     }
 
-    public static long filesCompareByByte(InputStream f1, InputStream f2) throws IOException {
+    @Test
+    public void testHeaders() throws IOException, ExecutionException, InterruptedException {
+        OrganisationConfig orgConfig = new OrganisationConfig(org, config);
+        OrganisationService orgService = new OrganisationService(host, orgConfig);
+
+        DeploymentSpec ssSpec = new DeploymentSpec()
+            .withArtifactId("12345")
+            .withApiName("supply-headers")
+            .withBlockchain("Quorum")
+            .withStorage("azure")
+            .withAppName("libsimba4J");
+
+        System.out.println("=================== Deploy Contract ===================");
+        Map<String, String> headers = new HashMap<>();
+        headers.put(ContractService.Headers.HTTP_HEADER_DELEGATE.getValue(), MockClient.HEADERS_VALUE);
+
+        Future<DeployedContract> ssFuture = orgService.deployContract(ssSpec, headers);
+        DeployedContract ssContract = ssFuture.get();
+        System.out.println("deployed contract address: " + ssContract.getAddress());
+
+        ContractService ssContractService = orgService.newContractService("my-app", "supply-headers");
+
+
+        JsonData ssSupplyData = JsonData.with("price", 120)
+                                        .and("dateTime", System.currentTimeMillis())
+                                        .and("supplier", JsonData.with("__Supplier", "Supplier3.33"))
+                                        .and("purchaser", JsonData.with("__Supplier", "Supplier2.12"))
+                                        .and("part", JsonData.with("__Part", "Part542"));
+
+
+        headers = new HashMap<>();
+        headers.put(ContractService.Headers.HTTP_HEADER_DELEGATE.getValue(), MockClient.HEADERS_VALUE);
+        CallResponse ret = ssContractService.callMethod("supply", ssSupplyData, headers);
+        System.out.println("Got back response: " + ret);
+        assertEquals(ContractService.Headers.HTTP_HEADER_DELEGATE.getValue() + "=" + MockClient.HEADERS_VALUE, ret.getError());
+
+        headers = new HashMap<>();
+        headers.put(ContractService.Headers.HTTP_HEADER_VALUE.getValue(), MockClient.HEADERS_VALUE);
+        ret = ssContractService.callMethod("supply", ssSupplyData, headers);
+        System.out.println("Got back response: " + ret);
+        assertEquals(ContractService.Headers.HTTP_HEADER_VALUE.getValue() + "=" + MockClient.HEADERS_VALUE, ret.getError());
+        
+        headers = new HashMap<>();
+        headers.put(ContractService.Headers.HTTP_HEADER_NONCE.getValue(), MockClient.HEADERS_VALUE);
+        ret = ssContractService.callMethod("supply", ssSupplyData, headers);
+        System.out.println("Got back response: " + ret);
+        assertEquals(ContractService.Headers.HTTP_HEADER_NONCE.getValue() + "=" + MockClient.HEADERS_VALUE, ret.getError());
+    }
+    
+    public static long compareBytes(InputStream f1, InputStream f2) throws IOException {
+        // return -1 if they match byte for byte 
         try (BufferedInputStream fis1 = new BufferedInputStream(f1);
             BufferedInputStream fis2 = new BufferedInputStream(f2)) {
             int ch;

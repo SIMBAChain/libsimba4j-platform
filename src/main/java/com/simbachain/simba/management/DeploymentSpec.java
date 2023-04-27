@@ -45,64 +45,72 @@ public class DeploymentSpec implements Jsonable {
         return artifactId;
     }
 
-    public void setArtifactId(String artifactId) {
+    public DeploymentSpec withArtifactId(String artifactId) {
         this.artifactId = artifactId;
+        return this;
     }
 
     public String getBlockchain() {
         return blockchain;
     }
 
-    public void setBlockchain(String blockchain) {
+    public DeploymentSpec withBlockchain(String blockchain) {
         this.blockchain = blockchain;
+        return this;
     }
 
     public String getStorage() {
         return storage;
     }
 
-    public void setStorage(String storage) {
+    public DeploymentSpec withStorage(String storage) {
         this.storage = storage;
+        return this;
     }
 
     public String getApiName() {
         return apiName;
     }
 
-    public void setApiName(String apiName) {
+    public DeploymentSpec withApiName(String apiName) {
         this.apiName = apiName;
+        return this;
     }
 
     public String getAppName() {
         return appName;
     }
 
-    public void setAppName(String appName) {
+    public DeploymentSpec withAppName(String appName) {
         this.appName = appName;
+        return this;
     }
 
     public String getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
+    public DeploymentSpec DisplayName(String displayName) {
         this.displayName = displayName;
+        return this;
     }
 
     public String getDeployedAddress() {
         return deployedAddress;
     }
 
-    public void setDeployedAddress(String deployedAddress) {
+    public DeploymentSpec withDeployedAddress(String deployedAddress) {
         this.deployedAddress = deployedAddress;
+        return this;
     }
 
     public Map<String, Object> getArgs() {
         return args;
     }
 
-    public void setArgs(Map<String, Object> args) {
+    public DeploymentSpec withArgs(Map<String, Object> args) {
         this.args = args;
+        return this;
     }
 
     @Override

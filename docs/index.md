@@ -85,6 +85,13 @@ SIMBA_AUTH_REALM=simbachain
 SIMBA_API_BASE_URL=https://my.blocks.server
 SIMBA_AUTH_BASE_URL=https://my.keycloak.server
 ```
+                                                                                                 
+Additionally, a `SIMBA_TOKEN_DIR` file location can be set to save tokens to file.
+Combined with setting `writeToFile` on the auth config will cause the token to
+be written to file.
+This is useful if you are making many calls but are closing down the application
+and cannot therefore cache in memory.
+
 
 These values can also be directly set an environment variables if you don't use a dot env file.
 
@@ -133,67 +140,29 @@ OrganisationConfig orgConfig = new OrganisationConfig("simbachain", config);
 OrganisationService orgService = new OrganisationService(host, orgConfig);
 ```
 
-The Interfaces in the `com.simbachain.auth` package provide a means to hook in your own auth.
-
-The `AuthConfig` abstract class is the way into providing an `AccessTokenProvider` which in turn
-creates `AccessToken` objects. `AccessToken` objects have a token and an
-expiry. `AccessTokenProvider`
-objects should be able to renew tokens transparently.
-
-```java
-public abstract class AuthConfig extends SimbaConfig {
-
-    private final String clientId;
-    private final String clientSecret;
-    private final boolean writeToFile;
-    private final String tokenDir;
-
-    public AuthConfig(String clientId, String clientSecret, boolean writeToFile, String tokenDir) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.writeToFile = writeToFile;
-        this.tokenDir = tokenDir;
-    }
-
-    public AuthConfig(String clientId, String clientSecret) {
-        this(clientId, clientSecret, false, null);
-    }
-
-    public AuthConfig getAuthConfig() {
-        return this;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public String getClientSecret() {
-        return clientSecret;
-    }
-
-    public boolean isWriteToFile() {
-        return writeToFile;
-    }
-
-    public String getTokenDir() {
-        return tokenDir;
-    }
-
-    public abstract AccessTokenProvider<? extends AuthConfig> getTokenProvider();
-}
-```
-
-
+The `OrganisationService` class provides access to general org-level APIs: 
 List applications, contract design, artifacts and deployed contracts:
 
 ```java
+PagedResult<Blockchain> bcs = orgService.getBlockchains();
+List<? extends Blockchain> bcsResults = bcs.getResults();
+for (Blockchain result : bcsResults) {
+System.out.println(result.getName());
+}
+
+PagedResult<Storage> sts = orgService.getStorages();
+List<? extends Storage> stsResults = sts.getResults();
+for (Storage result : stsResults) {
+System.out.println(result.getName());
+}
+    
 PagedResult<Application> apps = orgService.getApplications();
 List<? extends Application> results = apps.getResults();
 for (Application result : results) {
     System.out.println(result.getName());
 }
 
-PagedResult<ContractDesign> cds=orgService.getContractDesigns();
+PagedResult<ContractDesign> cds = orgService.getContractDesigns();
 List<? extends ContractDesign> cdsResults = cds.getResults();
 for(ContractDesign result:cdsResults){
     System.out.println(result.getName());
@@ -212,16 +181,20 @@ for(DeployedContract result:dcsResults){
 }
 
 ```
+                 
+## Deploying a Contract
 
-Deploy some solidity code:
+In the simple case, deploying a contract involves supplying solidity code and a contract name.
+The name is not required to be unique.
 
 ```java
 InputStream in = CompileDeployTest.class.getResourceAsStream("/supply.sol");
-        
-String apiName = "supply_" + System.currentTimeMillis(); 
-ContractDesign design = orgService.compileContract(in, apiName, "sasa");
+
+CompilationSpec compSpec = new CompilationSpec().withName(apiName);
+ContractDesign design = orgService.compileContract(in, compSpec);
 System.out.println(design);
 ```
+    
 
 Create a snapshot of the code as an artifact and deploy it.
 
@@ -232,31 +205,15 @@ A `DeploymentSpec` is used to spell out the configuration of the deployment incl
 * The name of the storage backend for off-chain storage.
 * The name of the application to deploy the contract into.
 
-Available blockchains and storage backends can be queried:
-
-```java
-PagedResult<Blockchain> bcs = orgService.getBlockchains();
-List<? extends Blockchain> bcsResults = bcs.getResults();
-for (Blockchain result : bcsResults) {
-    System.out.println(result.getName());
-}
-
-PagedResult<Storage> sts = orgService.getStorages();
-List<? extends Storage> stsResults = sts.getResults();
-for (Storage result : stsResults) {
-    System.out.println(result.getName());
-}
-```
-
 
 ```java
 ContractArtifact artifact = orgService.createArtifact(design.getId());
 
-DeploymentSpec spec=new DeploymentSpec();
-spec.setApiName(apiName);
-spec.setBlockchain("Quorum");
-spec.setStorage("azure");
-spec.setAppName("neo-supplychain");
+DeploymentSpec spec=new DeploymentSpec()
+    .withApiName(apiName)
+    .withBlockchain("Quorum")
+    .withStorage("azure")
+    .withAppName("neo-supplychain");
 
 
 Future<DeployedContract> future = orgService.deployContract(artifact.getId(),spec);

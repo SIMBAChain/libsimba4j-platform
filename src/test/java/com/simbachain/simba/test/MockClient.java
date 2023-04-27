@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.paweladamski.httpclientmock.HttpClientMock;
+import com.simbachain.simba.ContractService;
 import com.simbachain.simba.JsonData;
 
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
@@ -45,6 +46,8 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern;
  *
  */
 public class MockClient {
+    
+    public static final String HEADERS_VALUE = "FOOBAR";
     
     private final Map<String,Object> templates;
     private final ObjectMapper stringMapper;
@@ -101,7 +104,9 @@ public class MockClient {
         patterns.put("APP_TXN", Pattern.compile(".*/v2/apps/%s/transactions/[\\w-]+/$"));
         patterns.put("CONTRACT_METADATA", Pattern.compile(".*/v2/apps/[\\w-]+/contract/[\\w-]+/info/$"));
         patterns.put("MANIFEST", Pattern.compile(".*/v2/apps/[\\w-]+/contract/[\\w-]+/bundle/[\\w-]+/manifest/$"));
-        //.*/v2/apps/[\w-]+/contract/[\w-]+/bundle/[\w-]+/manifest/
+        patterns.put("BUNDLE_FILE", Pattern.compile(".*/v2/apps/[\\w-]+/contract/[\\w-]+/bundle/666/filename/Message/$"));
+        patterns.put("HEADERS", Pattern.compile(".*/v2/apps/my-app/contract/supply-headers/supply/$"));
+        
         return patterns;
     }
 
@@ -228,6 +233,42 @@ public class MockClient {
         clientMock.onGet()
                   .withPath(matchesPattern(this.patterns.get("MANIFEST")))
                   .doReturnJSON(this.makeObject("manifest"));
+
+        clientMock.onGet()
+                  .withPath(matchesPattern(this.patterns.get("BUNDLE_FILE")))
+                  .doReturn("Hello World");
+
+        clientMock.onPost()
+                  .withPath(matchesPattern(this.patterns.get("HEADERS")))
+                  .withHeader(ContractService.Headers.HTTP_HEADER_DELEGATE.getValue(), HEADERS_VALUE)
+                  .doReturnJSON(this.makeObject("transaction", Stream.of(new Object[][] {
+                      { "state", "ACCEPTED" },
+                      {"error", ContractService.Headers.HTTP_HEADER_DELEGATE.getValue() + "=" + HEADERS_VALUE}
+                  }).collect(Collectors.toMap(data -> (String) data[0], data -> data[1]))));
+
+        clientMock.onPost()
+                  .withPath(matchesPattern(this.patterns.get("HEADERS")))
+                  .withHeader(ContractService.Headers.HTTP_HEADER_DELEGATE.getValue(), HEADERS_VALUE)
+                  .doReturnJSON(this.makeObject("transaction", Stream.of(new Object[][] {
+                      { "state", "ACCEPTED" },
+                      {"error", ContractService.Headers.HTTP_HEADER_DELEGATE.getValue() + "=" + HEADERS_VALUE}
+                  }).collect(Collectors.toMap(data -> (String) data[0], data -> data[1]))));
+
+        clientMock.onPost()
+                  .withPath(matchesPattern(this.patterns.get("HEADERS")))
+                  .withHeader(ContractService.Headers.HTTP_HEADER_VALUE.getValue(), HEADERS_VALUE)
+                  .doReturnJSON(this.makeObject("transaction", Stream.of(new Object[][] {
+                      { "state", "ACCEPTED" },
+                      {"error", ContractService.Headers.HTTP_HEADER_VALUE.getValue() + "=" + HEADERS_VALUE}
+                  }).collect(Collectors.toMap(data -> (String) data[0], data -> data[1]))));
+
+        clientMock.onPost()
+                  .withPath(matchesPattern(this.patterns.get("HEADERS")))
+                  .withHeader(ContractService.Headers.HTTP_HEADER_NONCE.getValue(), HEADERS_VALUE)
+                  .doReturnJSON(this.makeObject("transaction", Stream.of(new Object[][] {
+                      { "state", "ACCEPTED" },
+                      {"error", ContractService.Headers.HTTP_HEADER_NONCE.getValue() + "=" + HEADERS_VALUE}
+                  }).collect(Collectors.toMap(data -> (String) data[0], data -> data[1]))));
 
         return clientMock;
     }
