@@ -4,7 +4,7 @@ This page provides usage examples of the Java SIMBA Chain Blocks Platform client
 
 JavaDocs are available <a href="./api-doc/index.html" target="_blank">here</a>
 
-Some notes on the Blocks API (to be extended) are available <a href="./api.md" target="_blank">here</a>
+Some notes on the Blocks API (to be extended) are available <a href="./api.html" target="_blank">here</a>
 
 ## Getting Started
 
