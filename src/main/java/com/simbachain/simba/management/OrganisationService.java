@@ -54,24 +54,25 @@ import org.web3j.crypto.RawTransaction;
 public class OrganisationService extends SimbaClient {
 
     private final OrganisationConfig config;
-    private Wallet wallet;
+    private final Map<String, Wallet> wallets = new HashMap<>();
 
     public OrganisationService(String endpoint, OrganisationConfig config) {
         super(endpoint);
         this.config = config;
-        this.client = config.getClientFactory().getClient();
+        this.client = config.getClientFactory()
+                            .getClient();
     }
 
     public OrganisationConfig getConfig() {
         return config;
     }
 
-    public Wallet getWallet() {
-        return wallet;
+    public Wallet getWallet(String address) {
+        return this.wallets.get(address);
     }
 
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
+    public void setWallet(Wallet wallet) throws SimbaException {
+        this.wallets.put(wallet.getAddress(), wallet);
     }
 
     public User whoami() throws SimbaException {
@@ -297,7 +298,8 @@ public class OrganisationService extends SimbaClient {
             getConfig().getOrganisationId(), id), jsonResponseHandler(DeployedContract.class));
     }
 
-    public ContractDesign compileContract(InputStream contract, CompilationSpec spec) throws SimbaException {
+    public ContractDesign compileContract(InputStream contract, CompilationSpec spec)
+        throws SimbaException {
         String contractCode = new BufferedReader(new InputStreamReader(contract)).lines()
                                                                                  .parallel()
                                                                                  .collect(
@@ -325,41 +327,47 @@ public class OrganisationService extends SimbaClient {
             getConfig().getOrganisationId()), data, jsonResponseHandler(ContractArtifact.class));
     }
 
-    public Future<DeployedContract> deployContract(DeploymentSpec spec,
-        Map<String, String> headers) throws SimbaException {
+    public Future<DeployedContract> deployContract(DeploymentSpec spec, Map<String, String> headers)
+        throws SimbaException {
         JsonData data = spec.toJsonData();
         DeploymentResponse response = this.post(
-            Urls.url(getEndpoint(), Urls.PathName.DEPLOY, getConfig().getOrganisationId()),
-            data, jsonResponseHandler(DeploymentResponse.class), headers);
-        if (this.wallet != null
-            && response.getState().equals("EXECUTING")
-            && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()) != null
-            && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()).equals(this.wallet.getAddress())) {
-            String txnId = response.getCurrentTransaction();
-            Transaction txn = this.get(
-                Urls.url(getEndpoint(), Urls.PathName.ORG_TXN, config.getOrganisationId(), txnId),
-                jsonResponseHandler(new TypeReference<Transaction>() {
-                }));
-            Map<String, Object> raw = txn.getRawTransaction();
-            RawTransaction rawTransaction = Signing.createSigningTransaction(raw);
-            Object chainId = raw.get("chainId");
-            String signedTransaction;
-            if (chainId instanceof Long) {
-                signedTransaction = this.wallet.sign(rawTransaction, (Long)chainId);
+            Urls.url(getEndpoint(), Urls.PathName.DEPLOY, getConfig().getOrganisationId()), data,
+            jsonResponseHandler(DeploymentResponse.class), headers);
+        if (response.getState()
+                    .equals("EXECUTING")
+            && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()) != null) {
+            Wallet wallet = this.wallets.get(
+                headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()));
+            if (wallet != null) {
+                String txnId = response.getCurrentTransaction();
+                Transaction txn = this.get(
+                    Urls.url(getEndpoint(), Urls.PathName.ORG_TXN, config.getOrganisationId(),
+                        txnId), jsonResponseHandler(new TypeReference<Transaction>() {
+                    }));
+                Map<String, Object> raw = txn.getRawTransaction();
+                RawTransaction rawTransaction = Signing.createSigningTransaction(raw);
+                Object chainId = raw.get("chainId");
+                String signedTransaction;
+                if (chainId instanceof Long) {
+                    signedTransaction = wallet.sign(rawTransaction, (Long) chainId);
+                } else {
+                    signedTransaction = wallet.sign(rawTransaction);
+                }
+                String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXN, spec.getAppName(),
+                    txnId);
+                this.post(endpoint, JsonData.with("transaction", signedTransaction),
+                    jsonResponseHandler(new TypeReference<Transaction>() {
+                    }));
             } else {
-                signedTransaction = this.wallet.sign(rawTransaction);
+                throw new SimbaException(String.format("No wallet matching %s",
+                    headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue())),
+                    SimbaException.SimbaError.WALLET_NOT_FOUND);
             }
-            String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXN, spec.getAppName(),
-                txnId);
-            this.post(endpoint, JsonData.with("transaction", signedTransaction),
-                jsonResponseHandler(new TypeReference<Transaction>() {
-                }));
         }
         return waitForContractDeployment(response.getDeployedArtifactId());
     }
 
-    public Future<DeployedContract> deployContract(DeploymentSpec spec)
-        throws SimbaException {
+    public Future<DeployedContract> deployContract(DeploymentSpec spec) throws SimbaException {
         Map<String, String> headers = new HashMap<>();
         return deployContract(spec, headers);
     }
@@ -367,9 +375,9 @@ public class OrganisationService extends SimbaClient {
     public ContractService newContractService(String appName, String contractName)
         throws SimbaException {
         ContractService service = new ContractService(getEndpoint(), contractName,
-            new AppConfig(appName, config.getOrganisationId(), config.getAuthConfig()));
+            new AppConfig(appName, config.getOrganisationId(), config.getAuthConfig()),
+            this.wallets);
         service.init();
-        service.setWallet(this.wallet);
         return service;
     }
 

@@ -15,7 +15,7 @@ to your pom file:
 <dependency>
     <groupId>com.simbachain</groupId>
     <artifactId>libsimba4j-platform</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.simbachain:libsimba4j-platform:1.0.0'
+    implementation 'com.simbachain:libsimba4j-platform:1.0.2'
 }
 ```
 
@@ -394,6 +394,45 @@ Manifest manifest = contractService.getBundleMetadataForTransaction(bundleHash);
 System.out.println("Manifest: " + manifest);
 ```
 
+## Client Side Signing Transactions
+
+Using the `Wallet` abstract class, you can create either `FileWallet` wallets from mnemonics
+or use the `Account` class initialised with a private key. Once you have a wallet instance,
+you can use the client side signing API. This involves sending the payload to Blocks and receiving
+the unsigned transaction back, signing it and then posting back the signed transaction for
+submission.
+
+You can set wallets on an `OrganisationService` or a `ContractService`. Wallets are stored in a
+map, keyed to their address.
+If you set them on an org service, it will pass the wallets through to the contract services it creates.
+
+To use a wallet for a transaction, add the `txn-sender` HTTP header with the address of the wallet.
+This is exposed as an Enum `ContractService.Headers.HTTP_HEADER_SENDER`:
+
+```java
+Account acc = new Account("22aabb811efca4e6f4748bd18a46b502fa85549df9fa07da649c0a148d7d5530");
+orgService.setWallet(acc);
+Map<String, String> headers = new HashMap<>();
+deployHeaders.put(ContractService.Headers.HTTP_HEADER_SENDER.getValue(), acc.getAddress());
+Future<DeployedContract> ssFuture = orgService.deployContract(ssSpec, headers);
+```
+
+And calling a method:
+
+```java
+JsonData ssSupplyData = JsonData.with("price", 120)
+     .and("dateTime", System.currentTimeMillis())
+     .and("supplier", JsonData.with("__Supplier", "Supplier3.33"))
+     .and("purchaser", JsonData.with("__Supplier", "Supplier2.12"))
+     .and("part", JsonData.with("__Part", "Part542"));
+
+headers.put(ContractService.Headers.HTTP_HEADER_SENDER.getValue(), acc.getAddress());
+CallResponse signedRet = ssContractService.callMethod("supply", ssSupplyData, headers);
+```
+
+Libsimba4J will map the stored wallets against the value in the header to select the chosen wallet.
+
+
 ## Generated Classes
 
 Using the `ContractService` you can also ask it to generate source code for you to simplify contract
@@ -404,353 +443,5 @@ String path = contractService.generateContractPackage("com.supplychain", "./");
 System.out.println(path);
 ```
 
-This will generate a Java class based on the contract:
+This will generate a Java class based on the contract.
 
-```java
-package com.supplychain;
-
-import com.simbachain.simba.JsonData;
-import com.simbachain.simba.CallResponse;
-import com.simbachain.SimbaException;
-import com.simbachain.simba.ContractService;
-import com.simbachain.simba.ContractClient;
-import com.simbachain.simba.PagedResult;
-import com.simbachain.simba.Query;
-import com.simbachain.simba.Transaction;
-import com.simbachain.simba.Jsonable;
-
-import java.math.BigInteger;
-
-/**
- * Class that represents the SupplyChain contract.
- */
-public class SupplyChain extends ContractClient {
-
-    public SupplyChain(ContractService simba) {
-        super(simba);
-    }
-
-    /**
-     * Execute the supply Transaction.
-     *
-     * @param supplier Supplier.
-     * @param purchaser Supplier.
-     * @param part Part.
-     * @param price BigInteger.
-     * @param dateTime BigInteger.
-     * @return CallResponse containing the response.
-     * @throws SimbaException if an error occurs. 
-     */
-    public CallResponse supply(Supplier supplier,
-        Supplier purchaser,
-        Part part,
-        BigInteger price,
-        BigInteger dateTime) throws SimbaException {
-        JsonData data = JsonData.jsonData();
-        data = data.and("supplier", supplier.toJsonData());
-        data = data.and("purchaser", purchaser.toJsonData());
-        data = data.and("part", part.toJsonData());
-        data = data.and("price", price);
-        data = data.and("dateTime", dateTime);
-        return this.simba.callMethod("supply", data);
-    }
-
-    /**
-     * Get transactions for the supply transaction.
-     *
-     * @param params Query.Params.
-     * @return PagedResult of Transaction objects.
-     */
-    public PagedResult<Transaction> getSupplyTransactions(Query.Params params)
-        throws SimbaException {
-        return this.getTransactions("supply", params);
-    }
-
-    /**
-     * Execute the assemble Transaction.
-     *
-     * @param part Part.
-     * @param subParts Part[].
-     * @param assemblyId String.
-     * @param dateTime BigInteger.
-     * @return CallResponse containing the response.
-     * @throws SimbaException if an error occurs. 
-     */
-    public CallResponse assemble(Part part, Part[] subParts, String assemblyId, BigInteger dateTime)
-        throws SimbaException {
-        JsonData data = JsonData.jsonData();
-        data = data.and("part", part.toJsonData());
-        java.util.List<JsonData> list = new java.util.ArrayList<>();
-        for (Part element : subParts) {
-            list.add(element.toJsonData());
-        }
-        data = data.and("subParts", list);
-        data = data.and("assemblyId", assemblyId);
-        data = data.and("dateTime", dateTime);
-        return this.simba.callMethod("assemble", data);
-    }
-
-    /**
-     * Get transactions for the assemble transaction.
-     *
-     * @param params Query.Params.
-     * @return PagedResult of Transaction objects.
-     */
-    public PagedResult<Transaction> getAssembleTransactions(Query.Params params)
-        throws SimbaException {
-        return this.getTransactions("assemble", params);
-    }
-
-    /**
-     * Execute the distribute Transaction.
-     *
-     * @param distributor Supplier.
-     * @param depots Depot[].
-     * @param part Part.
-     * @param dateTime BigInteger.
-     * @return CallResponse containing the response.
-     * @throws SimbaException if an error occurs. 
-     */
-    public CallResponse distribute(Supplier distributor,
-        Depot[] depots,
-        Part part,
-        BigInteger dateTime) throws SimbaException {
-        JsonData data = JsonData.jsonData();
-        data = data.and("distributor", distributor.toJsonData());
-        java.util.List<JsonData> list = new java.util.ArrayList<>();
-        for (Depot element : depots) {
-            list.add(element.toJsonData());
-        }
-        data = data.and("depots", list);
-        data = data.and("part", part.toJsonData());
-        data = data.and("dateTime", dateTime);
-        return this.simba.callMethod("distribute", data);
-    }
-
-    /**
-     * Get transactions for the distribute transaction.
-     *
-     * @param params Query.Params.
-     * @return PagedResult of Transaction objects.
-     */
-    public PagedResult<Transaction> getDistributeTransactions(Query.Params params)
-        throws SimbaException {
-        return this.getTransactions("distribute", params);
-    }
-
-    /**
-     * Execute the nonConformance Transaction.
-     *
-     * @param part Part.
-     * @param source DataSource.
-     * @param reason String.
-     * @param dateTime BigInteger.
-     * @return CallResponse containing the response.
-     * @throws SimbaException if an error occurs. 
-     */
-    public CallResponse nonConformance(Part part,
-        DataSource source,
-        String reason,
-        BigInteger dateTime) throws SimbaException {
-        JsonData data = JsonData.jsonData();
-        data = data.and("part", part.toJsonData());
-        data = data.and("source", source.toJsonData());
-        data = data.and("reason", reason);
-        data = data.and("dateTime", dateTime);
-        return this.simba.callMethod("nonConformance", data);
-    }
-
-    /**
-     * Get transactions for the nonConformance transaction.
-     *
-     * @param params Query.Params.
-     * @return PagedResult of Transaction objects.
-     */
-    public PagedResult<Transaction> getNonConformanceTransactions(Query.Params params)
-        throws SimbaException {
-        return this.getTransactions("nonConformance", params);
-    }
-
-    /**
-     * Execute the systemAssembly Transaction.
-     *
-     * @param system WeaponSystem.
-     * @param parts Part[].
-     * @return CallResponse containing the response.
-     * @throws SimbaException if an error occurs. 
-     */
-    public CallResponse systemAssembly(WeaponSystem system, Part[] parts) throws SimbaException {
-        JsonData data = JsonData.jsonData();
-        data = data.and("system", system.toJsonData());
-        java.util.List<JsonData> list = new java.util.ArrayList<>();
-        for (Part element : parts) {
-            list.add(element.toJsonData());
-        }
-        data = data.and("parts", list);
-        return this.simba.callMethod("systemAssembly", data);
-    }
-
-    /**
-     * Get transactions for the systemAssembly transaction.
-     *
-     * @param params Query.Params.
-     * @return PagedResult of Transaction objects.
-     */
-    public PagedResult<Transaction> getSystemAssemblyTransactions(Query.Params params)
-        throws SimbaException {
-        return this.getTransactions("systemAssembly", params);
-    }
-
-    /**
-     * The Supplier class used as inputs to functions.
-     */
-    public static class Supplier implements Jsonable {
-        private String __Supplier;
-
-        /**
-         * Getter for __Supplier.
-         * @return __Supplier
-         */
-        public String get__Supplier() {
-            return __Supplier;
-        }
-
-        /**
-         * Setter for __Supplier
-         * @param __Supplier of type String.
-         */
-        public void set__Supplier(String __Supplier) {
-            this.__Supplier = __Supplier;
-        }
-
-        @Override
-        public JsonData toJsonData() {
-            JsonData data = JsonData.jsonData();
-            data = data.and("__Supplier", __Supplier);
-            return data;
-        }
-    }
-
-    /**
-     * The Part class used as inputs to functions.
-     */
-    public static class Part implements Jsonable {
-        private String __Part;
-
-        /**
-         * Getter for __Part.
-         * @return __Part
-         */
-        public String get__Part() {
-            return __Part;
-        }
-
-        /**
-         * Setter for __Part
-         * @param __Part of type String.
-         */
-        public void set__Part(String __Part) {
-            this.__Part = __Part;
-        }
-
-        @Override
-        public JsonData toJsonData() {
-            JsonData data = JsonData.jsonData();
-            data = data.and("__Part", __Part);
-            return data;
-        }
-    }
-
-    /**
-     * The Depot class used as inputs to functions.
-     */
-    public static class Depot implements Jsonable {
-        private String __Depot;
-
-        /**
-         * Getter for __Depot.
-         * @return __Depot
-         */
-        public String get__Depot() {
-            return __Depot;
-        }
-
-        /**
-         * Setter for __Depot
-         * @param __Depot of type String.
-         */
-        public void set__Depot(String __Depot) {
-            this.__Depot = __Depot;
-        }
-
-        @Override
-        public JsonData toJsonData() {
-            JsonData data = JsonData.jsonData();
-            data = data.and("__Depot", __Depot);
-            return data;
-        }
-    }
-
-    /**
-     * The DataSource class used as inputs to functions.
-     */
-    public static class DataSource implements Jsonable {
-        private String __DataSource;
-
-        /**
-         * Getter for __DataSource.
-         * @return __DataSource
-         */
-        public String get__DataSource() {
-            return __DataSource;
-        }
-
-        /**
-         * Setter for __DataSource
-         * @param __DataSource of type String.
-         */
-        public void set__DataSource(String __DataSource) {
-            this.__DataSource = __DataSource;
-        }
-
-        @Override
-        public JsonData toJsonData() {
-            JsonData data = JsonData.jsonData();
-            data = data.and("__DataSource", __DataSource);
-            return data;
-        }
-    }
-
-    /**
-     * The WeaponSystem class used as inputs to functions.
-     */
-    public static class WeaponSystem implements Jsonable {
-        private String __WeaponSystem;
-
-        /**
-         * Getter for __WeaponSystem.
-         * @return __WeaponSystem
-         */
-        public String get__WeaponSystem() {
-            return __WeaponSystem;
-        }
-
-        /**
-         * Setter for __WeaponSystem
-         * @param __WeaponSystem of type String.
-         */
-        public void set__WeaponSystem(String __WeaponSystem) {
-            this.__WeaponSystem = __WeaponSystem;
-        }
-
-        @Override
-        public JsonData toJsonData() {
-            JsonData data = JsonData.jsonData();
-            data = data.and("__WeaponSystem", __WeaponSystem);
-            return data;
-        }
-    }
-
-}
-
-```

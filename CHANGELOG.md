@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.1](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.0...v1.0.1) (2023-04-28)
+
+### Features
+
+* Remove bad transitive dependency 
+
 ## [1.0.0](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.0-SNAPSHOT...v1.0.0) (2023-04-28)
                                                       
 ### Features

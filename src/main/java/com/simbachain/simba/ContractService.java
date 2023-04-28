@@ -49,8 +49,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     public enum Headers {
         HTTP_HEADER_SENDER("txn-sender"), HTTP_HEADER_SENDER_TOKEN("txn-sender-token"),
         HTTP_HEADER_NONCE("txn-nonce"), HTTP_HEADER_DELEGATE("txn-delegate"),
-        HTTP_HEADER_VALUE("txn-value"),
-        HTTP_HEADER_RUNLOCAL("txn-force-run-local"), HTTP_HEADER_REQUEST_ID("x-request-id");
+        HTTP_HEADER_VALUE("txn-value"), HTTP_HEADER_RUNLOCAL("txn-force-run-local"),
+        HTTP_HEADER_REQUEST_ID("x-request-id");
 
         private final String value;
 
@@ -62,7 +62,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
             return value;
         }
     }
-    private Wallet wallet;
+    private Map<String, Wallet> wallets = new HashMap<>();
 
     /**
      * Constructor overrriden by subclasses.
@@ -81,11 +81,14 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
      * @param endpoint the URL of a particular contract API, e.g. https://api.simbachain.com/
      * @param contract the name of the contract or the appname, e.g. mycontract
      * @param config   used by subclasses.
-     * @param wallet   A wallet to use for client side signing.
+     * @param wallets  A map of wallets to use for client side signing keyed to their address.
      */
-    public ContractService(String endpoint, String contract, AppConfig config, Wallet wallet) {
+    public ContractService(String endpoint,
+        String contract,
+        AppConfig config,
+        Map<String, Wallet> wallets) {
         this(endpoint, contract, config);
-        this.wallet = wallet;
+        this.wallets = wallets;
     }
 
     @Override
@@ -98,16 +101,12 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         return getMetadata();
     }
 
-    public Wallet getWallet() {
-        return wallet;
+    public Wallet getWallet(String address) {
+        return this.wallets.get(address);
     }
 
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
-    }
-
-    public void removeWallet() {
-        this.wallet = null;
+    public void setWallet(Wallet wallet) throws SimbaException {
+        this.wallets.put(wallet.getAddress(), wallet);
     }
 
     public String getApiPath() {
@@ -144,8 +143,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: SimbaPlatform.getTransaction: " + "txnId = [" + txnId + "]");
         }
-        String endpoint = Urls.url(getEndpoint(), Urls.PathName.ORG_TXN, getConfig().getOrganisationId(),
-            txnId);
+        String endpoint = Urls.url(getEndpoint(), Urls.PathName.ORG_TXN,
+            getConfig().getOrganisationId(), txnId);
         Transaction txn = this.get(endpoint, jsonResponseHandler(new TypeReference<Transaction>() {
         }));
         String method = txn.getMethod();
@@ -267,7 +266,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         return this.callMethodSync(method, parameters, new HashMap<>(), files);
     }
 
-    public CallResponse signAndSubmit(String transactionId, Map<String, Object> raw)
+    public CallResponse signAndSubmit(String transactionId, Map<String, Object> raw, Wallet wallet)
         throws SimbaException {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: ContractService.signAndSubmit: "
@@ -282,9 +281,9 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         Object chainId = raw.get("chainId");
         String signedTransaction;
         if (chainId instanceof Long) {
-            signedTransaction = this.wallet.sign(rawTransaction, (Long)chainId);
+            signedTransaction = wallet.sign(rawTransaction, (Long) chainId);
         } else {
-            signedTransaction = this.wallet.sign(rawTransaction);
+            signedTransaction = wallet.sign(rawTransaction);
         }
         String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXN, getConfig().getAppName(),
             transactionId);
@@ -327,9 +326,16 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
             jsonResponseHandler(new TypeReference<Transaction>() {
             }), headers, files);
         if (txn.getState() == com.simbachain.simba.Transaction.State.PENDING
-            && this.wallet != null) {
+            && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()) != null) {
+            Wallet wallet = this.wallets.get(
+                headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()));
+            if (wallet == null) {
+                throw new SimbaException(String.format("No wallet matching %s",
+                    headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue())),
+                    SimbaException.SimbaError.WALLET_NOT_FOUND);
+            }
             Map<String, Object> raw = txn.getRawTransaction();
-            return signAndSubmit(txn.getId(), raw);
+            return signAndSubmit(txn.getId(), raw, wallet);
         } else {
             CallResponse methodResponse = new CallResponse(txn.getId());
             methodResponse.setStatus(txn.getState()
@@ -368,9 +374,16 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
             jsonResponseHandler(new TypeReference<Transaction>() {
             }), headers, files);
         if (txn.getState() == com.simbachain.simba.Transaction.State.SUBMITTED
-            && this.wallet != null) {
+            && headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()) != null) {
+            Wallet wallet = this.wallets.get(
+                headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue()));
+            if (wallet == null) {
+                throw new SimbaException(String.format("No wallet matching %s",
+                    headers.get(ContractService.Headers.HTTP_HEADER_SENDER.getValue())),
+                    SimbaException.SimbaError.WALLET_NOT_FOUND);
+            }
             Map<String, Object> raw = txn.getRawTransaction();
-            return signAndSubmit(txn.getId(), raw);
+            return signAndSubmit(txn.getId(), raw, wallet);
         } else {
             CallResponse methodResponse = new CallResponse(txn.getId());
             methodResponse.setStatus(txn.getState()
@@ -384,8 +397,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     }
 
     @Override
-    public Manifest getBundleMetadataForTransaction(String bundleHash)
-        throws SimbaException {
+    public Manifest getBundleMetadataForTransaction(String bundleHash) throws SimbaException {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: SimbaPlatform.getBundleMetadataForTransaction: "
                 + "bundleHash = ["
@@ -418,9 +430,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     }
 
     @Override
-    public long getBundleForTransaction(String bundleHash,
-        OutputStream outputStream,
-        boolean close) throws SimbaException {
+    public long getBundleForTransaction(String bundleHash, OutputStream outputStream, boolean close)
+        throws SimbaException {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: SimbaPlatform.getBundleForTransaction: "
                 + "bundleHash = ["
@@ -474,8 +485,8 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     }
 
     @Override
-    public PagedResult<Transaction> getTransactions(String method,
-        Query.Params params) throws SimbaException {
+    public PagedResult<Transaction> getTransactions(String method, Query.Params params)
+        throws SimbaException {
         if (log.isDebugEnabled()) {
             log.debug("ENTER: SimbaPlatform.getTransactions: "
                 + "method = ["
@@ -515,8 +526,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         if (results.getPrevious() == null) {
             return null;
         }
-        PagedResult<Transaction> result = this.get(
-            results.getPrevious(),
+        PagedResult<Transaction> result = this.get(results.getPrevious(),
             jsonResponseHandler(new TypeReference<PagedResult<Transaction>>() {
             }));
 

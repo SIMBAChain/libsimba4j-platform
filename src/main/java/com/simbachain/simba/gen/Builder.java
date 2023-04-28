@@ -88,43 +88,42 @@ public class Builder {
         for (String s : methods.keySet()) {
             Method meth = methods.get(s);
             String viz = meth.getVisibility();
-            if (!"public".equals(viz)) {
-                continue;
-            }
-            String methodName = getJavaMethodName(s, meth.getParameterMap());
-            boolean access = meth.getAccessor();
+            if ("public".equals(viz) || "external".equals(viz)) {
+                String methodName = getJavaMethodName(s, meth.getParameterMap());
+                boolean access = meth.getAccessor();
 
-            List<Parameter> returns = meth.getReturns();
-            JavaMethod javaMethod = new JavaMethod(s, methodName, access);
-            List<Parameter> params = meth.getParams();
-            List<String> paramNames = new ArrayList<>();
-            for (Parameter param : params) {
-                paramNames.add(param.getName());
-                JavaObject p = createComponent(param);
-                if (p.isStructType()) {
-                    javaClass.addImport("com.simbachain.simba.Jsonable");
+                List<Parameter> returns = meth.getReturns();
+                JavaMethod javaMethod = new JavaMethod(s, methodName, access);
+                List<Parameter> params = meth.getParams();
+                List<String> paramNames = new ArrayList<>();
+                for (Parameter param : params) {
+                    paramNames.add(param.getName());
+                    JavaObject p = createComponent(param);
+                    if (p.isStructType()) {
+                        javaClass.addImport("com.simbachain.simba.Jsonable");
+                    }
+                    javaMethod.addParameter(p);
                 }
-                javaMethod.addParameter(p);
-            }
-            String dataName = getDataName(paramNames);
-            javaMethod.setJsonDataName(dataName);
-            String headersName = getHeadersName(paramNames);
-            javaMethod.setHeadersName(headersName);
-            int count = 0;
-            for (Parameter aReturn : returns) {
-                if (aReturn.getName() == null) {
-                    aReturn.setName("return" + count);
-                    count++;
+                String dataName = getDataName(paramNames);
+                javaMethod.setJsonDataName(dataName);
+                String headersName = getHeadersName(paramNames);
+                javaMethod.setHeadersName(headersName);
+                int count = 0;
+                for (Parameter aReturn : returns) {
+                    if (aReturn.getName() == null) {
+                        aReturn.setName("return" + count);
+                        count++;
+                    }
+                    javaMethod.addReturn(createComponent(aReturn));
                 }
-                javaMethod.addReturn(createComponent(aReturn));
+                if (javaMethod.isAccessor()) {
+                    javaClass.addImport("com.simbachain.simba.CallReturn");
+                }
+                if (javaMethod.isFiles()) {
+                    javaClass.addImport("com.simbachain.simba.SimbaClient.UploadFile");
+                }
+                javaClass.addMethod(javaMethod);
             }
-            if (javaMethod.isAccessor()) {
-                javaClass.addImport("com.simbachain.simba.CallReturn");
-            }
-            if (javaMethod.isFiles()) {
-                javaClass.addImport("com.simbachain.simba.SimbaClient.UploadFile");
-            }
-            javaClass.addMethod(javaMethod);
         }
         Map<String, Object> context = new HashMap<>();
         context.put("jc", javaClass);
@@ -219,12 +218,7 @@ public class Builder {
         String structName = getJavaClassName(struct);
         String[] parts = struct.split("\\.");
         if (parts.length == 2) {
-            String contract = getJavaClassName(parts[0]);
-            if (!contract.equals(this.javaClass.getClassName())) {
-                save = false;
-            } else {
-                structName = getJavaClassName(parts[1]);
-            }
+            structName = getJavaClassName(parts[1]);
         }
         if (save) {
             structure = new Struct(struct, structName, dimensions);

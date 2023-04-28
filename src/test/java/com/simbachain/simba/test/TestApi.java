@@ -327,8 +327,7 @@ public class TestApi {
 
         CallResponse signedRet = ssContractService.callMethod("supply", ssSupplyData, headers);
         System.out.println("Got back response: " + signedRet);
-
-        ssContractService.removeWallet();
+        
     }
 
     @Test
