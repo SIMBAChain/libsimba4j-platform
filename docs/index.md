@@ -256,8 +256,6 @@ of the deployment including:
 * An optional map of arguments in the case where the contract constructor takes arguments.
 
 ```java
-
-
 DeploymentSpec spec=new DeploymentSpec()
     .withApiName(apiName)
     .withBlockchain("Quorum")
