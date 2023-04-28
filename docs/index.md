@@ -4,6 +4,8 @@ This page provides usage examples of the Java SIMBA Chain Blocks Platform client
 
 JavaDocs are available <a href="./api-doc/index.html" target="_blank">here</a>
 
+Some notes on the Blocks API (to be extended) are available <a href="./api.md" target="_blank">here</a>
+
 ## Getting Started
 
 To use LibSimba4J include it as a dependency. For Maven builds add the following dependency
@@ -147,13 +149,13 @@ List applications, contract design, artifacts and deployed contracts:
 PagedResult<Blockchain> bcs = orgService.getBlockchains();
 List<? extends Blockchain> bcsResults = bcs.getResults();
 for (Blockchain result : bcsResults) {
-System.out.println(result.getName());
+    System.out.println(result.getName());
 }
 
 PagedResult<Storage> sts = orgService.getStorages();
 List<? extends Storage> stsResults = sts.getResults();
 for (Storage result : stsResults) {
-System.out.println(result.getName());
+    System.out.println(result.getName());
 }
     
 PagedResult<Application> apps = orgService.getApplications();
@@ -181,11 +183,48 @@ for(DeployedContract result:dcsResults){
 }
 
 ```
+
+You can also iterate over pages, e.g.:
+
+```java
+List<? extends ContractDesign> cdsResults = cds.getResults();
+for (ContractDesign result : cdsResults) {
+    System.out.println(result.getName());
+}
+while (cds.getNext() != null) {
+    cds = orgService.nextContractDesigns(cds);
+    cdsResults = cds.getResults();
+    for (ContractDesign result : cdsResults) {
+        System.out.printf("next returned contract design: %s%n", result);
+    }
+}
+```
                  
-## Deploying a Contract
+## Deploying Contracts
 
 In the simple case, deploying a contract involves supplying solidity code and a contract name.
-The name is not required to be unique.
+The name is not required to be unique. You create a design and compile it using a `CompilationSpec`
+object. This takes a number of fields:
+
+* `language`: Optional. Defaults to 'solidity'
+* `name`: A non-unique name for the design. This does not have to match the name of the contract in the solidity.
+* `target_contract`: `<CONTRACT_NAME>`. Optional. This field identifies the contract you want an HTTP API for. In the case
+  of a simple contract deployment, this is not required as there is only a single contract. However, if there
+  are related contracts in the compilation, this ensures the correct contract is the primary contract to be exposed
+  via the Blocks API.
+* `binary_targets`: A list containing the `<CONTRACT_NAME>`. Optional. Again, this is optional, but worth including if you want to
+  restrict the artifacts that should be deployed at deployment time. It defines
+  the contracts for which binary info should be returned. Without this info, the artifact cannot be deployed. Consider
+  a contract that depends on external libraries, for which you already know the addresses. In this case you want to
+  not have those deployed when deploying the contract as they are already deployed. In this case, the binary targets
+  list can be used to restrict deployment to only the main contract.
+* `libraries`: Optional dictionary of external libraries that are already deployed and should be linked to the contract.
+  The key values of the dictionary are `<LIBRARY_NAME>` key and value of `<ADDRESS>`. If libraries are included, they
+  are linked into the binary content of the compiled contract.
+* `encodeCode`: boolean. Defaults to true. If true, his tells LibSimba4J to base64 encode the source code
+  as the API expects the source to be Base64 encoded. 
+
+Along with the compilation spec, supply a String or an InputStream which is the code itself. 
 
 ```java
 InputStream in = CompileDeployTest.class.getResourceAsStream("/supply.sol");
@@ -194,20 +233,30 @@ CompilationSpec compSpec = new CompilationSpec().withName(apiName);
 ContractDesign design = orgService.compileContract(in, compSpec);
 System.out.println(design);
 ```
-    
+         
+Once a design is created, you can continue to modify it. Before deploying a contract, you should
+create a contract artifact. This is a frozen snapshot of a design and is used as the information
+to deploy.
 
-Create a snapshot of the code as an artifact and deploy it.
-
-A `DeploymentSpec` is used to spell out the configuration of the deployment including:
-
-* Contract API name. This is the path the contract will bedloyed to in the REST API.
-* The name of the blockchain to deploy to.
-* The name of the storage backend for off-chain storage.
-* The name of the application to deploy the contract into.
-
+To create a snapshot of the code as an artifact pass in the identifier of the contract design:
 
 ```java
 ContractArtifact artifact = orgService.createArtifact(design.getId());
+```
+
+To deploy the artifact, use a `DeploymentSpec`. This is used to spell out the configuration
+of the deployment including:
+
+* Contract API name. This is the path the contract will deployed to in the REST API.
+* An optional display name.
+* The name of the Application to add the deployed contract to.
+* The name of the blockchain to deploy to.
+* The name of the storage backend for off-chain storage.
+* The name of the application to deploy the contract into.
+* An optional map of arguments in the case where the contract constructor takes arguments.
+
+```java
+
 
 DeploymentSpec spec=new DeploymentSpec()
     .withApiName(apiName)
@@ -226,17 +275,25 @@ Once you have a deployed contract, you can create a `ContractService` to interac
 The `ContractService` creation method of `OrganisationService` takes an `Application` name, and the
 API name you gave to the `DeploedContract`.
 
+When creating the contract service, the auth config is passed to it.
+
 ```java
-ContractService contractService = orgService.newContractService("neo-supplychain", apiName);
+ContractService contractService = orgService.newContractService("supplychain", apiName);
+```
 
-JsonData supplyData=JsonData.with("price",120)
-    .and("dateTime",System.currentTimeMillis())
-    .and("supplier",JsonData.with("__Supplier","Supplier3.32"))
-    .and("purchaser",JsonData.with("__Supplier","Supplier2.11"))
-    .and("part",JsonData.with("__Part","Part542"));
+## Calling and Querying Contract Methods
 
-CallResponse ret=contractService.callMethod("supply",supplyData);
-System.out.println("Got back response: "+ret);
+You can now call methods on the contract:
+
+```java
+JsonData supplyData=JsonData.with("price", 120)
+    .and("dateTime", System.currentTimeMillis())
+    .and("supplier", JsonData.with("__Supplier", "Supplier3.32"))
+    .and("purchaser", JsonData.with("__Supplier", "Supplier2.11"))
+    .and("part", JsonData.with("__Part", "Part542"));
+
+CallResponse ret=contractService.callMethod("supply", supplyData);
+System.out.println("Got back response: " + ret);
 ```
 
 This is invoking a contract method defined as:
@@ -260,7 +317,16 @@ function supply (
 }
 ```
 
-Now query for transactions.
+For methods that are `getters`, i.e., do not create transactions and do return values, the `callGetter`
+function can be used. The json data here is converted to query paramters and the class defines
+the expected return type.
+
+```java
+CallReturn<String> getterResponse = contractService.callGetter("getSupplier", String.class, JsonData.with("pk", "1234567890"));
+System.out.println("getter response: " + getterResponse.getReturnValue());
+```
+              
+For methods that do create transactions, you can query for them and select a subset of fields to return:
 
 ```java
 List<String> fields = new ArrayList<>();
@@ -281,6 +347,54 @@ while (results.getNext() != null) {
     }
 }
 ```
+
+### Methods with File Uploads
+
+The special `_bundleHash` parameter name is used to determine whether a method has been defined to accept file uploads.
+This field should not be populated by the client side. Instead, if files are present in the current
+request and the field is defined on the method, then the files are written to off-chain storage
+with the JSON manifest being constructed and written out alongside the files.
+The manifest contains the content hashes of the files along with metadata and timestamp.
+The content hash of the JSON manifest is then set to be the value of the `_bundleHash` field.
+This hash value is then what ends up on the chain in the transaction.
+
+To create a bundle, the function must have a `_bundleHash` parameter in the function.
+
+Below is an example of submitting files and getting the bundle hash back. The `UploadFile`class is used
+to define the data to upload.
+
+```java
+JsonData nonConformanceData = JsonData.with("dateTime", System.currentTimeMillis())
+    .and("reason", "Non conformant")
+    .and("source", JsonData.with("__DataSource", "DataSource2.11"))
+    .and("part", JsonData.with("__Part", "Part542"));
+
+headers = new HashMap<>();
+
+InputStream report = CompileDeployExample.class.getResourceAsStream("/ConformanceReport.pdf");
+SimbaClient.UploadFile uploadFile = new SimbaClient.UploadFile("ConformanceReport", "application/pdf", report); 
+CallResponse bundleCall = contractService.callMethod("nonConformance", nonConformanceData, headers, uploadFile);
+Future<Transaction> ftxn = contractService.waitForTransactionCompletion(bundleCall.getRequestIdentitier());
+Transaction txn = ftxn.get();
+Map<String, Object> inputs = txn.getInputs();
+String bundleHash = (String) inputs.get("_bundleHash");
+System.out.println("Bundle Hash: " + bundleHash);
+```
+   
+Using the bundle hash, you can query for the entire bundle which will be in gzip format, or files
+inside it, or the JSON manifest describing the bundle. When downloading files, specify the
+location to write locally to.
+
+```java
+File file = new File(dataDir, "MyReport.pdf");
+BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(file)); 
+contractService.getBundleFileForTransaction(bundleHash, "ConformanceReport.pdf", bout);
+
+Manifest manifest = contractService.getBundleMetadataForTransaction(bundleHash);
+System.out.println("Manifest: " + manifest);
+```
+
+## Generated Classes
 
 Using the `ContractService` you can also ask it to generate source code for you to simplify contract
 interactions:

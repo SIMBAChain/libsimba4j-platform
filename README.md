@@ -21,6 +21,6 @@ check [issues page](https://github.com/simbachain/libsimba4j-platform/issues).
 
 ## License
 
-Copyright © 2019 [SIMBAChain Inc](https://simbachain.com/).<br />
+Copyright © 2023 [SIMBAChain Inc](https://simbachain.com/).<br />
 This project is [MIT](https://github.com/SIMBAChain/libsimba4j-platform/blob/master/LICENCE) licensed.
 
