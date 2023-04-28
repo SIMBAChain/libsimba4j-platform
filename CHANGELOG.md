@@ -1,6 +1,12 @@
 # Changelog
 
-## [1.0.0-SNAPSHOT](https://github.com/SIMBAChain/libsimba4j-platform/compare/v0.1.14...v1.0.0) (2022-09-24)
+## [1.0.0](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.0-SNAPSHOT...v1.0.0) (2023-04-28)
+                                                      
+### Features
+
+* Brand new Blocks release
+
+## [1.0.0-SNAPSHOT](https://github.com/SIMBAChain/libsimba4j-platform/compare/v0.1.14...v1.0.0-SNAPSHOT) (2022-09-24)
 
 ### Breaking Changes
 
