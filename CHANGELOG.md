@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.1...v1.0.2) (2023-04-28)
+
+### Features
+
+* Improve self signing
+* Fix builder
+* More docs
+
 ## [1.0.1](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.0...v1.0.1) (2023-04-28)
 
 ### Features
