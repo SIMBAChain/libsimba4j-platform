@@ -25,6 +25,8 @@ package com.simbachain.simba;
 import java.math.BigInteger;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.web3j.crypto.RawTransaction;
 import org.web3j.utils.Numeric;
 
@@ -32,6 +34,8 @@ import org.web3j.utils.Numeric;
  *
  */
 public class Signing {
+    
+    protected static Logger log = LoggerFactory.getLogger(Signing.class.getName());
 
     private Signing() {
     }
@@ -70,9 +74,17 @@ public class Signing {
         Object maxPriorityFeePerGas = raw.get("maxPriorityFeePerGas");
         Object maxFeePerGas = raw.get("maxFeePerGas");
         if (gasPrice != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("EXIT: Signing.createSigningTransaction: "
+                    + " legacy transaction signed");
+            }
             return RawTransaction.createTransaction(getBigInt(nonce), getBigInt(gasPrice),
                 getBigInt(gasLimit), (String) to, value, (String) data);
         }  else {
+            if (log.isDebugEnabled()) {
+                log.debug("EXIT: Signing.createSigningTransaction: "
+                    + " EIP 1559 transaction signed");
+            }
             return RawTransaction.createTransaction(getBigInt(chainId).longValue(), getBigInt(nonce),
                 getBigInt(gasLimit), (String) to, value, (String) data, getBigInt(maxPriorityFeePerGas),
                 getBigInt(maxFeePerGas));

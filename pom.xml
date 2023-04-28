@@ -25,7 +25,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.simbachain</groupId>
 	<artifactId>libsimba4j-platform</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
     <name>LibSimba4J Blocks Platform</name>
     <description>Java Client for SIMBA Chain Blocks Platform</description>
     <url>https://simbachain.github.io/libsimba4j/</url>
@@ -69,6 +69,12 @@
 			<groupId>org.web3j</groupId>
 			<artifactId>core</artifactId>
 			<version>4.9.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.squareup.okhttp3</groupId>
+                    <artifactId>okhttp</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
