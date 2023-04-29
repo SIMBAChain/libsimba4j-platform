@@ -2,6 +2,12 @@ pragma solidity ^0.8.3;
 
 contract SupplyChain {
 
+    event SupplyEvent(
+        address indexed sender,
+        string supplier,
+        uint indexed dateTime
+    );
+
     struct Supplier {
         string __Supplier;
     }
@@ -32,6 +38,7 @@ contract SupplyChain {
         uint price,
         uint dateTime
     ) public {
+        emit SupplyEvent(msg.sender, supplier.__Supplier, dateTime);
     }
 
     function distribute (

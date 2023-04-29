@@ -49,6 +49,7 @@ import com.simbachain.simba.PagedResult;
 import com.simbachain.simba.Query;
 import com.simbachain.simba.SimbaClient;
 import com.simbachain.simba.Transaction;
+import com.simbachain.simba.TransactionEvent;
 import com.simbachain.simba.management.Application;
 import com.simbachain.simba.management.AuthenticatedUser;
 import com.simbachain.simba.management.Blockchain;
@@ -247,6 +248,12 @@ public class TestApi {
             for (Transaction transaction : txns) {
                 System.out.printf("next returned transaction: %s%n", transaction);
             }
+        }
+        System.out.println("=================== List Transaction Events ===================");
+        PagedResult<TransactionEvent> eventResults = contractService.getTransactionEvents("SupplyEvent", Query.ex("inputs.supplier", "Supplier3.32"));
+        List<? extends TransactionEvent> evts = eventResults.getResults();
+        for (TransactionEvent evt : evts) {
+            System.out.println(String.format("returned transaction event: %s", evt));
         }
 
         System.out.println("=================== Submit with Bundle ===================");

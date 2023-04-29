@@ -222,7 +222,6 @@
   "event": {
     "id": "e0a1ec02-4de5-4e5f-9938-a5e107469650",
     "created_on": "2022-08-21T10:45:34.475878Z",
-    "updated_on": "2022-08-21T10:45:34.475894Z",
     "event_name": "string",
     "inputs": {},
     "transaction": "69b95637-d455-41b5-a35f-4ad29da6c340"

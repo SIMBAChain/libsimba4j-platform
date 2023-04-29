@@ -196,20 +196,21 @@ public class Query {
         }
     }
 
-    public static class IEx extends Param<String> {
-
-        public IEx(String name, String value) {
-            super(name, value);
-        }
-
-        public String toString() {
-            return asString("_iexact");
-        }
-
-        public String toJsonApiString() {
-            return asJsonApiString(".iexact");
-        }
-    }
+//    public static class IEx extends Param<String> {
+//
+//        public IEx(String name, String value) {
+//            super(name, value);
+//        }
+//
+//        public String toString() {
+//            return asString("_iexact");
+//        }
+//
+//        public String toJsonApiString() {
+//            return asJsonApiString(".iexact");
+//        }
+//    }
+    
     public static class IContains extends Param<String> {
 
         public IContains(String name, String value) {
@@ -303,10 +304,10 @@ public class Query {
             return this;
         }
 
-        public Params iex(String name, String value) {
-            params.add(new IEx(name, value));
-            return this;
-        }
+//        public Params iex(String name, String value) {
+//            params.add(new IEx(name, value));
+//            return this;
+//        }
 
         public Params icontains(String name, String value) {
             params.add(new IContains(name, value));
@@ -413,11 +414,11 @@ public class Query {
         return p;
     }
 
-    public static Params iex(String name, String value) {
-        Params p = new Params();
-        p.iex(name, value);
-        return p;
-    }
+//    public static Params iex(String name, String value) {
+//        Params p = new Params();
+//        p.iex(name, value);
+//        return p;
+//    }
 
     public static Params icontains(String name, String value) {
         Params p = new Params();

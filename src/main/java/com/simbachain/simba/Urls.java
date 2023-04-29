@@ -65,7 +65,7 @@ public class Urls {
     public enum PathName {
         WHOAMI, WALLET, APPLICATIONS, TXN_COUNT, ADDRESS_TXN_COUNT, CONTRACT_DESIGNS,
         CONTRACT_ARTIFACTS, CONTRACT_ARTIFACT, DEPLOYED_CONTRACTS, DEPLOYED_CONTRACT,
-        BLOCKCHAINS, STORAGES, ORG_TXNS, ORG_TXN, APP_TXNS, APP_TXN, DEPLOY,
+        BLOCKCHAINS, STORAGES, ORG_TXNS, ORG_TXN, APP_TXNS, APP_TXN, DEPLOY, CONTRACT_EVENTS,
         CONTRACT_API, CONTRACT_METHOD, CONTRACT_METHOD_SYNC, BUNDLE_MANIFEST, BUNDLE, BUNDLE_FILE,
         BALANCE, ADDRESS_BALANCE, FUND
     }
@@ -102,6 +102,8 @@ public class Urls {
                                                  "v2/apps/%s/contract/%s/info/"},
                                                 {PathName.CONTRACT_METHOD,
                                                  "v2/apps/%s/contract/%s/%s/"},
+                                                {PathName.CONTRACT_EVENTS,
+                                                 "v2/apps/%s/contract/%s/events/%s/"},
                                                 {PathName.CONTRACT_METHOD_SYNC,
                                                  "v2/apps/%s/sync/contract/%s/%s/"},
                                                 {PathName.BUNDLE,

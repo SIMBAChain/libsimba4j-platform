@@ -106,6 +106,7 @@ public class MockClient {
         patterns.put("MANIFEST", Pattern.compile(".*/v2/apps/[\\w-]+/contract/[\\w-]+/bundle/[\\w-]+/manifest/$"));
         patterns.put("BUNDLE_FILE", Pattern.compile(".*/v2/apps/[\\w-]+/contract/[\\w-]+/bundle/666/filename/Message/$"));
         patterns.put("HEADERS", Pattern.compile(".*/v2/apps/my-app/contract/supply-headers/supply/$"));
+        patterns.put("CONTRACT_EVENTS", Pattern.compile(".*/v2/apps/[\\w-]+/contract/[\\w-]+/events/[\\w-]+/$"));
         
         return patterns;
     }
@@ -225,6 +226,10 @@ public class MockClient {
         clientMock.onGet()
                   .withPath(matchesPattern(this.patterns.get("CONTRACT")))
                   .doReturnJSON(this.makeObject("deployed_contract"));
+
+        clientMock.onGet()
+                  .withPath(matchesPattern(this.patterns.get("CONTRACT_EVENTS")))
+                  .doReturnJSON(this.makeResults("event"));
 
         clientMock.onGet()
                   .withPath(matchesPattern(this.patterns.get("CONTRACT_METADATA")))

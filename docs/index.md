@@ -294,6 +294,13 @@ CallResponse ret=contractService.callMethod("supply", supplyData);
 System.out.println("Got back response: " + ret);
 ```
 
+To wait for a transaction to complete, retrieve a future object using the transaction id:
+
+```java
+Future<Transaction> transactionFuture = contractService.waitForTransactionCompletion(ret.getRequestIdentitier());
+Transaction result = transactionFuture.get();
+```
+
 This is invoking a contract method defined as:
 
 ```javascript
@@ -324,7 +331,8 @@ CallReturn<String> getterResponse = contractService.callGetter("getSupplier", St
 System.out.println("getter response: " + getterResponse.getReturnValue());
 ```
               
-For methods that do create transactions, you can query for them and select a subset of fields to return:
+For methods that do create transactions, you can query for them using filters
+and select a subset of fields to return:
 
 ```java
 List<String> fields = new ArrayList<>();
@@ -390,6 +398,19 @@ contractService.getBundleFileForTransaction(bundleHash, "ConformanceReport.pdf",
 
 Manifest manifest = contractService.getBundleMetadataForTransaction(bundleHash);
 System.out.println("Manifest: " + manifest);
+```
+    
+## Retrieving Contract Events
+
+To query for events emitted by a contract, call the `getTransactionEvents` method of the
+contract service. This can include query parameters:
+
+```java
+PagedResult<TransactionEvent> eventResults = contractService.getTransactionEvents("SupplyEvent", Query.icontains("inputs.supplier", "supplier3.32"));
+List<? extends TransactionEvent> evts = eventResults.getResults();
+for (TransactionEvent evt : evts) {
+    System.out.println(String.format("returned transaction event: %s", evt));
+}
 ```
 
 ## Client Side Signing Transactions

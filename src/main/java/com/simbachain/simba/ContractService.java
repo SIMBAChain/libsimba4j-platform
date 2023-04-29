@@ -141,7 +141,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     @Override
     public com.simbachain.simba.Transaction getTransaction(String txnId) throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.getTransaction: " + "txnId = [" + txnId + "]");
+            log.debug("ENTER: ContractService.getTransaction: " + "txnId = [" + txnId + "]");
         }
         String endpoint = Urls.url(getEndpoint(), Urls.PathName.ORG_TXN,
             getConfig().getOrganisationId(), txnId);
@@ -157,7 +157,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
 
     public <R> CallReturn<R> callGetter(String method, Class<R> cls) throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.callGetter: " + "method = [" + method + "]");
+            log.debug("ENTER: ContractService.callGetter: " + "method = [" + method + "]");
         }
         String endpoint = Urls.url(getEndpoint(), Urls.PathName.CONTRACT_METHOD,
             getConfig().getAppName(), getContract(), method);
@@ -169,7 +169,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         methodResponse.setStatus(data.getState());
         methodResponse.setError(data.getError());
         if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.callGetter: returning " + methodResponse);
+            log.debug("EXIT: ContractService.callGetter: returning " + methodResponse);
         }
         return methodResponse;
     }
@@ -177,7 +177,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     public <R> CallReturn<R> callGetter(String method, Class<R> cls, JsonData params)
         throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.callGetter: " + "method = [" + method + "]");
+            log.debug("ENTER: ContractService.callGetter: " + "method = [" + method + "]");
         }
         String endpoint = Urls.url(getEndpoint(), Urls.PathName.CONTRACT_METHOD,
             asQueryParameters(params), getConfig().getAppName(), getContract(), method);
@@ -189,7 +189,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         methodResponse.setStatus(data.getState());
         methodResponse.setError(data.getError());
         if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.callGetter: returning " + methodResponse);
+            log.debug("EXIT: ContractService.callGetter: returning " + methodResponse);
         }
         return methodResponse;
     }
@@ -295,7 +295,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
                                     .toString());
         methodResponse.setError(txn.getError());
         if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.callMethod: returning " + methodResponse);
+            log.debug("EXIT: ContractService.callMethod: returning " + methodResponse);
         }
         return methodResponse;
     }
@@ -307,7 +307,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         UploadFile... files) throws SimbaException {
         if (log.isDebugEnabled()) {
             Object f = files.length == 0 ? "" : Arrays.asList(files);
-            log.debug("ENTER: SimbaPlatform.callMethod: "
+            log.debug("ENTER: ContractService.callMethod: "
                 + "method = ["
                 + method
                 + "], parameters = ["
@@ -342,7 +342,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
                                         .toString());
             methodResponse.setError(txn.getError());
             if (log.isDebugEnabled()) {
-                log.debug("EXIT: SimbaPlatform.callMethod: returning " + methodResponse);
+                log.debug("EXIT: ContractService.callMethod: returning " + methodResponse);
             }
             return methodResponse;
         }
@@ -355,7 +355,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         UploadFile... files) throws SimbaException {
         if (log.isDebugEnabled()) {
             Object f = files.length == 0 ? "" : Arrays.asList(files);
-            log.debug("ENTER: SimbaPlatform.callMethodSync: "
+            log.debug("ENTER: ContractService.callMethodSync: "
                 + "method = ["
                 + method
                 + "], parameters = ["
@@ -390,7 +390,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
                                         .toString());
             methodResponse.setError(txn.getError());
             if (log.isDebugEnabled()) {
-                log.debug("EXIT: SimbaPlatform.callMethodSync: returning " + methodResponse);
+                log.debug("EXIT: ContractService.callMethodSync: returning " + methodResponse);
             }
             return methodResponse;
         }
@@ -399,7 +399,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     @Override
     public Manifest getBundleMetadataForTransaction(String bundleHash) throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.getBundleMetadataForTransaction: "
+            log.debug("ENTER: ContractService.getBundleMetadataForTransaction: "
                 + "bundleHash = ["
                 + bundleHash
                 + "]");
@@ -410,7 +410,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         }));
         m.setHash(bundleHash);
         if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.getBundleMetadataForTransaction: returning " + m);
+            log.debug("EXIT: ContractService.getBundleMetadataForTransaction: returning " + m);
         }
         return m;
     }
@@ -433,7 +433,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     public long getBundleForTransaction(String bundleHash, OutputStream outputStream, boolean close)
         throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.getBundleForTransaction: "
+            log.debug("ENTER: ContractService.getBundleForTransaction: "
                 + "bundleHash = ["
                 + bundleHash
                 + "], outputStream = ["
@@ -453,7 +453,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         OutputStream outputStream,
         boolean close) throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.getBundleFileForTransaction: "
+            log.debug("ENTER: ContractService.getBundleFileForTransaction: "
                 + "bundleHash = ["
                 + bundleHash
                 + "], fileName = ["
@@ -468,6 +468,55 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
             getConfig().getAppName(), getContract(), bundleHash, fileName);
         return get(endpoint, streamResponseHandler(outputStream, close));
     }
+    
+    public PagedResult<TransactionEvent> getTransactionEvents(String eventName, Query.Params params)
+        throws SimbaException {
+        if (log.isDebugEnabled()) {
+            log.debug("ENTER: ContractService.getTransactionEvents: "
+                + "eventName = ["
+                + eventName
+                + "], params = ["
+                + params
+                + "]");
+        }
+        String endpoint = Urls.url(getEndpoint(), Urls.PathName.CONTRACT_EVENTS, params,
+            getConfig().getAppName(), getContract(), eventName);
+        PagedResult<TransactionEvent> result = this.get(endpoint,
+            jsonResponseHandler(new TypeReference<PagedResult<TransactionEvent>>() {
+            }));
+        if (log.isDebugEnabled()) {
+            log.debug("EXIT: ContractService.getTransactionEvents: returning " + result);
+        }
+        return result;
+    }
+    
+    public PagedResult<TransactionEvent> nextEvents(PagedResult<com.simbachain.simba.Transaction> results)
+        throws SimbaException {
+        if (results.getNext() == null) {
+            return null;
+        }
+        PagedResult<TransactionEvent> result = this.get(results.getNext(),
+            jsonResponseHandler(new TypeReference<PagedResult<TransactionEvent>>() {
+            }));
+        if (log.isDebugEnabled()) {
+            log.debug("EXIT: ContractService.nextEvents: returning " + result);
+        }
+        return result;
+    }
+    
+    public PagedResult<TransactionEvent> previousEvents(PagedResult<com.simbachain.simba.Transaction> results)
+        throws SimbaException {
+        if (results.getPrevious() == null) {
+            return null;
+        }
+        PagedResult<TransactionEvent> result = this.get(results.getPrevious(),
+            jsonResponseHandler(new TypeReference<PagedResult<TransactionEvent>>() {
+            }));
+        if (log.isDebugEnabled()) {
+            log.debug("EXIT: ContractService.previousEvents: returning " + result);
+        }
+        return result;
+    }
 
     @Override
     public PagedResult<Transaction> getTransactions() throws SimbaException {
@@ -479,7 +528,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
             jsonResponseHandler(new TypeReference<PagedResult<Transaction>>() {
             }));
         if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.getTransactions: returning " + result);
+            log.debug("EXIT: ContractService.getTransactions: returning " + result);
         }
         return result;
     }
@@ -488,7 +537,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
     public PagedResult<Transaction> getTransactions(String method, Query.Params params)
         throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.getTransactions: "
+            log.debug("ENTER: ContractService.getTransactions: "
                 + "method = ["
                 + method
                 + "], params = ["
@@ -503,7 +552,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
             jsonResponseHandler(new TypeReference<PagedResult<Transaction>>() {
             }));
         if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.getTransactions: returning " + result);
+            log.debug("EXIT: ContractService.getTransactions: returning " + result);
         }
         return result;
     }
@@ -538,7 +587,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         Query.Params params,
         List<String> fields) throws SimbaException {
         if (log.isDebugEnabled()) {
-            log.debug("ENTER: SimbaPlatform.getTransactions: "
+            log.debug("ENTER: ContractService.getTransactions: "
                 + "method = ["
                 + method
                 + "], params = ["
@@ -554,7 +603,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
             jsonResponseHandler(new TypeReference<PagedResult<Transaction>>() {
             }));
         if (log.isDebugEnabled()) {
-            log.debug("EXIT: SimbaPlatform.getTransactions: returning " + result);
+            log.debug("EXIT: ContractService.getTransactions: returning " + result);
         }
         return result;
     }

@@ -25,7 +25,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.simbachain</groupId>
 	<artifactId>libsimba4j-platform</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3</version>
     <name>LibSimba4J Blocks Platform</name>
     <description>Java Client for SIMBA Chain Blocks Platform</description>
     <url>https://simbachain.github.io/libsimba4j/</url>
