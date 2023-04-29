@@ -431,6 +431,26 @@ CallResponse signedRet = ssContractService.callMethod("supply", ssSupplyData, he
 Libsimba4J will map the stored wallets against the value in the header to select the chosen wallet.
 
 
+## Available HTTP Headers
+
+As described above, the `txn-sender` header can be used to change the server behaviour to not
+attempt server side signing using a custodial wallet. The following headers are
+available for use with transactions. These are all defined in the  `ContractService.Headers` enum.
+
+* `HTTP_HEADER_SENDER("txn-sender")` - specify an address to perform client side signing.
+* `HTTP_HEADER_NONCE("txn-nonce")` - specify the nonce to use in the transaction.
+* `HTTP_HEADER_DELEGATE("txn-delegate")` - specify a custodial wallet to use via it's alias. This header
+  can also be used with creating or setting a wallet. When this is done, the alias is applied to
+  the wallet. This allows different custodial wallets to be used by a single Blocks user. *NOTE: This
+  API will be simplified and made more flexible and the current API will be deprecated.** 
+* `HTTP_HEADER_VALUE("txn-value")` - apply a value to a transaction, for example when calling
+  a payable contract method.
+* `HTTP_HEADER_RUNLOCAL("txn-force-run-local")` - force the server to run the transaction locally
+  first. By default this is happens anyway, so this header will be deprecated.
+* `HTTP_HEADER_SENDER_TOKEN("txn-sender-token")` - Used for external service transaction signing. Currently
+  this is not used.
+
+
 ## Generated Classes
 
 Using the `ContractService` you can also ask it to generate source code for you to simplify contract
