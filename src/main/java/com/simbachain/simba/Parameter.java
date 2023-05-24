@@ -37,6 +37,8 @@ public class Parameter {
     private String defaultValue;
     @JsonProperty ("simba_type")
     private String simbaType;
+    @JsonProperty ("enum")
+    private String enumType;
 
     public String getName() {
         return name;
@@ -70,9 +72,17 @@ public class Parameter {
         this.simbaType = simbaType;
     }
 
+    public String getEnumType() {
+        return enumType;
+    }
+
+    public void setEnumType(String enumType) {
+        this.enumType = enumType;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Param{");
+        final StringBuilder sb = new StringBuilder("Parameter{");
         sb.append("name='")
           .append(name)
           .append('\'');
@@ -84,6 +94,9 @@ public class Parameter {
           .append('\'');
         sb.append(", simbaType='")
           .append(simbaType)
+          .append('\'');
+        sb.append(", enumType='")
+          .append(enumType)
           .append('\'');
         sb.append('}');
         return sb.toString();
