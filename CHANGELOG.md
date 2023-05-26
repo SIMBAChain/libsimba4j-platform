@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.4](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.3...v1.0.4) (2023-06-24)
+
+### Fixes
+
+* Fix unknown field `enum` in Parameter for solidity enums.
+
 ## [1.0.3](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.2...v1.0.3) (2023-04-29)
 
 ### Features
