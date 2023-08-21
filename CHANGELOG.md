@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.6](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.5...v1.0.6) (2023-08-21)
+
+### Features
+
+* Use HttpClients.createSystem() to load System.properties in http client factory
+
 ## [1.0.5](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.4...v1.0.5) (2023-08-21)
 
 ### Fixes

@@ -37,7 +37,7 @@ public class HttpClientFactory {
     }
     
     protected CloseableHttpClient loadClient() {
-        return HttpClients.createDefault();
+        return HttpClients.createSystem();
     }
     
 
