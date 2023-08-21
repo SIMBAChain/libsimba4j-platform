@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.4...v1.0.5) (2023-08-21)
+
+### Fixes
+
+* Fix file upload file names not being captured.
+
+
 ## [1.0.4](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.3...v1.0.4) (2023-06-24)
 
 ### Fixes

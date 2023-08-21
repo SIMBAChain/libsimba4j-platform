@@ -467,9 +467,16 @@ public abstract class SimbaClient {
                 builder.addTextBody(key, d.toString());
 
             }
+            Map<String, String> names = new HashMap<>();
             for (int i = 0; i < files.length; i++) {
                 UploadFile file = files[i];
-                builder.addBinaryBody(String.format("file_%s", i), file.getFile(),
+                String name = file.getName(); 
+                if(names.get(name) != null) {
+                    name = String.format("%s_%s", i, name);
+                } else {
+                    names.put(name, name);
+                }
+                builder.addBinaryBody(name, file.getFile(),
                     ContentType.create(file.getMimeType()), file.getName());
             }
             return builder.build();
