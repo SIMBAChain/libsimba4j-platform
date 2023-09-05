@@ -66,15 +66,15 @@ public class SimbaConfigFile {
     }
 
     private File findFile(String root) {
-        File f = new File(String.join(File.pathSeparator, root, ENV_DOT_FILENAME));
+        File f = new File(String.join(File.separator, root, ENV_DOT_FILENAME));
         if (f.exists()) {
             return f;
         }
-        f = new File(String.join(File.pathSeparator, root, ENV_FILENAME));
+        f = new File(String.join(File.separator, root, ENV_FILENAME));
         if (f.exists()) {
             return f;
         }
-        f = new File(String.join(File.pathSeparator, root, ENV_DEFAULT));
+        f = new File(String.join(File.separator, root, ENV_DEFAULT));
         if (f.exists()) {
             return f;
         }
