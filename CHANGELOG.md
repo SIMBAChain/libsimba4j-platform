@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.8](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.7...v1.0.8) (2023-09-06)
+
+### Fix
+
+* Finding config files using incorrect separator constant.  
+
 ## [1.0.7](https://github.com/SIMBAChain/libsimba4j-platform/compare/v1.0.6...v1.0.7) (2023-08-22)
 
 ### Fix
