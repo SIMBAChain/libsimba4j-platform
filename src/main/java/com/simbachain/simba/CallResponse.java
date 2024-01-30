@@ -32,18 +32,18 @@ package com.simbachain.simba;
  */
 public class CallResponse {
 
-    private final String requestIdentitier;
+    private final String requestIdentifier;
 
     private String status;
 
     private String error;
 
     public CallResponse(String requestIdentitier) {
-        this.requestIdentitier = requestIdentitier;
+        this.requestIdentifier = requestIdentitier;
     }
 
-    public String getRequestIdentitier() {
-        return requestIdentitier;
+    public String getRequestIdentifier() {
+        return requestIdentifier;
     }
 
     public String getStatus() {
@@ -65,8 +65,8 @@ public class CallResponse {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("CallResponse{");
-        sb.append("requestIdentitier='")
-          .append(requestIdentitier)
+        sb.append("requestIdentifier='")
+          .append(requestIdentifier)
           .append('\'');
         sb.append(", status='")
           .append(status)
