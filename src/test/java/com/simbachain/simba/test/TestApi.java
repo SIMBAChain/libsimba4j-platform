@@ -269,7 +269,7 @@ public class TestApi {
         CallResponse bundleCall = contractService.callMethod("nonConformance", nonConformanceData,
             headers, uploadFile);
         System.out.println("Got back response: " + bundleCall);
-        Future<Transaction> ftxn = contractService.waitForTransactionCompletion(bundleCall.getRequestIdentitier());
+        Future<Transaction> ftxn = contractService.waitForTransactionCompletion(bundleCall.getRequestIdentifier());
         Transaction txn = ftxn.get();
         System.out.println(txn);
         Map<String, Object> inputs = txn.getInputs();
