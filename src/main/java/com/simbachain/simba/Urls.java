@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 SIMBA Chain Inc.
+ * Copyright (c) 2025 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ public class Urls {
         BALANCE, ADDRESS_BALANCE, FUND
     }
 
-    private static final Object[][] urlPaths = {{PathName.WHOAMI, "user/whoami/"},
+    private static final Object[][] urlPaths = {{PathName.WHOAMI, "user_accounts/whoami/"},
                                                 {PathName.WALLET, "user/wallet/"},
                                                 {PathName.TXN_COUNT, "user/transactions/%s/count/"},
                                                 {PathName.ADDRESS_TXN_COUNT,
@@ -103,7 +103,7 @@ public class Urls {
                                                 {PathName.CONTRACT_METHOD,
                                                  "v2/apps/%s/contract/%s/%s/"},
                                                 {PathName.CONTRACT_EVENTS,
-                                                 "v2/apps/%s/contract/%s/events/%s/"},
+                                                 "v2/apps/%s/contract/%s/events/"},
                                                 {PathName.CONTRACT_METHOD_SYNC,
                                                  "v2/apps/%s/sync/contract/%s/%s/"},
                                                 {PathName.BUNDLE,

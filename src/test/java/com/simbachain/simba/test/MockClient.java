@@ -81,8 +81,8 @@ public class MockClient {
 
     public Map<String, Pattern> getPatterns() {
         Map<String, Pattern> patterns = new HashMap<>();
-        patterns.put("LOGIN", Pattern.compile(".*/o/token.*"));
-        patterns.put("ME", Pattern.compile("/user/whoami/"));
+        patterns.put("LOGIN", Pattern.compile(".*/oauth/token.*"));
+        patterns.put("ME", Pattern.compile("/user_accounts/whoami/"));
         patterns.put("WALLET", Pattern.compile("/user/wallet/"));
         patterns.put("ORG", Pattern.compile(".*/v2/organisations/[\\w-]+/$"));
         patterns.put("BALANCE", Pattern.compile(".*/user/account/[\\w-]+/balance/$"));

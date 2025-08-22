@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 SIMBA Chain Inc.
+ * Copyright (c) 2025 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -341,6 +341,15 @@ public class Query {
 
         public List<Param<?>> getParams() {
             return params;
+        }
+        
+        public boolean containsParam(String name, Object value) {
+            for (Param<?> param : params) {
+                if (param.getName().equals(name) && param.getValue().equals(value)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public String toString() {

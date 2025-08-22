@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 SIMBA Chain Inc.
+ * Copyright (c) 2025 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -567,6 +568,52 @@ public abstract class SimbaClient {
         ResponseHandler<R> handler,
         UploadFile... files) throws SimbaException {
         return post(endpoint, data.asMap(), handler, new HashMap<>(), files);
+    }
+    
+    protected <R> R patch(String endpoint,
+        Map<String, Object> data,
+        ResponseHandler<R> handler,
+        Map<String, String> clientHeaders) throws SimbaException {
+        if (log.isDebugEnabled()) {
+            log.debug("ENTER: Simba.patch: "
+                + "endpoint = ["
+                + endpoint
+                + "], data = ["
+                + data
+                + "], handler = ["
+                + handler
+                + "]");
+        }
+
+        HttpPatch httpPatch = new HttpPatch(endpoint);
+        httpPatch.setEntity(createEntity(data));
+        Map<String, String> headers = getApiHeaders();
+        if (headers != null) {
+            for (String s : headers.keySet()) {
+                httpPatch.setHeader(s, headers.get(s));
+            }
+        }
+        if (clientHeaders != null) {
+            for (String s : clientHeaders.keySet()) {
+                httpPatch.setHeader(s, clientHeaders.get(s));
+            }
+        }
+        try {
+            return this.client.execute(httpPatch, handler);
+        } catch (Exception e) {
+            throw getException("POST", e);
+        }
+    }
+
+    protected <R> R patch(String endpoint, Map<String, Object> data, ResponseHandler<R> handler)
+        throws SimbaException {
+        return patch(endpoint, data, handler, new HashMap<>());
+    }
+
+    protected <R> R patch(String endpoint,
+        JsonData data,
+        ResponseHandler<R> handler) throws SimbaException {
+        return patch(endpoint, data.asMap(), handler, new HashMap<>());
     }
 
     protected <R> R get(String endpoint, ResponseHandler<R> handler) throws SimbaException {

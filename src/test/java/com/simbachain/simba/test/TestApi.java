@@ -37,8 +37,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.simbachain.auth.blocks.BlocksConfig;
-import com.simbachain.simba.Balance;
+import com.simbachain.auth.plat.PlatConfig;
 import com.simbachain.simba.CallResponse;
 import com.simbachain.simba.CallReturn;
 import com.simbachain.simba.ContractService;
@@ -53,7 +52,6 @@ import com.simbachain.simba.TransactionEvent;
 import com.simbachain.simba.management.Application;
 import com.simbachain.simba.management.AuthenticatedUser;
 import com.simbachain.simba.management.Blockchain;
-import com.simbachain.simba.management.BlockchainIdentities;
 import com.simbachain.simba.management.CompilationSpec;
 import com.simbachain.simba.management.ContractArtifact;
 import com.simbachain.simba.management.ContractDesign;
@@ -83,7 +81,7 @@ public class TestApi {
         }
     }
 
-    private static BlocksConfig config;
+    private static PlatConfig config;
     private static String host;
     private static String org;
     
@@ -92,28 +90,17 @@ public class TestApi {
         String clientId = "foo";
         String clientSecret = "bar";
         String authHost = "https://localhost";
-        config = new BlocksConfig(new MockFactory(), clientId, clientSecret, authHost);
+        config = new PlatConfig(new MockFactory(), clientId, clientSecret, authHost);
         host = "https://localhost";
         org = "libsimba";
     }
     
     @Test
-    public void testAuthenticatedUser() throws IOException, ExecutionException, InterruptedException {
+    public void testAuthenticatedUser() throws IOException {
         // whoami
         System.out.println("=================== whoami ===================");
         AuthenticatedUser user = new AuthenticatedUser(host, config);
         System.out.println("Authenticated user: " + user.whoami());
-        Balance balance = user.getBalance("Quorum");
-        System.out.println("balance: " + balance);
-        // wallets
-        System.out.println("=================== List Wallets ===================");
-        BlockchainIdentities identities = user.getIdentities();
-        System.out.println("wallet: " + identities.getWallet());
-        List<BlockchainIdentities.Identity> idents = identities.getWallet()
-                                                               .getIdentities("ethereum", "Quorum");
-        for (BlockchainIdentities.Identity ident : idents) {
-            System.out.println("balance for " + ident + " is " + user.getBalance("Quorum"));
-        }
     }
 
     @Test

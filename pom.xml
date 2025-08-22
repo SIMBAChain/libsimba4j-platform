@@ -25,7 +25,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.simbachain</groupId>
 	<artifactId>libsimba4j-platform</artifactId>
-	<version>1.0.9-SNAPSHOT</version>
+	<version>1.0.10-SNAPSHOT</version>
     <name>LibSimba4J Blocks Platform</name>
     <description>Java Client for SIMBA Chain Blocks Platform</description>
     <url>https://simbachain.github.io/libsimba4j-platform</url>
@@ -45,8 +45,8 @@
     </scm>
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>sonatype</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
     
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
-            <version>2.3</version>
+            <version>2.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.75</version>
+            <version>1.78</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -99,7 +99,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.14.2</version>
+            <version>2.19.2</version>
         </dependency>
         <dependency>
             <groupId>io.github.cdimascio</groupId>
@@ -166,6 +166,18 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>net.ju-n.maven.plugins</groupId>
+                <artifactId>checksum-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>artifacts</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.2.1</version>
@@ -206,14 +218,13 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.8</version>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <publishingServerId>central</publishingServerId>
+                    <checksums>required</checksums>
                 </configuration>
             </plugin>
         </plugins>

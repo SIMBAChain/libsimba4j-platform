@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 SIMBA Chain Inc.
+ * Copyright (c) 2025 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ import java.util.Map;
 import com.simbachain.SimbaException;
 import com.simbachain.auth.AccessToken;
 import com.simbachain.auth.AuthConfig;
-import com.simbachain.simba.Balance;
 import com.simbachain.simba.SimbaClient;
 import com.simbachain.simba.Urls;
 
@@ -58,14 +57,5 @@ public class AuthenticatedUser extends SimbaClient {
         return this.get(Urls.url(getEndpoint(), Urls.PathName.WHOAMI),
             jsonResponseHandler(User.class));
     }
-
-    public Balance getBalance(String blockchain) throws SimbaException {
-        return this.get(Urls.url(getEndpoint(), Urls.PathName.BALANCE, blockchain),
-            jsonResponseHandler(Balance.class));
-    }
-
-    public BlockchainIdentities getIdentities() throws SimbaException {
-        return this.get(Urls.url(getEndpoint(), Urls.PathName.WALLET),
-            jsonResponseHandler(BlockchainIdentities.class));
-    }
+    
 }

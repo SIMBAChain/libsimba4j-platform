@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 SIMBA Chain Inc.
+ * Copyright (c) 2025 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,75 +22,39 @@
 
 package com.simbachain.simba.management;
 
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A Blockchain object.
+ * A User object.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
     @JsonProperty
-    private String username;
+    private String id;
 
-    @JsonProperty ("first_name")
-    private String firstName;
 
-    @JsonProperty ("last_name")
-    private String lastName;
-
-    @JsonProperty ("onboarding_complete")
-    private String onboardingComplete;
-
-    @JsonProperty ("default_organisation")
-    private String defaultOrganisation;
-
-    @JsonProperty ("permissions")
-    private Map<String, Map<String, String>> permissions;
-
-    @JsonProperty
-    private Boolean admin;
-
+    @JsonProperty ("simba_id")
+    private String simbaId;
+    
     @JsonProperty
     private String email;
 
-    @JsonProperty ("organisations")
-    private List<Organisation> organisations;
-
-    public String getUsername() {
-        return username;
+    public String getId() {
+        return id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getSimbaId() {
+        return simbaId;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Boolean getAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(Boolean admin) {
-        this.admin = admin;
+    public void setSimbaId(String simbaId) {
+        this.simbaId = simbaId;
     }
 
     public String getEmail() {
@@ -101,33 +65,18 @@ public class User {
         this.email = email;
     }
 
-    public List<Organisation> getOrganisations() {
-        return organisations;
-    }
-
-    public void setOrganisations(List<Organisation> organisations) {
-        this.organisations = organisations;
-    }
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
-        sb.append("username='")
-          .append(username)
+        sb.append("id='")
+          .append(id)
           .append('\'');
-        sb.append(", firstName='")
-          .append(firstName)
-          .append('\'');
-        sb.append(", lastName='")
-          .append(lastName)
-          .append('\'');
-        sb.append(", admin=")
-          .append(admin);
         sb.append(", email='")
           .append(email)
           .append('\'');
-        sb.append(", organisations=")
-          .append(organisations);
+        sb.append(", simbaId='")
+          .append(simbaId)
+          .append('\'');
         sb.append('}');
         return sb.toString();
     }

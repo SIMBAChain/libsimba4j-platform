@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 SIMBA Chain Inc.
+ * Copyright (c) 2025 SIMBA Chain Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -287,7 +287,7 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
         }
         String endpoint = Urls.url(getEndpoint(), Urls.PathName.APP_TXN, getConfig().getAppName(),
             transactionId);
-        Transaction txn = this.post(endpoint, JsonData.with("transaction", signedTransaction),
+        Transaction txn = this.patch(endpoint, JsonData.with("transaction", signedTransaction),
             jsonResponseHandler(new TypeReference<Transaction>() {
             }));
         CallResponse methodResponse = new CallResponse(txn.getId());
@@ -478,6 +478,9 @@ public class ContractService extends Simba<AppConfig> implements FieldFiltered {
                 + "], params = ["
                 + params
                 + "]");
+        }
+        if (!params.containsParam("event_name", eventName)) {
+            params = params.ex("event_name", eventName);
         }
         String endpoint = Urls.url(getEndpoint(), Urls.PathName.CONTRACT_EVENTS, params,
             getConfig().getAppName(), getContract(), eventName);

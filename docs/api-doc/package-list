@@ -3,6 +3,7 @@ com.simbachain.auth
 com.simbachain.auth.blocks
 com.simbachain.auth.keycloak
 com.simbachain.auth.local
+com.simbachain.auth.plat
 com.simbachain.simba
 com.simbachain.simba.gen
 com.simbachain.simba.management
